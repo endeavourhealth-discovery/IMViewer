@@ -117,6 +117,18 @@
                 </mat-option>
               </mat-select>
             </mat-form-field>
+
+            <!-- type filter -->
+            <mat-form-field appearance="outline" fxFlex="100">
+              <mat-label>Type</mat-label>
+              <mat-select multiple [(ngModel)]="searchOptions.typeSelections"
+                (selectionChange)="searchOptions.onTypeChange()">
+                <mat-option *ngFor="let typeOption of searchOptions.typeOptions"
+                  [value]="typeOption.iri">
+                  {{typeOption.name}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
           </div>
         </div>
       </div>

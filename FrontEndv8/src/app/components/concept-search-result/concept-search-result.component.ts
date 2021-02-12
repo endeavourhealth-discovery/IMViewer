@@ -16,6 +16,7 @@ class ConceptSearchOptions {
 
   codeSchemeSelections: ConceptReference[];
   conceptStatusSelections: string[];
+  typeSelections: string[];
   sortBySelection: string;
   resultCount: number;
 
@@ -23,12 +24,14 @@ class ConceptSearchOptions {
 
   constructor(private _searchRequest: SearchRequest,
               public conceptStatusOptions: string[],
+              public typeOptions: ConceptReference[],
               public codeSchemeOptions: ConceptReference[],
               public sortByOptions: string[]) {
     this.searchRequest = new Subject();
 
     this.conceptStatusSelections = _searchRequest.statuses.map(status => { return ConceptStatus[status] } );
     this.codeSchemeSelections = _searchRequest.codeSchemes;
+    this.typeSelections = _searchRequest.types;
     this.sortBySelection = SortBy[_searchRequest.sortBy]
     this.resultCount = _searchRequest.size;
   }
@@ -37,6 +40,12 @@ class ConceptSearchOptions {
   onConceptStatusChange() {
     const selected: ConceptStatus[] = this.conceptStatusSelections.map(selectedName => { return ConceptStatus[selectedName] });
     this._searchRequest.statuses = selected;
+
+    this.onChangeSearchRequest()
+  }
+
+  onTypeChange() {
+    this._searchRequest.types = this.typeSelections;
 
     this.onChangeSearchRequest()
   }
@@ -239,8 +248,16 @@ export class ConceptSearchResultComponent implements OnInit  {
     this.codeSchemes.codeSchemes.subscribe(
       (result) => {
         const conceptStatusOptions: string[] = Object.keys(ConceptStatus).filter(f => isNaN(Number(f)));
+
+        const typeOptions: ConceptReference[] = [
+          { iri: ":SemanticConcept", name: "Semantic concept" },
+          { iri: ":DiscoveryCommonDataModel", name: "Data model" },
+          { iri: ":VSET_ValueSet", name: "Value set" },
+          { iri: ":DSET_DataSet", name: "Data set" },
+          { iri: ":MAP_Map", name: "Map" }
+        ]
         const sortByOptions: string[] = Object.keys(SortBy).filter(f => isNaN(Number(f)));
-        searchOptionsObservable.next(new ConceptSearchOptions(searchRequest, conceptStatusOptions, result, sortByOptions));
+        searchOptionsObservable.next(new ConceptSearchOptions(searchRequest, conceptStatusOptions, typeOptions, result, sortByOptions));
       },
       (error) => {
         this.log.error(`Error - unable to get a list of code schemes. Cause ${error}`);
