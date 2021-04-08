@@ -70,6 +70,7 @@ export default class Graph extends Vue {
 
   zoomReset() {
     this.panZoom.resetZoom();
+    this.panZoom.resetPan();
   }
 
   zoomOut() {
