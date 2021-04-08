@@ -101,13 +101,13 @@ import AuthService from "@/services/AuthService";
   watch: {
     passwordNew1: {
       immediate: true,
-      handler(newValue, oldValue) {
+      handler(newValue) {
         this.passwordStrength = checkPasswordStrength(newValue);
       }
     },
     passwordNew2: {
       immediate: true,
-      handler(newValue, oldValue) {
+      handler(newValue) {
         this.passwordsMatch = verifyPasswordsMatch(this.passwordNew1, newValue);
       }
     }

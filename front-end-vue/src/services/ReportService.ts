@@ -1,5 +1,4 @@
 import axios from "axios";
-import { SimpleCount } from "@/models/reports/SimpleCount";
 
 export default class ReportService {
   static api = process.env.VUE_APP_API;

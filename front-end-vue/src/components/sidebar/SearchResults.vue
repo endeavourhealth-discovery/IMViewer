@@ -96,7 +96,7 @@ import { mapState } from "vuex";
   components: {},
   computed: mapState(["searchResults"]),
   watch: {
-    searchResults(newValue, oldValue) {
+    searchResults(newValue) {
       this.results = newValue;
     }
   }

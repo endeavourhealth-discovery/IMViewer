@@ -10,7 +10,6 @@
 <script>
 import { Options, Vue } from "vue-class-component";
 import ButtonBar from "@/components/user/ButtonBar.vue";
-import store from "@/store/index";
 
 @Options({
   name: "User",

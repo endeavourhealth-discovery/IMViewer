@@ -44,7 +44,6 @@
 </template>
 
 <script lang="ts">
-import { ConceptType } from "@/models/search/ConceptType";
 import { Options, Vue } from "vue-class-component";
 
 @Options({

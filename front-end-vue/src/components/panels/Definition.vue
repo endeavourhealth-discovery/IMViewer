@@ -15,7 +15,7 @@ import {
   components: {},
   props: ["definition"],
   watch: {
-    async definition(newValue, oldValue) {
+    async definition() {
       const model = monaco.editor.getModels()[0];
       model.setValue(this.filteredDefinition);
     }

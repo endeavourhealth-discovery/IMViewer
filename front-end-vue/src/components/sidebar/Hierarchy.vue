@@ -13,7 +13,6 @@
 
 <script lang="ts">
 import { HistoryItem } from "@/models/HistoryItem";
-import { RouteRecordName } from "node_modules/vue-router/dist/vue-router";
 import { Options, Vue } from "vue-class-component";
 import { mapState } from "vuex";
 import ConceptService from "@/services/ConceptService";
@@ -34,7 +33,7 @@ interface TreeNode {
   components: {},
   computed: mapState(["conceptAggregate"]),
   watch: {
-    conceptAggregate(newValue, oldValue) {
+    conceptAggregate(newValue) {
       this.createTree(newValue.concept, newValue.parents, newValue.children);
       this.$store.commit("updateHistory", {
         url: this.$route.fullPath,

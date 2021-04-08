@@ -36,7 +36,7 @@ import ConceptStatus from "@/components/dashboard/ConceptStatus.vue";
   watch: {
     windowWidth: {
       immediate: true,
-      handler(newValue, oldValue) {
+      handler(newValue) {
         this.setLegendOptions(newValue);
       }
     }

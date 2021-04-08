@@ -175,7 +175,7 @@ export default class EditorDialog extends Vue {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       const that = this;
       const model = monaco.editor.getModels()[0];
-      model.onDidChangeContent(event => {
+      model.onDidChangeContent(() => {
         this.$emit("updateText", model.getValue());
         that.editorText = model.getValue();
         that.validate();

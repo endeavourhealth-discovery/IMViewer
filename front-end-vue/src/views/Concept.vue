@@ -6,8 +6,7 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import PanelControl from "@/components/panels/PanelControl.vue"; // @ is an alias to /src
-import store from "@/store/index";
+import PanelControl from "@/components/panels/PanelControl.vue";
 
 @Options({
   name: "Concept",

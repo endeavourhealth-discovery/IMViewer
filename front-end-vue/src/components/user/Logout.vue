@@ -41,7 +41,6 @@
 import { Options, Vue } from "vue-class-component";
 import store from "@/store/index";
 import Swal from "sweetalert2";
-import AuthService from "@/services/AuthService";
 
 @Options({
   name: "Logout",
@@ -70,7 +69,7 @@ export default class Logout extends Vue {
               icon: "success",
               title: "Success",
               text: res.message
-            }).then(result => {
+            }).then(() => {
               this.$router.push({ name: "Home" });
             });
           } else {

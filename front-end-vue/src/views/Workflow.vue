@@ -209,7 +209,6 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import store from "@/store/index";
 import SideNav from "@/components/home/SideNav.vue";
 import Header from "@/components/home/Header.vue";
 import SidebarControl from "@/components/sidebar/SidebarControl.vue";

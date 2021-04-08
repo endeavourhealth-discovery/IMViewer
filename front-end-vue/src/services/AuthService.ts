@@ -4,7 +4,7 @@ import { User } from "@/models/User";
 export default {
   async register(userToRegister: User) {
     try {
-      const { user } = await Auth.signUp({
+      await Auth.signUp({
         username: userToRegister.username,
         password: userToRegister.password,
         attributes: {

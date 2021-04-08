@@ -183,47 +183,44 @@ import AuthService from "@/services/AuthService";
   watch: {
     username: {
       immediate: true,
-      handler(newValue, oldValue) {
+      handler(newValue) {
         this.usernameVerified = verifyIsUsername(newValue);
       }
     },
     email1: {
       immediate: true,
-      handler(newValue, oldValue) {
+      handler(newValue) {
         this.email1Verified = verifyIsEmail(newValue);
       }
     },
     email2: {
       immediate: true,
-      handler(newValue, oldValue) {
-        this.emailsMatch = verifyEmailsMatch(this.email1, this.email2);
+      handler(newValue) {
+        this.emailsMatch = verifyEmailsMatch(this.email1, newValue);
       }
     },
     firstName: {
       immediate: true,
-      handler(newValue, oldValue) {
+      handler(newValue) {
         this.firstNameVerified = verifyIsName(newValue);
       }
     },
     lastName: {
       immediate: true,
-      handler(newValue, oldValue) {
+      handler(newValue) {
         this.lastNameVerified = verifyIsName(newValue);
       }
     },
     password1: {
       immediate: true,
-      handler(newValue, oldValue) {
+      handler(newValue) {
         this.passwordStrength = checkPasswordStrength(newValue);
       }
     },
     password2: {
       immediate: true,
-      handler(newValue, oldValue) {
-        this.passwordsMatch = verifyPasswordsMatch(
-          this.password1,
-          this.password2
-        );
+      handler(newValue) {
+        this.passwordsMatch = verifyPasswordsMatch(this.password1, newValue);
       }
     }
   }

@@ -1,5 +1,5 @@
 import { ConceptReference } from "@/models/ConceptReference";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 
 export default class SuggestionService {
   static api = process.env.VUE_APP_API;

@@ -52,7 +52,7 @@ import { RouteRecordName } from "node_modules/vue-router/dist/vue-router";
   components: {},
   computed: mapState(["conceptAggregate"]),
   watch: {
-    async conceptAggregate(newValue, oldValue) {
+    async conceptAggregate(newValue) {
       this.properties = newValue.properties;
     }
   }

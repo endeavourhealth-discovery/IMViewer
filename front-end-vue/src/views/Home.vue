@@ -16,10 +16,8 @@ import { Options, Vue } from "vue-class-component";
 import SideNav from "@/components/home/SideNav.vue";
 import Header from "@/components/home/Header.vue";
 import SidebarControl from "@/components/sidebar/SidebarControl.vue";
-import { mapState } from "vuex";
 import { User } from "../models/User";
 import store from "@/store/index";
-import AuthService from "@/services/AuthService";
 
 @Options({
   name: "Home",

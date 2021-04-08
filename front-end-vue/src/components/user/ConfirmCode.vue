@@ -65,7 +65,6 @@
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
 import store from "@/store/index";
-import { User } from "@/models/User";
 import AuthService from "@/services/AuthService";
 import Swal from "sweetalert2";
 
@@ -79,7 +78,7 @@ import Swal from "sweetalert2";
   watch: {
     code: {
       immediate: true,
-      handler(newValue, oldValue) {
+      handler() {
         this.verifyCode();
       }
     }
@@ -111,7 +110,7 @@ export default class ConfirmCode extends Vue {
               title: "Success",
               text: res.message,
               confirmButtonText: "Login"
-            }).then(result => {
+            }).then(() => {
               store.commit("updateRegisteredUsername", this.username);
               this.$router.push({ name: "Login" });
             });
@@ -124,6 +123,7 @@ export default class ConfirmCode extends Vue {
           }
         })
         .catch(err => {
+          console.log(err);
           Swal.fire({
             icon: "error",
             title: "Error",
@@ -157,6 +157,7 @@ export default class ConfirmCode extends Vue {
         }
       })
       .catch(err => {
+        console.log(err);
         Swal.fire({
           icon: "error",
           title: "Error",

@@ -1,9 +1,4 @@
-import {
-  createRouter,
-  createWebHashHistory,
-  RouteRecordRaw,
-  viewDepthKey
-} from "vue-router";
+import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
 import Dashboard from "../views/Dashboard.vue";
 import Datamodel from "../views/Concept.vue";
@@ -18,8 +13,7 @@ import ConfirmCode from "../components/user/ConfirmCode.vue";
 import Logout from "../components/user/Logout.vue";
 import ForgotPassword from "../components/user/ForgotPassword.vue";
 import ForgotPasswordSubmit from "../components/user/ForgotPasswordSubmit.vue";
-import RecoverByEmail from "../components/user/RecoverByEmail.vue";
-import { HistoryItem } from "../models/HistoryItem";
+// import RecoverByEmail from "../components/user/RecoverByEmail.vue";
 import store from "@/store/index";
 
 const routes: Array<RouteRecordRaw> = [

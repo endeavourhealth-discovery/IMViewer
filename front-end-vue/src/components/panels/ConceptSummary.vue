@@ -101,13 +101,13 @@ import Definition from "./Definition.vue";
   prop: {},
   computed: mapState(["conceptAggregate", "conceptIri"]),
   watch: {
-    async conceptAggregate(newValue, oldValue) {
+    async conceptAggregate(newValue) {
       this.concept = newValue.concept;
       this.definitionText = await (
         await ConceptService.getConceptImLang(newValue.concept["@id"])
       ).data;
     },
-    async conceptIri(newValue, oldValue) {
+    async conceptIri(newValue) {
       await ConceptService.getConceptSynonyms(newValue).then(res => {
         this.synonyms = [];
         for (const data of res.data) {

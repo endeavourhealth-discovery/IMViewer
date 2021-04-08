@@ -137,19 +137,19 @@ import Swal from "sweetalert2";
   watch: {
     code: {
       immediate: true,
-      handler(newValue, oldValue) {
+      handler() {
         this.verifyCode();
       }
     },
     newPassword1: {
       immediate: true,
-      handler(newValue, oldValue) {
+      handler(newValue) {
         this.passwordStrength = checkPasswordStrength(newValue);
       }
     },
     newPassword2: {
       immediate: true,
-      handler(newValue, oldValue) {
+      handler(newValue) {
         this.passwordsMatch = verifyPasswordsMatch(this.newPassword1, newValue);
       }
     }

@@ -105,7 +105,7 @@ export default class Login extends Vue {
             icon: "success",
             title: "Success",
             text: "Login successful"
-          }).then(result => {
+          }).then(() => {
             this.$router.push({ name: "Home" });
           });
         } else {
@@ -136,6 +136,7 @@ export default class Login extends Vue {
         }
       })
       .catch(err => {
+        console.log(err);
         Swal.fire({
           icon: "error",
           title: "Error",
