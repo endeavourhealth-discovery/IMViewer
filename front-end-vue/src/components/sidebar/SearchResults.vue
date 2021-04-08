@@ -77,7 +77,7 @@
               hoveredResult.scheme.name
             }}</span>
           </p>
-          <p><strong>Type:</strong> {{ hoveredResult.type }}</p>
+          <p><strong>Type:</strong> {{ getConceptTypes(hoveredResult) }}</p>
         </div>
       </div>
     </OverlayPanel>
@@ -130,6 +130,14 @@ export default class SearchResults extends Vue {
     this.hoveredResult = data;
     const x = this.$refs.op as any;
     x.toggle(event);
+  }
+
+  getConceptTypes(concept: any) {
+    return concept.conceptType.elements
+      .map(function(type: any) {
+        return type.name;
+      })
+      .join(", ");
   }
 }
 </script>
