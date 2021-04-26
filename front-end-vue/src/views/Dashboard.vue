@@ -73,6 +73,10 @@ export default class Dashboard extends Vue {
   onResize() {
     this.windowHeight = window.innerHeight;
     this.windowWidth = window.innerWidth;
+    const dash = document.getElementById("dash-scroll-container");
+    if (dash && dash.clientWidth !== dash.offsetWidth) {
+      dash.style.marginRight = this.scrollWidth + "px";
+    }
   }
 
   setLegendOptions(width: number) {
