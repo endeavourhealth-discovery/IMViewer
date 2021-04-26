@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-container">
+  <div id="dash-scroll-container" class="dashboard-container">
     <!-- <mapping-module />
     <workflow-manager /> -->
     <ontology-overview />
@@ -17,6 +17,7 @@ import OntologyOverview from "@/components/dashboard/OntologyOverview.vue";
 import ConceptTypes from "@/components/dashboard/ConceptTypes.vue";
 import ConceptSchemes from "@/components/dashboard/ConceptSchemes.vue";
 import ConceptStatus from "@/components/dashboard/ConceptStatus.vue";
+import { TempScrollBox } from "@/helpers/TempScrollBox";
 
 @Options({
   name: "Dashboard",
@@ -47,6 +48,7 @@ export default class Dashboard extends Vue {
   windowHeight = 0;
   windowWidth = 0;
   graphHeight = 200;
+  scrollWidth = 0;
 
   mounted() {
     this.$nextTick(() => {
@@ -55,6 +57,13 @@ export default class Dashboard extends Vue {
 
     this.windowHeight = window.innerHeight;
     this.windowWidth = window.innerWidth;
+
+    // check for scroll bar and add padding if present
+    this.scrollWidth = new TempScrollBox().width;
+    const dash = document.getElementById("dash-scroll-container");
+    if (dash && dash.clientWidth !== dash.offsetWidth) {
+      dash.style.marginRight = this.scrollWidth + "px";
+    }
   } // mounted end
 
   beforeDestroy() {

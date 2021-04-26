@@ -1,5 +1,5 @@
 export class TempScrollBox {
-  scrollBarWidth: number;
+  private scrollBarWidth: number;
 
   constructor() {
     this.scrollBarWidth = 0;
