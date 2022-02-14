@@ -357,12 +357,6 @@ describe("Concept.vue ___ not moduleIri", () => {
     expect(wrapper.vm.active).toBe(0);
   });
 
-  it("can update focusTree", () => {
-    wrapper.vm.focusTree();
-    expect(mockStore.commit).toHaveBeenCalledTimes(1);
-    expect(mockStore.commit).toHaveBeenCalledWith("updateFocusTree", true);
-  });
-
   it("can routeToEdit", async () => {
     wrapper.vm.directToEditRoute();
     expect(mockRouter.push).toHaveBeenCalledTimes(1);
@@ -706,72 +700,48 @@ describe("Concept.vue ___ not moduleIri", () => {
     wrapper.vm.types = [{ "@id": "http://endhealth.info/im#Concept", name: "Concept" }];
     await wrapper.vm.$nextTick();
     wrapper.vm.setStoreType();
-    expect(mockStore.commit).toHaveBeenCalledTimes(2);
-    expect(mockStore.commit).toHaveBeenNthCalledWith(1, "updateSelectedEntityType", "Ontology");
-    expect(mockStore.commit).toHaveBeenNthCalledWith(2, "updateModuleSelectedEntities", {
-      module: "Ontology",
-      iri: "http://endhealth.info/im#CriticalCareEncounter"
-    });
+    expect(mockStore.commit).toHaveBeenCalledTimes(1);
+    expect(mockStore.commit).toHaveBeenCalledWith("updateSelectedEntityType", "Ontology");
   });
 
   it("can setStoreType ___ set", async () => {
     wrapper.vm.types = [{ "@id": "http://endhealth.info/im#ConceptSet", name: "Concept Set" }];
     await wrapper.vm.$nextTick();
     wrapper.vm.setStoreType();
-    expect(mockStore.commit).toHaveBeenCalledTimes(2);
-    expect(mockStore.commit).toHaveBeenNthCalledWith(1, "updateSelectedEntityType", "Sets");
-    expect(mockStore.commit).toHaveBeenNthCalledWith(2, "updateModuleSelectedEntities", {
-      module: "Sets",
-      iri: "http://endhealth.info/im#CriticalCareEncounter"
-    });
+    expect(mockStore.commit).toHaveBeenCalledTimes(1);
+    expect(mockStore.commit).toHaveBeenCalledWith("updateSelectedEntityType", "Sets");
   });
 
   it("can setStoreType ___ query", async () => {
     wrapper.vm.types = [{ "@id": "http://endhealth.info/im#QueryTemplate", name: "Query template" }];
     await wrapper.vm.$nextTick();
     wrapper.vm.setStoreType();
-    expect(mockStore.commit).toHaveBeenCalledTimes(2);
-    expect(mockStore.commit).toHaveBeenNthCalledWith(1, "updateSelectedEntityType", "Queries");
-    expect(mockStore.commit).toHaveBeenNthCalledWith(2, "updateModuleSelectedEntities", {
-      module: "Queries",
-      iri: "http://endhealth.info/im#CriticalCareEncounter"
-    });
+    expect(mockStore.commit).toHaveBeenCalledTimes(1);
+    expect(mockStore.commit).toHaveBeenCalledWith("updateSelectedEntityType", "Queries");
   });
 
   it("can setStoreType ___ dataModel", async () => {
     wrapper.vm.types = [{ "@id": "http://www.w3.org/ns/shacl#NodeShape", name: "Node shape" }];
     await wrapper.vm.$nextTick();
     wrapper.vm.setStoreType();
-    expect(mockStore.commit).toHaveBeenCalledTimes(2);
-    expect(mockStore.commit).toHaveBeenNthCalledWith(1, "updateSelectedEntityType", "DataModel");
-    expect(mockStore.commit).toHaveBeenNthCalledWith(2, "updateModuleSelectedEntities", {
-      module: "DataModel",
-      iri: "http://endhealth.info/im#CriticalCareEncounter"
-    });
+    expect(mockStore.commit).toHaveBeenCalledTimes(1);
+    expect(mockStore.commit).toHaveBeenCalledWith("updateSelectedEntityType", "DataModel");
   });
 
   it("can setStoreType ___ property", async () => {
     wrapper.vm.types = [{ "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property", name: "Property" }];
     await wrapper.vm.$nextTick();
     wrapper.vm.setStoreType();
-    expect(mockStore.commit).toHaveBeenCalledTimes(2);
-    expect(mockStore.commit).toHaveBeenNthCalledWith(1, "updateSelectedEntityType", "Property");
-    expect(mockStore.commit).toHaveBeenNthCalledWith(2, "updateModuleSelectedEntities", {
-      module: "DataModel",
-      iri: "http://endhealth.info/im#CriticalCareEncounter"
-    });
+    expect(mockStore.commit).toHaveBeenCalledTimes(1);
+    expect(mockStore.commit).toHaveBeenCalledWith("updateSelectedEntityType", "Property");
   });
 
   it("can setStoreType ___ not found", async () => {
     wrapper.vm.types = [];
     await wrapper.vm.$nextTick();
     wrapper.vm.setStoreType();
-    expect(mockStore.commit).toHaveBeenCalledTimes(2);
-    expect(mockStore.commit).toHaveBeenNthCalledWith(1, "updateSelectedEntityType", "default");
-    expect(mockStore.commit).toHaveBeenNthCalledWith(2, "updateModuleSelectedEntities", {
-      module: "default",
-      iri: "http://endhealth.info/im#CriticalCareEncounter"
-    });
+    expect(mockStore.commit).toHaveBeenCalledTimes(1);
+    expect(mockStore.commit).toHaveBeenCalledWith("updateSelectedEntityType", "default");
   });
 
   it("can setActivePanel ___ same type", () => {

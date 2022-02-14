@@ -12,23 +12,24 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import TopBar from "@/components/home/TopBar.vue";
+import { mapState } from "vuex";
 
 export default defineComponent({
   name: "Home",
   components: {
     TopBar
   },
+  computed: mapState(["conceptIri"]),
   async mounted() {
     this.updateRoute();
   },
   methods: {
     updateRoute(): void {
-      const iri = this.$route.params.selectedIri;
-      if (!iri) {
+      if (!this.conceptIri) {
         this.$router.back();
       } else {
-        this.$store.commit("updateConceptIri", iri);
-        this.$router.push({ name: "Concept", params: { selectedIri: iri } });
+        this.$store.commit("updateConceptIri", this.conceptIri);
+        this.$router.push({ name: "Concept", params: { selectedIri: this.conceptIri } });
       }
     }
   }

@@ -69,65 +69,65 @@ describe("router", () => {
     });
   });
 
-  describe("router ___ no auth", () => {
-    let wrapper;
+  // describe("router ___ no auth", () => {
+  //   let wrapper;
 
-    beforeEach(async () => {
-      jest.resetAllMocks();
-      window.sessionStorage.clear();
-      store.state.snomedLicenseAccepted = "true";
-      store.dispatch = jest.fn().mockResolvedValue({ authenticated: false });
-      router.push("/");
-      await router.isReady();
+  //   beforeEach(async () => {
+  //     jest.resetAllMocks();
+  //     window.sessionStorage.clear();
+  //     store.state.snomedLicenseAccepted = "true";
+  //     store.dispatch = jest.fn().mockResolvedValue({ authenticated: false });
+  //     router.push("/");
+  //     await router.isReady();
 
-      wrapper = shallowMount(App, {
-        global: {
-          components: { Toast },
-          plugins: [router, store]
-        }
-      });
+  //     wrapper = shallowMount(App, {
+  //       global: {
+  //         components: { Toast },
+  //         plugins: [router, store]
+  //       }
+  //     });
 
-      await flushPromises();
-      await wrapper.vm.$nextTick();
-      jest.clearAllMocks();
-    });
+  //     await flushPromises();
+  //     await wrapper.vm.$nextTick();
+  //     jest.clearAllMocks();
+  //   });
 
-    it("routes to login if false", async () => {
-      router.push({ name: "UserEdit" });
-      await flushPromises();
-      expect(wrapper.vm.$route.path).toBe("/user/login");
-    });
-  });
+  //   it("routes to login if false", async () => {
+  //     router.push({ name: "UserEdit" });
+  //     await flushPromises();
+  //     expect(wrapper.vm.$route.path).toBe("/user/login");
+  //   });
+  // });
 
-  describe("router ___ auth", () => {
-    let wrapper;
+  // describe("router ___ auth", () => {
+  //   let wrapper;
 
-    beforeEach(async () => {
-      jest.resetAllMocks();
-      window.sessionStorage.clear();
-      store.state.snomedLicenseAccepted = "true";
-      store.dispatch = jest.fn().mockResolvedValue({ authenticated: true });
-      router.push("/");
-      await router.isReady();
+  //   beforeEach(async () => {
+  //     jest.resetAllMocks();
+  //     window.sessionStorage.clear();
+  //     store.state.snomedLicenseAccepted = "true";
+  //     store.dispatch = jest.fn().mockResolvedValue({ authenticated: true });
+  //     router.push("/");
+  //     await router.isReady();
 
-      wrapper = shallowMount(App, {
-        global: {
-          components: { Toast },
-          plugins: [router, store]
-        }
-      });
+  //     wrapper = shallowMount(App, {
+  //       global: {
+  //         components: { Toast },
+  //         plugins: [router, store]
+  //       }
+  //     });
 
-      await flushPromises();
-      await wrapper.vm.$nextTick();
-      jest.clearAllMocks();
-    });
+  //     await flushPromises();
+  //     await wrapper.vm.$nextTick();
+  //     jest.clearAllMocks();
+  //   });
 
-    it("routes to login if false", async () => {
-      router.push({ name: "UserEdit" });
-      await flushPromises();
-      expect(wrapper.vm.$route.path).toBe("/user/my-account/edit");
-    });
-  });
+  //   it("routes to login if false", async () => {
+  //     router.push({ name: "UserEdit" });
+  //     await flushPromises();
+  //     expect(wrapper.vm.$route.path).toBe("/user/my-account/edit");
+  //   });
+  // });
 
   describe("router ___ blockedIri", () => {
     let wrapper;
@@ -190,39 +190,6 @@ describe("router", () => {
       expect(store.commit).toHaveBeenCalledTimes(1);
       expect(store.commit).toHaveBeenCalledWith("updateConceptIri", "http://snomed.info/sct#298382003");
       expect(wrapper.vm.$route.path).toBe("/concept/http:%2F%2Fsnomed.info%2Fsct%23298382003");
-    });
-  });
-
-  describe("router ___ individual", () => {
-    let wrapper;
-
-    beforeEach(async () => {
-      jest.resetAllMocks();
-      window.sessionStorage.clear();
-      store.state.snomedLicenseAccepted = "true";
-      store.commit = jest.fn();
-      store.dispatch = jest.fn().mockResolvedValue({ authenticated: true });
-      router.push("/");
-      await router.isReady();
-
-      wrapper = shallowMount(App, {
-        global: {
-          components: { Toast },
-          plugins: [router, store]
-        }
-      });
-
-      await flushPromises();
-      await wrapper.vm.$nextTick();
-      jest.clearAllMocks();
-    });
-
-    it("updates instanceIri on individual routing", async () => {
-      router.push({ name: "Individual", params: { selectedIri: "http://snomed.info/sct#298382003" } });
-      await flushPromises();
-      expect(store.commit).toHaveBeenCalledTimes(1);
-      expect(store.commit).toHaveBeenCalledWith("updateInstanceIri", "http://snomed.info/sct#298382003");
-      expect(wrapper.vm.$route.path).toBe("/catalogue/individual/http:%2F%2Fsnomed.info%2Fsct%23298382003");
     });
   });
 });

@@ -12,7 +12,6 @@ export default createStore({
   state: {
     conceptIri: IM.MODULE_ONTOLOGY,
     currentUser: {} as User,
-    registeredUsername: "" as string,
     isLoggedIn: false as boolean,
     snomedLicenseAccepted: localStorage.getItem("snomedLicenseAccepted") as string,
     blockedIris: [] as string[],
@@ -28,9 +27,6 @@ export default createStore({
     },
     updateCurrentUser(state, user) {
       state.currentUser = user;
-    },
-    updateRegisteredUsername(state, username) {
-      state.registeredUsername = username;
     },
     updateIsLoggedIn(state, status) {
       state.isLoggedIn = status;
