@@ -102,7 +102,6 @@ import { EntityReferenceNode } from "@/models/EntityReferenceNode";
 import { TTIriRef } from "@/models/TripleTree";
 import { ConceptAggregate } from "@/models/ConceptAggregate";
 import { isArrayHasLength, isObject, isObjectHasKeys } from "@/helpers/DataTypeCheckers";
-import { byLabel, byName } from "@/helpers/Sorters";
 
 export default defineComponent({
   name: "SecondaryTree",

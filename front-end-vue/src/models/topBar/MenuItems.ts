@@ -1,13 +1,13 @@
 export interface LoginItem {
   label: string;
   icon: string;
-  to: string;
+  url: string;
 }
 
 export interface AccountItem {
   label: string;
   icon: string;
-  to: string;
+  url: string;
 }
 
 export interface ModuleItem {

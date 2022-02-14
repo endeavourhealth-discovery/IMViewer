@@ -3,9 +3,6 @@
     <Panel>
       <template #icons>
         <div class="icons-container">
-          <button class="p-panel-header-icon p-link p-mr-2" @click="focusTree" v-tooltip.left="'Focus hierarchy tree to this concept'">
-            <i class="fas fa-sitemap" aria-hidden="true"></i>
-          </button>
           <div v-if="isObjectHasKeysWrapper(concept, ['inferred'])" class="copy-container">
             <Button
               icon="far fa-copy"
@@ -124,7 +121,6 @@ import SecondaryTree from "../components/concept/SecondaryTree.vue";
 import { IM } from "@/vocabulary/IM";
 import { RDF } from "@/vocabulary/RDF";
 import { RDFS } from "@/vocabulary/RDFS";
-import { MODULE_IRIS } from "@/helpers/ModuleIris";
 import { SHACL } from "@/vocabulary/SHACL";
 import Properties from "@/components/concept/Properties.vue";
 import { DefinitionConfig } from "@/models/configs/DefinitionConfig";
@@ -259,10 +255,6 @@ export default defineComponent({
       this.setContentHeight();
     },
 
-    focusTree(): void {
-      this.$store.commit("updateFocusTree", true);
-    },
-
     directToEditRoute(): void {
       this.$router.push({
         name: "Edit",
@@ -342,12 +334,6 @@ export default defineComponent({
         this.active = 0;
       }
       this.$store.commit("updateSelectedEntityType", type);
-      if (!MODULE_IRIS.includes(this.conceptIri)) {
-        this.$store.commit("updateModuleSelectedEntities", {
-          module: this.isProperty ? "DataModel" : type,
-          iri: this.conceptIri
-        });
-      }
     },
 
     setActivePanel(newType: string, oldType: string): void {
