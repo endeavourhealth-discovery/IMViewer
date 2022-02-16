@@ -88,7 +88,6 @@ export default defineComponent({
     await this.getMembers();
     this.onResize();
     this.getUserRoles();
-    this.checkAuthorization();
   },
   beforeUnmount() {
     window.removeEventListener("resize", this.onResize);
@@ -210,9 +209,13 @@ export default defineComponent({
     },
 
     getUserRoles() {
-      Auth.currentSession().then(data => {
-        this.userRoles = data.getIdToken().payload["cognito:groups"];
-      });
+      Auth.currentSession()
+        .then(data => {
+          this.userRoles = data.getIdToken().payload["cognito:groups"];
+        })
+        .catch(() => {
+          this.userRoles = [];
+        });
     },
 
     checkAuthorization() {
