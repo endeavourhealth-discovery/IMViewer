@@ -27,4 +27,10 @@ export default class SetService {
       return {} as SearchResponse;
     }
   }
+
+  public static async publish(conceptIri: string) {
+    return await axios.get(this.api + "api/set/publish", {
+      params: { iri: conceptIri }
+    });
+  }
 }

@@ -20,6 +20,9 @@
       <template #header>
         <div class="table-header-bar">
           <div class="checkboxes-container">
+            <template v-if="checkAuthorization()">
+              <Button type="button" label="Publish" @click="publish"></Button>
+            </template>
             <Button type="button" label="Download..." @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" :loading="downloading" />
             <Menu id="overlay_menu" ref="menu" :model="downloadMenu" :popup="true" />
           </div>
@@ -60,6 +63,7 @@
 </template>
 
 <script lang="ts">
+import { Auth } from "aws-amplify";
 import { defineComponent } from "@vue/runtime-core";
 import EntityService from "@/services/EntityService";
 import SetService from "@/services/SetService";
@@ -83,12 +87,15 @@ export default defineComponent({
     window.addEventListener("resize", this.onResize);
     await this.getMembers();
     this.onResize();
+    this.getUserRoles();
+    this.checkAuthorization();
   },
   beforeUnmount() {
     window.removeEventListener("resize", this.onResize);
   },
   data() {
     return {
+      userRoles: [] as string[],
       loading: false,
       downloading: false,
       members: {} as ExportValueSet,
@@ -196,6 +203,20 @@ export default defineComponent({
       if (table) {
         table.style.width = "100%";
       }
+    },
+
+    async publish() {
+      await SetService.publish(this.conceptIri);
+    },
+
+    getUserRoles() {
+      Auth.currentSession().then(data => {
+        this.userRoles = data.getIdToken().payload["cognito:groups"];
+      });
+    },
+
+    checkAuthorization() {
+      return this.userRoles.includes("IM1_PUBLISH");
     }
   }
 });
