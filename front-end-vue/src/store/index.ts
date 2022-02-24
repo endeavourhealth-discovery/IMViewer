@@ -1,17 +1,17 @@
 import { createStore } from "vuex";
-import { User } from "../models/user/User";
 import AuthService from "@/services/AuthService";
-import { avatars } from "@/models/user/Avatars";
 import LoggerService from "@/services/LoggerService";
-import { CustomAlert } from "@/models/user/CustomAlert";
-import { IM } from "@/vocabulary/IM";
 import ConfigService from "@/services/ConfigService";
+import { Models, Vocabulary, Constants } from "im-library";
+const { User, CustomAlert } = Models;
+const { IM } = Vocabulary;
+const { Avatars } = Constants;
 
 export default createStore({
   // update stateType.ts when adding new state!
   state: {
     conceptIri: IM.MODULE_ONTOLOGY,
-    currentUser: {} as User,
+    currentUser: {} as Models.User,
     isLoggedIn: false as boolean,
     snomedLicenseAccepted: localStorage.getItem("snomedLicenseAccepted") as string,
     blockedIris: [] as string[],
@@ -66,9 +66,9 @@ export default createStore({
         if (res.status === 200 && res.user) {
           commit("updateIsLoggedIn", true);
           const loggedInUser = res.user;
-          const foundAvatar = avatars.find(avatar => avatar === loggedInUser.avatar);
+          const foundAvatar = Avatars.find(avatar => avatar === loggedInUser.avatar);
           if (!foundAvatar) {
-            loggedInUser.avatar = avatars[0];
+            loggedInUser.avatar = Avatars[0];
           }
           commit("updateCurrentUser", loggedInUser);
           result.authenticated = true;

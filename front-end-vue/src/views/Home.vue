@@ -2,7 +2,7 @@
   <div class="layout-main">
     <div class="main-grid">
       <div class="topbar-container">
-        <TopBar />
+        <TopBar :isLoggedIn="isLoggedIn" :currentUser="currentUser" />
       </div>
       <router-view />
     </div>
@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import TopBar from "@/components/home/TopBar.vue";
+import { TopBar } from "im-library";
 import { mapState } from "vuex";
 
 export default defineComponent({
@@ -19,7 +19,7 @@ export default defineComponent({
   components: {
     TopBar
   },
-  computed: mapState(["conceptIri"]),
+  computed: mapState(["conceptIri", "isLoggedIn", "currentUser"]),
   async mounted() {
     this.updateRoute();
   },
@@ -37,8 +37,8 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.topbar-main-container {
-  height: 100%;
+.topbar-container {
+  height: 10%;
   width: 100%;
   display: flex;
   flex-flow: column nowrap;

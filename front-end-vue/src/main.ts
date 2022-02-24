@@ -79,8 +79,12 @@ import Tag from "primevue/tag";
 import { Amplify, Auth } from "aws-amplify";
 import awsconfig from "./aws-exports";
 import axios from "axios";
-import { isObjectHasKeys } from "./helpers/DataTypeCheckers";
-import {ImLibrarySample} from 'im-library';
+
+// IMLibrary imports
+import { Helpers } from "im-library";
+const {
+  DataTypeCheckers: { isObjectHasKeys }
+} = Helpers;
 
 Amplify.configure(awsconfig);
 Auth.configure(awsconfig);
@@ -143,13 +147,12 @@ const app = createApp(App)
   .component("RadioButton", RadioButton)
   .component("ConfirmPopup", ConfirmPopup)
   .component("InputSwitch", InputSwitch)
-  .component("Tag", Tag)
-  .component("IMLibrarySample", ImLibrarySample);
+  .component("Tag", Tag);
 
 const vm = app.mount("#app");
 
 axios.interceptors.request.use(async request => {
-  if (store.state.isLoggedIn && process.env.VUE_APP_API && request.url?.startsWith(process.env.VUE_APP_API)) {
+  if (store.state.isLoggedIn && import.meta.env.VITE_API && request.url?.startsWith(import.meta.env.VITE_API as string)) {
     request.headers.Authorization = "Bearer " + (await Auth.currentSession()).getIdToken().getJwtToken();
   }
   return request;

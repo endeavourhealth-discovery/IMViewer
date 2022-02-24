@@ -3,7 +3,8 @@ import EntityService from "@/services/EntityService";
 import { flushPromises, shallowMount } from "@vue/test-utils";
 import ProgressSpinner from "primevue/progressspinner";
 import MultiSelect from "primevue/multiselect";
-import * as GraphTranslator from "@/helpers/GraphTranslator";
+import { Helpers } from "im-library";
+const { GraphTranslator } = Helpers;
 import ConfigService from "@/services/ConfigService";
 
 describe("Graph.vue", () => {

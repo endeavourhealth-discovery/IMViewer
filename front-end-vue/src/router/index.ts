@@ -49,7 +49,7 @@ router.beforeEach((to, from, next) => {
       console.log("auth guard user authenticated:" + res.authenticated);
       if (!res.authenticated) {
         console.log("redirecting to login");
-        window.location.href = process.env.VUE_APP_AUTH_URL + "login?returnUrl=VUE_APP_VIEWER";
+        window.location.href = import.meta.env.VITE_AUTH_URL + "login?returnUrl=VITE_VIEWER";
       } else {
         if (to.matched.some(record => record.meta.requiresLicense)) {
           console.log("snomed license accepted:" + store.state.snomedLicenseAccepted);

@@ -1,8 +1,8 @@
 import axios from "axios";
-import { DefinitionConfig } from "@/models/configs/DefinitionConfig";
+import { DefinitionConfig } from "im-library/dist/types/interfaces/Interfaces";
 
 export default class ConfigService {
-  static api = process.env.VUE_APP_API;
+  static api = import.meta.env.VITE_API;
 
   public static async getComponentLayout(name: string): Promise<DefinitionConfig[]> {
     try {

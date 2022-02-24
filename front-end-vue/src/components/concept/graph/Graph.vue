@@ -9,13 +9,15 @@
 </template>
 
 <script lang="ts">
-import TTGraphData from "../../../models/TTGraphData";
-import { translateFromEntityBundle } from "../../../helpers/GraphTranslator";
 import { defineComponent } from "@vue/runtime-core";
 import EntityService from "@/services/EntityService";
 import GraphComponent from "./GraphComponent.vue";
-import { PartialBundle } from "@/models/entityServiceTypes/EntityServiceTypes";
 import ConfigService from "@/services/ConfigService";
+import { TTGraphData, PartialBundle } from "im-library/dist/types/interfaces/Interfaces";
+import { Helpers } from "im-library";
+const {
+  GraphTranslator: { translateFromEntityBundle }
+} = Helpers;
 
 export default defineComponent({
   name: "Graph",

@@ -7,8 +7,8 @@ import Button from "primevue/button";
 import ProgressSpinner from "primevue/progressspinner";
 import EntityService from "@/services/EntityService";
 import LoggerService from "@/services/LoggerService";
-import { RDFS } from "@/vocabulary/RDFS";
-import { IM } from "@/vocabulary/IM";
+import { Vocabulary } from "im-library";
+const { IM, RDFS } = Vocabulary;
 
 describe("DownloadDialog.vue", () => {
   const CONCEPT = { "@id": "http://snomed.info/sct#298382003", "http://www.w3.org/2000/01/rdf-schema#label": "Scoliosis deformity of spine (disorder)" };

@@ -48,7 +48,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import { SimpleMap } from "@/models/mappings/SimpleMap";
+import { SimpleMap } from "im-library/dist/types/interfaces/Interfaces";
 
 export default defineComponent({
   name: "SimpleMaps",

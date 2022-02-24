@@ -1,7 +1,7 @@
 import SetService from "@/services/SetService";
 import axios from "axios";
 
-const api = process.env.VUE_APP_API;
+const api = import.meta.env.VITE_API;
 
 describe("SetService.ts ___ axios success", () => {
   beforeEach(() => {

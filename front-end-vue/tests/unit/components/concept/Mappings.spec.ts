@@ -5,7 +5,8 @@ import ProgressSpinner from "primevue/progressspinner";
 import OrganizationChart from "primevue/organizationchart";
 import OverlayPanel from "primevue/overlaypanel";
 import EntityService from "@/services/EntityService";
-import { IM } from "@/vocabulary/IM";
+import { Vocabulary } from "im-library";
+const { IM } = Vocabulary;
 
 describe("Mappings.vue", () => {
   let wrapper: any;

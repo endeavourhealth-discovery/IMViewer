@@ -1,6 +1,6 @@
 <template>
-  <div class="p-d-flex p-flex-column p-jc-start" id="secondary-tree-bar-container">
-    <div id="alternate-parents-container" class="p-d-flex p-flex-column p-jc-start p-ai-start">
+  <div class="flex flex-column justify-contents-start" id="secondary-tree-bar-container">
+    <div id="alternate-parents-container" class="flex flex-column justify-contents-start align-items-start">
       <Button
         v-for="altParent in alternateParents"
         :key="altParent.iri"
@@ -13,7 +13,7 @@
         class="p-button-text p-button-plain"
       />
     </div>
-    <div class="p-d-flex p-flex-row p-jc-start" id="secondary-tree-parents-bar">
+    <div class="flex flex-row justify-contents-start" id="secondary-tree-parents-bar">
       <Button
         :label="currentParent?.name"
         :disabled="loading || !currentParent"
@@ -54,7 +54,7 @@
     </Tree>
 
     <OverlayPanel ref="altTreeOP" id="secondary_tree_overlay_panel" style="width: 700px" :breakpoints="{ '960px': '75vw' }">
-      <div v-if="hoveredResult.name" class="p-d-flex p-flex-row p-jc-start result-overlay" style="width: 100%; gap: 7px;">
+      <div v-if="hoveredResult.name" class="flex flex-row justify-contents-start result-overlay" style="width: 100%; gap: 7px;">
         <div class="left-side" style="width: 50%;">
           <p>
             <strong>Name: </strong>
@@ -89,19 +89,18 @@
 </template>
 
 <script lang="ts">
-import { getColourFromType, getFAIconFromType } from "@/helpers/ConceptTypeMethods";
-import { TreeNode } from "@/models/TreeNode";
 import EntityService from "@/services/EntityService";
-import { IM } from "@/vocabulary/IM";
-import { RDF } from "@/vocabulary/RDF";
-import { RDFS } from "@/vocabulary/RDFS";
 import { defineComponent } from "vue";
-import { ConceptSummary } from "@/models/search/ConceptSummary";
-import { TreeParent } from "@/models/secondaryTree/TreeParent";
-import { EntityReferenceNode } from "@/models/EntityReferenceNode";
-import { TTIriRef } from "@/models/TripleTree";
-import { ConceptAggregate } from "@/models/ConceptAggregate";
-import { isArrayHasLength, isObject, isObjectHasKeys } from "@/helpers/DataTypeCheckers";
+import { TTIriRef, EntityReferenceNode, TreeParent, TreeNode, ConceptAggregate } from "im-library/dist/types/interfaces/Interfaces";
+import { Helpers, Models, Vocabulary } from "im-library";
+const {
+  DataTypeCheckers: { isArrayHasLength, isObjectHasKeys, isObject },
+  ConceptTypeMethods: { getColourFromType, getFAIconFromType }
+} = Helpers;
+const { IM, RDF, RDFS } = Vocabulary;
+const {
+  Search: { ConceptSummary }
+} = Models;
 
 export default defineComponent({
   name: "SecondaryTree",
@@ -128,7 +127,7 @@ export default defineComponent({
       currentParent: {} as TreeParent | null,
       alternateParents: [] as TreeParent[],
       parentPosition: 0,
-      hoveredResult: {} as ConceptSummary | any,
+      hoveredResult: {} as Models.Search.ConceptSummary | any,
       overlayLocation: {} as any,
       loading: false
     };
