@@ -45,7 +45,7 @@
               <font-awesome-icon :icon="getPerspectiveByConceptType(slotProps.data.entityType)" class="result-icon fa-fw" />
             </div>
             <div class="result-text-container">
-              {{ slotProps.data.name }}<br />
+              {{ slotProps.data.match }}<br />
               <small style="color:lightgrey">{{ slotProps.data.name }}</small>
             </div>
             <div class="button-container">
