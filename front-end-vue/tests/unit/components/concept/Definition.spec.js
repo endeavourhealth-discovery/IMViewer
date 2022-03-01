@@ -6,9 +6,6 @@ import TextHTMLWithLabel from "@/components/generics/TextHTMLWithLabel.vue";
 import TextWithLabel from "@/components/generics/TextWithLabel.vue";
 import ObjectNameWithLabel from "@/components/generics/ObjectNameWithLabel.vue";
 import ArrayObjectNameListboxWithLabel from "@/components/generics/ArrayObjectNameListboxWithLabel.vue";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
 
 describe("Definition.vue ___ no headers", () => {
   let wrapper;

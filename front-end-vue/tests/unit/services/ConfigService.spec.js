@@ -1,8 +1,5 @@
 import ConfigService from "@/services/ConfigService";
 import axios from "axios";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment node
 
 describe("ConfigService.ts ___ axios success", () => {
   const api = import.meta.env.VITE_API;

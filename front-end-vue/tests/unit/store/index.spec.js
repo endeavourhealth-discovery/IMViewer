@@ -12,10 +12,6 @@ const {
 } = Models;
 const { IM } = Vocabulary;
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
-
 describe("state", () => {
   beforeEach(() => {
     vi.resetAllMocks();

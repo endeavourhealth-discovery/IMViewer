@@ -5,10 +5,6 @@ import StyleClass from "primevue/styleclass";
 import ConfigService from "@/services/ConfigService";
 import ProgressSpinner from "primevue/progressspinner";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
-
 describe("TextDefinition.vue ___ data", () => {
   let wrapper;
   let mockStore;
@@ -96,9 +92,9 @@ describe("TextDefinition.vue ___ data", () => {
   };
 
   beforeEach(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
-    ConfigService.getDefaultPredicateNames = jest.fn().mockResolvedValue({
+    ConfigService.getDefaultPredicateNames = vi.fn().mockResolvedValue({
       "http://endhealth.info/im#roleGroup": "Where",
       "http://www.w3.org/2002/07/owl#onProperty": "On property",
       "http://www.w3.org/2002/07/owl#intersectionOf": "Combination of",
@@ -107,11 +103,11 @@ describe("TextDefinition.vue ___ data", () => {
       "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Is subclass of"
     });
 
-    mockStore = { state: { blockedIris: BLOCKED_IRIS }, commit: jest.fn() };
+    mockStore = { state: { blockedIris: BLOCKED_IRIS }, commit: vi.fn() };
 
-    mockButton = { click: jest.fn() };
+    mockButton = { click: vi.fn() };
 
-    docSpy = jest.spyOn(document, "getElementById");
+    docSpy = vi.spyOn(document, "getElementById");
     docSpy.mockReturnValue(mockButton);
 
     wrapper = shallowMount(TextDefinition, {
@@ -126,7 +122,7 @@ describe("TextDefinition.vue ___ data", () => {
 
     await flushPromises();
     await wrapper.vm.$nextTick();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("mounts", () => {
@@ -151,7 +147,7 @@ describe("TextDefinition.vue ___ data", () => {
   });
 
   it("inits ___ definition ___ button", async () => {
-    wrapper.vm.getDefinition = jest.fn();
+    wrapper.vm.getDefinition = vi.fn();
     wrapper.vm.init();
     expect(wrapper.vm.loading).toBe(true);
     await flushPromises();
@@ -162,7 +158,7 @@ describe("TextDefinition.vue ___ data", () => {
 
   it("inits ___ definition ___ no button", async () => {
     docSpy.mockReturnValue(undefined);
-    wrapper.vm.getDefinition = jest.fn();
+    wrapper.vm.getDefinition = vi.fn();
     wrapper.vm.init();
     expect(wrapper.vm.loading).toBe(true);
     await flushPromises();
@@ -199,15 +195,15 @@ describe("TextDefinition.vue ___ no data", () => {
   let mockButton;
 
   beforeEach(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
-    ConfigService.getDefaultPredicateNames = jest.fn().mockResolvedValue({});
+    ConfigService.getDefaultPredicateNames = vi.fn().mockResolvedValue({});
 
-    mockStore = { state: { blockedIris: [] }, commit: jest.fn() };
+    mockStore = { state: { blockedIris: [] }, commit: vi.fn() };
 
-    mockButton = { click: jest.fn() };
+    mockButton = { click: vi.fn() };
 
-    docSpy = jest.spyOn(document, "getElementById");
+    docSpy = vi.spyOn(document, "getElementById");
     docSpy.mockReturnValue(mockButton);
 
     wrapper = shallowMount(TextDefinition, {
@@ -221,11 +217,11 @@ describe("TextDefinition.vue ___ no data", () => {
 
     await flushPromises();
     await wrapper.vm.$nextTick();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("inits ___ not definition", async () => {
-    wrapper.vm.getDefinition = jest.fn();
+    wrapper.vm.getDefinition = vi.fn();
     wrapper.vm.init();
     expect(wrapper.vm.loading).toBe(true);
     await flushPromises();

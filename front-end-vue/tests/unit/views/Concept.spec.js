@@ -17,9 +17,6 @@ import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import Panel from "primevue/panel";
 import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
 
 Object.assign(navigator, {
   clipboard: {

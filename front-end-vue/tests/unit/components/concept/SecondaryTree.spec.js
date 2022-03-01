@@ -7,10 +7,6 @@ import OverlayPanel from "primevue/overlaypanel";
 import EntityService from "@/services/EntityService";
 import Tooltip from "primevue/tooltip";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
-
 describe("SecondaryTree.vue", () => {
   let wrapper;
   let mockToast;

@@ -10,10 +10,6 @@ import SetService from "@/services/SetService";
 import LoggerService from "@/services/LoggerService";
 import Menu from "primevue/menu";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
-
 describe("Members.vue", () => {
   let wrapper;
   let mockRouter;

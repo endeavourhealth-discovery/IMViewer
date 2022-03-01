@@ -3,10 +3,6 @@ import { shallowMount } from "@vue/test-utils";
 import Tag from "primevue/tag";
 import LoggerService from "@/services/LoggerService";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
-
 describe("ObjectNameTagWithLabel.vue", () => {
   let wrapper;
 

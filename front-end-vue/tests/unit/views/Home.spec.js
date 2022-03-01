@@ -1,8 +1,5 @@
 import { shallowMount } from "@vue/test-utils";
 import Home from "@/views/Home.vue";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
 
 describe("Home.vue ___ route = Concept", () => {
   let wrapper;

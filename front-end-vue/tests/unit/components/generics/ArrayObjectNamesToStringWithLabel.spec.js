@@ -1,10 +1,6 @@
 import { shallowMount } from "@vue/test-utils";
 import ArrayObjectNamesToStringWithLabel from "@/components/generics/ArrayObjectNamesToStringWithLabel.vue";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
-
 describe("ArrayObjectNameToStringWithLabel.vue", () => {
   let wrapper;
 

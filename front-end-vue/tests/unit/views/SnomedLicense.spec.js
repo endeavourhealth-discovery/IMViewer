@@ -4,10 +4,6 @@ import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 import PrimeVue from "primevue/config";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
-
 describe("SnomedLicense.vue", () => {
   let wrapper;
   let mockStore;

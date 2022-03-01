@@ -1,7 +1,4 @@
 import LoggerService from "@/services/LoggerService";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment node
 
 describe("LoggerService", () => {
   describe("error", () => {

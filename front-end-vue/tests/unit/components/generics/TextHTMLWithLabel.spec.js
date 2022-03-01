@@ -1,10 +1,6 @@
 import { shallowMount } from "@vue/test-utils";
 import TextHTMLWithLabel from "@/components/generics/TextHTMLWithLabel.vue";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
-
 describe("TextHTMLWithLabel.vue", () => {
   let wrapper;
 

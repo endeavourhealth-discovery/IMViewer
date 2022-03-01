@@ -4,10 +4,6 @@ import ProgressSpinner from "primevue/progressspinner";
 import OrganizationChart from "primevue/organizationchart";
 import EntityService from "@/services/EntityService";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
-
 describe("Graph.vue", () => {
   let wrapper;
   let mockRoute;

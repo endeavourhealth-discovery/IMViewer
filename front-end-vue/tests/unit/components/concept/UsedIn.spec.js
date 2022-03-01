@@ -4,10 +4,6 @@ import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import EntityService from "@/services/EntityService";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
-
 describe("UsedIn.vue", () => {
   let wrapper;
   let mockRouter;

@@ -4,10 +4,6 @@ import Listbox from "primevue/listbox";
 import Button from "primevue/button";
 import StyleClass from "primevue/styleclass";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
-
 describe("ArrayObjectNameListboxWithLabel.vue ___ ontology", () => {
   let wrapper;
   let mockRoute;

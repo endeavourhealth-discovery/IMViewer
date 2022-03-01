@@ -1,9 +1,6 @@
 import EclDefinition from "@/components/concept/EclDefinition.vue";
 import { flushPromises, shallowMount } from "@vue/test-utils";
 import EntityService from "@/services/EntityService";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
 
 describe("EclDefinition.vue", () => {
   let wrapper;

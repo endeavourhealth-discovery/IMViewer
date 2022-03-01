@@ -3,9 +3,6 @@ import { Auth } from "aws-amplify";
 import AuthService from "@/services/AuthService";
 import { Models } from "im-library";
 const { User, CustomAlert } = Models;
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment node
 
 const testUser = new User("devtest", "John", "Doe", "john.doe@ergosoft.co.uk", "12345678", "colour/002-man.png");
 

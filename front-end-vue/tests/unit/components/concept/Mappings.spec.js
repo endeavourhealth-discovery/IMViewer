@@ -8,10 +8,6 @@ import EntityService from "@/services/EntityService";
 import { Vocabulary } from "im-library";
 const { IM } = Vocabulary;
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment jsdom
-
 describe("Mappings.vue", () => {
   let wrapper;
   let mockStore;

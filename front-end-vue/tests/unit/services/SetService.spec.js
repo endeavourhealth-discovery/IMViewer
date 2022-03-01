@@ -1,8 +1,5 @@
 import SetService from "@/services/SetService";
 import axios from "axios";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment node
 
 const api = import.meta.env.VITE_API;
 

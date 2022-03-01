@@ -5,9 +5,6 @@ import { Models } from "im-library";
 const {
   Search: { SearchRequest }
 } = Models;
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// @vitest-environment node
 
 const api = import.meta.env.VITE_API;
 const SEARCH_PAYLOAD = {
