@@ -4,9 +4,12 @@ import Button from "primevue/button";
 import StyleClass from "primevue/styleclass";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment jsdom
 
 describe("TermsTable.vue", () => {
-  let wrapper: any;
+  let wrapper;
 
   beforeEach(() => {
     wrapper = shallowMount(TermsTable, {

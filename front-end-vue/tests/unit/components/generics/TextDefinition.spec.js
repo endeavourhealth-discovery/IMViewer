@@ -5,6 +5,10 @@ import StyleClass from "primevue/styleclass";
 import ConfigService from "@/services/ConfigService";
 import ProgressSpinner from "primevue/progressspinner";
 
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment jsdom
+
 describe("TextDefinition.vue ___ data", () => {
   let wrapper;
   let mockStore;

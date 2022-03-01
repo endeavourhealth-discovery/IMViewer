@@ -1,8 +1,12 @@
 import { shallowMount } from "@vue/test-utils";
 import PanelHeader from "@/components/concept/PanelHeader.vue";
 
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment jsdom
+
 describe("PanelHeader.vue", () => {
-  let wrapper: any;
+  let wrapper;
 
   beforeEach(() => {
     wrapper = shallowMount(PanelHeader, {

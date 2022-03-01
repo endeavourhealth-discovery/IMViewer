@@ -1,13 +1,16 @@
 import SetService from "@/services/SetService";
 import axios from "axios";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment node
 
 const api = import.meta.env.VITE_API;
 
 describe("SetService.ts ___ axios success", () => {
   beforeEach(() => {
-    jest.resetAllMocks();
-    axios.get = jest.fn().mockResolvedValue("axios get return");
-    axios.post = jest.fn().mockResolvedValue("axios post return");
+    vi.resetAllMocks();
+    axios.get = vi.fn().mockResolvedValue("axios get return");
+    axios.post = vi.fn().mockResolvedValue("axios post return");
   });
 
   it("can download", async () => {
@@ -35,9 +38,9 @@ describe("SetService.ts ___ axios success", () => {
 
 describe("SetService.ts ___ axios fail", () => {
   beforeEach(() => {
-    jest.resetAllMocks();
-    axios.get = jest.fn().mockRejectedValue(false);
-    axios.post = jest.fn().mockRejectedValue(false);
+    vi.resetAllMocks();
+    axios.get = vi.fn().mockRejectedValue(false);
+    axios.post = vi.fn().mockRejectedValue(false);
   });
 
   it("can get ECLSearch", async () => {

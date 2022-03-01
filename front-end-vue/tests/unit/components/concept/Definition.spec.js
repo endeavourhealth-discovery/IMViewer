@@ -6,6 +6,9 @@ import TextHTMLWithLabel from "@/components/generics/TextHTMLWithLabel.vue";
 import TextWithLabel from "@/components/generics/TextWithLabel.vue";
 import ObjectNameWithLabel from "@/components/generics/ObjectNameWithLabel.vue";
 import ArrayObjectNameListboxWithLabel from "@/components/generics/ArrayObjectNameListboxWithLabel.vue";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment jsdom
 
 describe("Definition.vue ___ no headers", () => {
   let wrapper;
@@ -165,7 +168,7 @@ describe("Definition.vue ___ no headers", () => {
   ];
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
     wrapper = shallowMount(Definition, {
       global: {
@@ -231,7 +234,7 @@ describe("Definition.vue ___ no headers", () => {
 
   it("sets hasData ___ unknown ___ false", () => {
     const log = console.log;
-    console.log = jest.fn();
+    console.log = vi.fn();
     wrapper.vm.hasData(function testFunction() {
       return true;
     });
@@ -370,7 +373,7 @@ describe("Definition.vue ___ with headers", () => {
   ];
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
     wrapper = shallowMount(Definition, {
       global: {

@@ -1,19 +1,22 @@
 import { shallowMount } from "@vue/test-utils";
 import Home from "@/views/Home.vue";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment jsdom
 
 describe("Home.vue ___ route = Concept", () => {
-  let wrapper: any;
-  let mockStore: any;
-  let mockRouter: any;
+  let wrapper;
+  let mockStore;
+  let mockRouter;
 
   beforeEach(() => {
     mockStore = {
       state: { conceptIri: "test concept iri" },
-      commit: jest.fn()
+      commit: vi.fn()
     };
     mockRouter = {
-      push: jest.fn(),
-      back: jest.fn()
+      push: vi.fn(),
+      back: vi.fn()
     };
     wrapper = shallowMount(Home, {
       global: {
@@ -21,7 +24,7 @@ describe("Home.vue ___ route = Concept", () => {
         stubs: ["router-link", "router-view"]
       }
     });
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should updateRoute ___ Concept", async () => {
@@ -35,24 +38,24 @@ describe("Home.vue ___ route = Concept", () => {
 });
 
 describe("Home.vue ___ route = Other", () => {
-  let wrapper: any;
-  let mockStore: any;
-  let mockRouter: any;
+  let wrapper;
+  let mockStore;
+  let mockRouter;
 
   beforeEach(() => {
     mockStore = {
       state: { conceptIri: "" },
-      commit: jest.fn()
+      commit: vi.fn()
     };
 
-    mockRouter = { push: jest.fn(), back: jest.fn() };
+    mockRouter = { push: vi.fn(), back: vi.fn() };
     wrapper = shallowMount(Home, {
       global: {
         mocks: { $router: mockRouter, $store: mockStore },
         stubs: ["router-link", "router-view"]
       }
     });
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("updateRoute goes back on other routes", async () => {

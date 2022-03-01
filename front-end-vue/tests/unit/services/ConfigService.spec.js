@@ -1,11 +1,14 @@
 import ConfigService from "@/services/ConfigService";
 import axios from "axios";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment node
 
 describe("ConfigService.ts ___ axios success", () => {
   const api = import.meta.env.VITE_API;
 
   beforeEach(() => {
-    axios.get = jest.fn().mockResolvedValue(["test config"]);
+    axios.get = vi.fn().mockResolvedValue(["test config"]);
   });
 
   it("can get component layout", async () => {
@@ -34,7 +37,7 @@ describe("ConfigService.ts ___ axios fail", () => {
   const api = import.meta.env.VITE_API;
 
   beforeEach(() => {
-    axios.get = jest.fn().mockRejectedValue(false);
+    axios.get = vi.fn().mockRejectedValue(false);
   });
 
   it("can get component layout", async () => {

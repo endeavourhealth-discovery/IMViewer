@@ -2,6 +2,10 @@ import { shallowMount } from "@vue/test-utils";
 import ObjectNameWithLabel from "@/components/generics/ObjectNameWithLabel.vue";
 import LoggerService from "@/services/LoggerService";
 
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment jsdom
+
 describe("ObjectNameWithLabel.vue", () => {
   let wrapper;
 

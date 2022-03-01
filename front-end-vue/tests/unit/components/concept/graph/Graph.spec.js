@@ -6,10 +6,13 @@ import MultiSelect from "primevue/multiselect";
 import { Helpers } from "im-library";
 const { GraphTranslator } = Helpers;
 import ConfigService from "@/services/ConfigService";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment jsdom
 
 describe("Graph.vue", () => {
-  let wrapper: any;
-  let translatorSpy: any;
+  let wrapper;
+  let translatorSpy;
   const TRANSLATED = {
     name: "Scoliosis deformity of spine",
     iri: "http://snomed.info/sct#298382003",
@@ -33,9 +36,9 @@ describe("Graph.vue", () => {
   };
 
   beforeEach(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
-    ConfigService.getGraphExcludePredicates = jest
+    ConfigService.getGraphExcludePredicates = vi
       .fn()
       .mockResolvedValue([
         "http://endhealth.info/im#matchedTo",
@@ -51,7 +54,7 @@ describe("Graph.vue", () => {
         "http://endhealth.info/im#isA"
       ]);
 
-    EntityService.getPartialEntityBundle = jest.fn().mockResolvedValue({
+    EntityService.getPartialEntityBundle = vi.fn().mockResolvedValue({
       entity: {
         "@id": "http://snomed.info/sct#298382003",
         "http://endhealth.info/im#definitionalStatus": {
@@ -182,10 +185,10 @@ describe("Graph.vue", () => {
       }
     });
 
-    translatorSpy = jest.spyOn(GraphTranslator, "translateFromEntityBundle").mockReturnValue(TRANSLATED);
+    translatorSpy = vi.spyOn(GraphTranslator, "translateFromEntityBundle").mockReturnValue(TRANSLATED);
 
     const warn = console.warn;
-    console.warn = jest.fn();
+    console.warn = vi.fn();
 
     wrapper = shallowMount(Graph, {
       global: { components: { ProgressSpinner, MultiSelect } },
@@ -196,7 +199,7 @@ describe("Graph.vue", () => {
 
     await flushPromises();
     await wrapper.vm.$nextTick();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("mounts", () => {
@@ -205,7 +208,7 @@ describe("Graph.vue", () => {
   });
 
   it("watches conceptIri", async () => {
-    wrapper.vm.getEntityBundle = jest.fn();
+    wrapper.vm.getEntityBundle = vi.fn();
     wrapper.vm.$options.watch.conceptIri.call(wrapper.vm, "http://snomed.info/sct#203639008");
     await flushPromises();
     expect(wrapper.vm.getEntityBundle).toHaveBeenCalledTimes(1);
@@ -213,7 +216,7 @@ describe("Graph.vue", () => {
   });
 
   it("can getEntityBundle", async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     wrapper.vm.getEntityBundle("http://snomed.info/sct#203639008");
     expect(wrapper.vm.loading).toBe(true);
     expect(EntityService.getPartialEntityBundle).toHaveBeenCalledTimes(1);

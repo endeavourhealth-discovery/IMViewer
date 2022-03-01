@@ -7,12 +7,16 @@ import OverlayPanel from "primevue/overlaypanel";
 import EntityService from "@/services/EntityService";
 import Tooltip from "primevue/tooltip";
 
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment jsdom
+
 describe("SecondaryTree.vue", () => {
-  let wrapper: any;
-  let mockToast: any;
-  let mockRoute: any;
-  let mockRouter: any;
-  let mockRef: any;
+  let wrapper;
+  let mockToast;
+  let mockRoute;
+  let mockRouter;
+  let mockRef;
 
   const CONCEPT = {
     "@id": "http://snomed.info/sct#298382003",

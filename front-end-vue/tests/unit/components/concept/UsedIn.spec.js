@@ -4,11 +4,15 @@ import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import EntityService from "@/services/EntityService";
 
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment jsdom
+
 describe("UsedIn.vue", () => {
-  let wrapper: any;
-  let mockRouter: any;
-  let mockToast: any;
-  let docSpy: any;
+  let wrapper;
+  let mockRouter;
+  let mockToast;
+  let docSpy;
   const USAGES = [
     { name: "Acrodysplasia scoliosis (disorder)", "@id": "http://snomed.info/sct#773773006" },
     { name: "Anterior vertebral body tethering (procedure)", "@id": "http://snomed.info/sct#788325009" },

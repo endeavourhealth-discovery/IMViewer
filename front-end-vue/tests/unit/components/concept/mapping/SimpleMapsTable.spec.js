@@ -2,27 +2,30 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 import SimpleMaps from "@/components/concept/mapping/SimpleMaps.vue";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment jsdom
 
 describe("SimpleMapsTable.vue", () => {
-  let wrapper: any;
-  let mockRouter: any;
-  let docSpy: any;
+  let wrapper;
+  let mockRouter;
+  let docSpy;
   const SIMPLE_MAP = [
     { name: "Amputation of right foot", iri: "http://endhealth.info/emis#^ESCTAM784250", scheme: "EMIS (inc. Read2 like) namespace" },
     { name: "Amputation of right foot", iri: "http://endhealth.info/emis#^ESCTAM784250", scheme: "EMIS (inc. Read2 like) namespace" }
   ];
 
   beforeEach(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
     mockRouter = {
-      push: jest.fn()
+      push: vi.fn()
     };
 
-    docSpy = jest.spyOn(document, "getElementById");
+    docSpy = vi.spyOn(document, "getElementById");
     docSpy.mockReturnValue(undefined);
 
     const warn = console.warn;
-    console.warn = jest.fn();
+    console.warn = vi.fn();
 
     wrapper = shallowMount(SimpleMaps, {
       global: {
@@ -44,7 +47,7 @@ describe("SimpleMapsTable.vue", () => {
 
   it("adds event listener to setHeight and Scroll on resize", async () => {
     await flushPromises();
-    const spy = jest.spyOn(wrapper.vm, "setTableWidth");
+    const spy = vi.spyOn(wrapper.vm, "setTableWidth");
     window.dispatchEvent(new Event("resize"));
     await wrapper.vm.$nextTick();
     expect(spy).toHaveBeenCalledTimes(1);
@@ -52,14 +55,14 @@ describe("SimpleMapsTable.vue", () => {
   });
 
   it("can remove eventListener", () => {
-    const spy = jest.spyOn(global, "removeEventListener");
+    const spy = vi.spyOn(global, "removeEventListener");
     wrapper.unmount();
     expect(spy).toHaveBeenCalled();
     spy.mockReset();
   });
 
   it("can resize", () => {
-    wrapper.vm.setTableWidth = jest.fn();
+    wrapper.vm.setTableWidth = vi.fn();
     wrapper.vm.onResize();
     expect(wrapper.vm.setTableWidth).toHaveBeenCalledTimes(1);
   });
@@ -67,7 +70,7 @@ describe("SimpleMapsTable.vue", () => {
   it("can setTableWidth", () => {
     const mockElement = document.createElement("div");
     mockElement.style.width = "10px";
-    mockElement.getElementsByClassName = jest.fn().mockReturnValue([mockElement]);
+    mockElement.getElementsByClassName = vi.fn().mockReturnValue([mockElement]);
     docSpy.mockReturnValue(mockElement);
     wrapper.vm.setTableWidth();
     expect(mockElement.style.width).toBe("100%");
@@ -76,7 +79,7 @@ describe("SimpleMapsTable.vue", () => {
   it("can setTableWidth ___ element fail", () => {
     const mockElement = document.createElement("div");
     mockElement.style.width = "10px";
-    mockElement.getElementsByClassName = jest.fn().mockReturnValue([undefined]);
+    mockElement.getElementsByClassName = vi.fn().mockReturnValue([undefined]);
     docSpy.mockReturnValue(mockElement);
     wrapper.vm.setTableWidth();
     expect(mockElement.style.width).toBe("10px");
@@ -85,7 +88,7 @@ describe("SimpleMapsTable.vue", () => {
   it("can scrollToTop", () => {
     const mockElement = document.createElement("div");
     mockElement.scrollTop = 100;
-    mockElement.getElementsByClassName = jest.fn().mockReturnValue([mockElement]);
+    mockElement.getElementsByClassName = vi.fn().mockReturnValue([mockElement]);
     docSpy.mockReturnValue(mockElement);
     wrapper.vm.scrollToTop();
     expect(mockElement.scrollTop).toBe(0);
@@ -94,7 +97,7 @@ describe("SimpleMapsTable.vue", () => {
   it("can scrollToTop ___ id element fail", () => {
     const mockElement = document.createElement("div");
     mockElement.scrollTop = 100;
-    mockElement.getElementsByClassName = jest.fn().mockReturnValue([undefined]);
+    mockElement.getElementsByClassName = vi.fn().mockReturnValue([undefined]);
     docSpy.mockReturnValue(mockElement);
     wrapper.vm.scrollToTop();
     expect(mockElement.scrollTop).toBe(100);
@@ -103,7 +106,7 @@ describe("SimpleMapsTable.vue", () => {
   it("can scrollToTop ___ class element fail", () => {
     const mockElement = document.createElement("div");
     mockElement.scrollTop = 100;
-    mockElement.getElementsByClassName = jest.fn().mockReturnValue([undefined]);
+    mockElement.getElementsByClassName = vi.fn().mockReturnValue([undefined]);
     docSpy.mockReturnValue(undefined);
     wrapper.vm.scrollToTop();
     expect(mockElement.scrollTop).toBe(100);

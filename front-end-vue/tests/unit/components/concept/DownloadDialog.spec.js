@@ -9,6 +9,9 @@ import EntityService from "@/services/EntityService";
 import LoggerService from "@/services/LoggerService";
 import { Vocabulary } from "im-library";
 const { IM, RDFS } = Vocabulary;
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment jsdom
 
 describe("DownloadDialog.vue", () => {
   const CONCEPT = { "@id": "http://snomed.info/sct#298382003", "http://www.w3.org/2000/01/rdf-schema#label": "Scoliosis deformity of spine (disorder)" };
@@ -90,20 +93,20 @@ describe("DownloadDialog.vue", () => {
     { name: "Scoliosis deformity of spine (disorder)", code: "2153143014", scheme: "Snomed-CT namespace" }
   ];
 
-  let wrapper: any;
-  let mockToast: any;
+  let wrapper;
+  let mockToast;
 
   beforeEach(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
     mockToast = {
-      add: jest.fn()
+      add: vi.fn()
     };
-    EntityService.getPartialEntity = jest.fn().mockResolvedValue(CONCEPT);
-    EntityService.getDefinitionBundle = jest.fn().mockResolvedValue(DEFINITION);
-    EntityService.getEntityChildren = jest.fn().mockResolvedValue(CHILDREN);
-    EntityService.getDataModelProperties = jest.fn().mockResolvedValue(DATA_MODEL);
-    EntityService.getEntityMembers = jest.fn().mockResolvedValue(MEMBERS);
-    EntityService.getEntityTermCodes = jest.fn().mockResolvedValue(TERMS);
+    EntityService.getPartialEntity = vi.fn().mockResolvedValue(CONCEPT);
+    EntityService.getDefinitionBundle = vi.fn().mockResolvedValue(DEFINITION);
+    EntityService.getEntityChildren = vi.fn().mockResolvedValue(CHILDREN);
+    EntityService.getDataModelProperties = vi.fn().mockResolvedValue(DATA_MODEL);
+    EntityService.getEntityMembers = vi.fn().mockResolvedValue(MEMBERS);
+    EntityService.getEntityTermCodes = vi.fn().mockResolvedValue(TERMS);
 
     wrapper = shallowMount(DownloadDialog, {
       global: {
@@ -115,7 +118,7 @@ describe("DownloadDialog.vue", () => {
 
     await flushPromises();
     await wrapper.vm.$nextTick();
-    jest.clearAllMocks();
+    vi.clearMocks();
   });
 
   it("inits on mounted", async () => {
@@ -131,7 +134,7 @@ describe("DownloadDialog.vue", () => {
   });
 
   it("inits on conceptIri change", () => {
-    wrapper.vm.init = jest.fn();
+    wrapper.vm.init = vi.fn();
     wrapper.vm.$options.watch.conceptIri.call(wrapper.vm, "http://endhealth.info/im#DiscoveryOntology");
     expect(wrapper.vm.init).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.init).toHaveBeenCalledWith("http://endhealth.info/im#DiscoveryOntology");
@@ -143,8 +146,8 @@ describe("DownloadDialog.vue", () => {
   });
 
   it("can downloadConcept ___ success", () => {
-    wrapper.vm.closeDownloadDialog = jest.fn();
-    window.open = jest.fn().mockReturnValue(true);
+    wrapper.vm.closeDownloadDialog = vi.fn();
+    window.open = vi.fn().mockReturnValue(true);
     wrapper.vm.downloadConcept();
     expect(wrapper.vm.closeDownloadDialog).toHaveBeenCalledTimes(1);
     expect(window.open).toHaveBeenCalledTimes(1);
@@ -156,8 +159,8 @@ describe("DownloadDialog.vue", () => {
   });
 
   it("can downloadConcept ___ fail", () => {
-    wrapper.vm.closeDownloadDialog = jest.fn();
-    window.open = jest.fn().mockReturnValue(false);
+    wrapper.vm.closeDownloadDialog = vi.fn();
+    window.open = vi.fn().mockReturnValue(false);
     wrapper.vm.downloadConcept();
     expect(wrapper.vm.closeDownloadDialog).toHaveBeenCalledTimes(1);
     expect(window.open).toHaveBeenCalledTimes(1);
@@ -169,7 +172,7 @@ describe("DownloadDialog.vue", () => {
   });
 
   it("Inits ___ success", async () => {
-    wrapper.vm.setIncludeBooleans = jest.fn();
+    wrapper.vm.setIncludeBooleans = vi.fn();
     wrapper.vm.init("http://snomed.info/sct#298382003");
     expect(wrapper.vm.loading).toBe(true);
     await flushPromises();
@@ -197,13 +200,13 @@ describe("DownloadDialog.vue", () => {
   });
 
   it("Inits ___ success ___ not objectwithkeys", async () => {
-    EntityService.getPartialEntity = jest.fn().mockResolvedValue({
+    EntityService.getPartialEntity = vi.fn().mockResolvedValue({
       "@id": "http://snomed.info/sct#298382003",
       "http://www.w3.org/2000/01/rdf-schema#label": "Scoliosis deformity of spine (disorder)",
       "http://endhealth.info/im#isChildOf": [{ "@id": "testIsChildOfIri", name: "testIsChildOfName" }],
       "http://endhealth.info/im#hasChildren": [{ "@id": "testHasChildrenIri", name: "testHasChildrenName" }]
     });
-    wrapper.vm.setIncludeBooleans = jest.fn();
+    wrapper.vm.setIncludeBooleans = vi.fn();
     wrapper.vm.init("http://snomed.info/sct#298382003");
     expect(wrapper.vm.loading).toBe(true);
     await flushPromises();

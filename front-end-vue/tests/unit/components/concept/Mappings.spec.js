@@ -8,11 +8,15 @@ import EntityService from "@/services/EntityService";
 import { Vocabulary } from "im-library";
 const { IM } = Vocabulary;
 
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment jsdom
+
 describe("Mappings.vue", () => {
-  let wrapper: any;
-  let mockStore: any;
-  let mockToast: any;
-  let mockRef: any;
+  let wrapper;
+  let mockStore;
+  let mockToast;
+  let mockRef;
 
   const HAS_MAPS = {
     "http://endhealth.info/im#hasMap": [
@@ -41,7 +45,7 @@ describe("Mappings.vue", () => {
         ]
       }
     ]
-  } as any;
+  };
   const NAMESPACES = [
     { iri: "http://endhealth.info/bc#", prefix: "bc", name: "Barts Cerner namespace" },
     { iri: "http://endhealth.info/ceg16#", prefix: "ceg13", name: "CEG ethnicity 16+ category" },

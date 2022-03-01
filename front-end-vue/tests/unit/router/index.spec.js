@@ -3,6 +3,9 @@ import App from "@/App.vue";
 import Toast from "primevue/toast";
 import store from "@/store/index";
 import { flushPromises, shallowMount } from "@vue/test-utils";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment jsdom
 
 describe("router", () => {
   beforeEach(() => {

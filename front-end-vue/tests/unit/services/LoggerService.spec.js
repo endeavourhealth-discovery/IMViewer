@@ -1,11 +1,14 @@
 import LoggerService from "@/services/LoggerService";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment node
 
 describe("LoggerService", () => {
   describe("error", () => {
     const testError = new Error("Test error message");
     beforeEach(() => {
-      jest.clearAllMocks();
-      console.error = jest.fn();
+      vi.clearAllMocks();
+      console.error = vi.fn();
     });
 
     it("creates an error in the console and returns a toast message", () => {
@@ -32,8 +35,8 @@ describe("LoggerService", () => {
   describe("warn", () => {
     const testError = new Error("Test error message");
     beforeEach(() => {
-      jest.clearAllMocks();
-      console.warn = jest.fn();
+      vi.clearAllMocks();
+      console.warn = vi.fn();
     });
 
     it("creates a log in the console and returns a toast message", () => {
@@ -60,8 +63,8 @@ describe("LoggerService", () => {
   describe("info", () => {
     const testError = new Error("Test error message");
     beforeEach(() => {
-      jest.clearAllMocks();
-      console.info = jest.fn();
+      vi.clearAllMocks();
+      console.info = vi.fn();
     });
 
     it("creates an info in the console and returns a toast message", () => {
@@ -87,8 +90,8 @@ describe("LoggerService", () => {
 
   describe("success", () => {
     beforeEach(() => {
-      jest.clearAllMocks();
-      console.log = jest.fn();
+      vi.clearAllMocks();
+      console.log = vi.fn();
     });
 
     it("creates a log in the console and returns a toast message", () => {
@@ -114,7 +117,7 @@ describe("LoggerService", () => {
 
   describe("debug", () => {
     it("creates a debug to console", () => {
-      console.debug = jest.fn();
+      console.debug = vi.fn();
       LoggerService.debug("Test debug log");
       expect(console.debug).toHaveBeenCalledTimes(1);
       expect(console.debug).toHaveBeenCalledWith("Test debug log");
@@ -123,7 +126,7 @@ describe("LoggerService", () => {
 
   describe("trace", () => {
     it("creates a trace to console", () => {
-      console.trace = jest.fn();
+      console.trace = vi.fn();
       LoggerService.trace("Test trace log");
       expect(console.trace).toHaveBeenCalledTimes(1);
       expect(console.trace).toHaveBeenCalledWith("Test trace log");

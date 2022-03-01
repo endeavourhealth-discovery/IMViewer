@@ -3,18 +3,21 @@ import { Auth } from "aws-amplify";
 import AuthService from "@/services/AuthService";
 import { Models } from "im-library";
 const { User, CustomAlert } = Models;
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment node
 
 const testUser = new User("devtest", "John", "Doe", "john.doe@ergosoft.co.uk", "12345678", "colour/002-man.png");
 
 describe("signOut", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("returns 200 with auth success", async () => {
-    Auth.signOut = jest.fn().mockResolvedValue({ code: 200 });
+    Auth.signOut = vi.fn().mockResolvedValue({ code: 200 });
     const result = AuthService.signOut();
-    let promiseResult: any;
+    let promiseResult;
     result.then(res => {
       promiseResult = res;
     });
@@ -24,10 +27,10 @@ describe("signOut", () => {
   });
 
   it("returns 400 with auth fail", async () => {
-    Auth.signOut = jest.fn().mockRejectedValue({ code: "Logout", name: "testError", message: "Logout error test" });
+    Auth.signOut = vi.fn().mockRejectedValue({ code: "Logout", name: "testError", message: "Logout error test" });
     const result = AuthService.signOut();
-    let promiseResult: any;
-    let err: any;
+    let promiseResult;
+    let err;
     result.then(res => {
       err = res.error;
       promiseResult = res;
@@ -40,11 +43,11 @@ describe("signOut", () => {
 
 describe("getCurrentAuthenticatedUser", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("returns 200 with auth success, user, password empty, with id", async () => {
-    Auth.currentAuthenticatedUser = jest.fn().mockResolvedValueOnce({
+    Auth.currentAuthenticatedUser = vi.fn().mockResolvedValueOnce({
       username: "devtest",
       attributes: {
         "custom:avatar": "colour/002-man.png",
@@ -56,7 +59,7 @@ describe("getCurrentAuthenticatedUser", () => {
       }
     });
     const result = AuthService.getCurrentAuthenticatedUser();
-    let promiseResult: any;
+    let promiseResult;
     result.then(res => {
       promiseResult = res;
     });
@@ -68,10 +71,10 @@ describe("getCurrentAuthenticatedUser", () => {
   });
 
   it("returns 400 with auth fail", async () => {
-    Auth.currentAuthenticatedUser = jest.fn().mockRejectedValue({ code: "currentUserFail", message: "get current user error" });
+    Auth.currentAuthenticatedUser = vi.fn().mockRejectedValue({ code: "currentUserFail", message: "get current user error" });
     const result = AuthService.getCurrentAuthenticatedUser();
-    let promiseResult: any;
-    let err: any;
+    let promiseResult;
+    let err;
     result.then(res => {
       err = res.error;
       promiseResult = res;

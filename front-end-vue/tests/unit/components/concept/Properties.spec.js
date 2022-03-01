@@ -6,6 +6,10 @@ import Column from "primevue/column";
 import EntityService from "@/services/EntityService";
 import LoggerService from "@/services/LoggerService";
 
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// @vitest-environment jsdom
+
 describe("Properties.vue", () => {
   let wrapper;
   let mockRouter;
