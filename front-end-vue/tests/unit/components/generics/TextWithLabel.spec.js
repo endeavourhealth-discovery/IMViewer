@@ -5,7 +5,7 @@ describe("TextWithLabel.vue", () => {
   let wrapper;
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
     wrapper = shallowMount(TextWithLabel, {
       props: { label: "Name", data: "Scoliosis", size: "50%" }

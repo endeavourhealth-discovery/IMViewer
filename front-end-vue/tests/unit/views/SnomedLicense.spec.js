@@ -12,11 +12,11 @@ describe("SnomedLicense.vue", () => {
   beforeEach(() => {
     mockStore = {
       state: { snomedLicenseAccepted: "false", historyCount: 1 },
-      commit: jest.fn()
+      commit: vi.fn()
     };
     mockRouter = {
-      push: jest.fn(),
-      go: jest.fn()
+      push: vi.fn(),
+      go: vi.fn()
     };
     wrapper = mount(SnomedLicense, {
       global: {
@@ -72,11 +72,11 @@ describe("SnomedLicense.vue ___ mock window location", () => {
     };
     mockStore = {
       state: { snomedLicenseAccepted: "false", historyCount: 1 },
-      commit: jest.fn()
+      commit: vi.fn()
     };
     mockRouter = {
-      push: jest.fn(),
-      go: jest.fn()
+      push: vi.fn(),
+      go: vi.fn()
     };
     wrapper = mount(SnomedLicense, {
       global: {

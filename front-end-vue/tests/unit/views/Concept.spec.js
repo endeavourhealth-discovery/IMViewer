@@ -232,7 +232,7 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("can remove eventListener", () => {
-    const spy = vi.spyOn(global, "removeEventListener");
+    const spy = vi.spyOn(window, "removeEventListener");
     wrapper.unmount();
     expect(spy).toHaveBeenCalled();
     spy.mockReset();

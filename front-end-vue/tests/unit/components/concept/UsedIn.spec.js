@@ -24,23 +24,23 @@ describe("UsedIn.vue", () => {
   ];
 
   beforeEach(async () => {
-    jest.resetAllMocks();
-    EntityService.getEntityUsages = jest.fn().mockResolvedValue(USAGES);
-    EntityService.getUsagesTotalRecords = jest.fn().mockResolvedValue(50);
+    vi.resetAllMocks();
+    EntityService.getEntityUsages = vi.fn().mockResolvedValue(USAGES);
+    EntityService.getUsagesTotalRecords = vi.fn().mockResolvedValue(50);
     mockRouter = {
-      push: jest.fn()
+      push: vi.fn()
     };
     mockToast = {
-      add: jest.fn()
+      add: vi.fn()
     };
-    docSpy = jest.spyOn(document, "getElementById");
+    docSpy = vi.spyOn(document, "getElementById");
     docSpy.mockReturnValue(undefined);
 
     const warn = console.warn;
-    console.warn = jest.fn();
+    console.warn = vi.fn();
 
     const error = console.error;
-    console.error = jest.fn();
+    console.error = vi.fn();
 
     wrapper = shallowMount(UsedIn, {
       global: {
@@ -51,7 +51,7 @@ describe("UsedIn.vue", () => {
     });
 
     await flushPromises();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     console.warn = warn;
     console.error = error;
@@ -69,16 +69,16 @@ describe("UsedIn.vue", () => {
   });
 
   it("inits on iri change", async () => {
-    wrapper.vm.init = jest.fn();
+    wrapper.vm.init = vi.fn();
     wrapper.vm.$options.watch.conceptIri.call(wrapper.vm, "http://endhealth.info/im#DiscoveryOntology");
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.init).toHaveBeenCalledTimes(1);
   });
 
   it("adds event listener to setHeight and Scroll on resize", async () => {
-    console.error = jest.fn();
+    console.error = vi.fn();
     await flushPromises();
-    const spy = jest.spyOn(wrapper.vm, "setScrollHeight");
+    const spy = vi.spyOn(wrapper.vm, "setScrollHeight");
     window.dispatchEvent(new Event("resize"));
     await wrapper.vm.$nextTick();
     expect(spy).toHaveBeenCalledTimes(1);
@@ -86,17 +86,17 @@ describe("UsedIn.vue", () => {
   });
 
   it("can remove eventListener", () => {
-    console.error = jest.fn();
-    const spy = jest.spyOn(global, "removeEventListener");
+    console.error = vi.fn();
+    const spy = vi.spyOn(window, "removeEventListener");
     wrapper.unmount();
     expect(spy).toHaveBeenCalled();
     spy.mockReset();
   });
 
   it("can resize", () => {
-    console.error = jest.fn();
-    console.warn = jest.fn();
-    wrapper.vm.setScrollHeight = jest.fn();
+    console.error = vi.fn();
+    console.warn = vi.fn();
+    wrapper.vm.setScrollHeight = vi.fn();
     wrapper.vm.onResize();
     expect(wrapper.vm.setScrollHeight).toHaveBeenCalledTimes(1);
   });
@@ -119,16 +119,16 @@ describe("UsedIn.vue", () => {
   });
 
   it("can handle page", () => {
-    wrapper.vm.getPage = jest.fn();
-    wrapper.vm.scrollToTop = jest.fn();
+    wrapper.vm.getPage = vi.fn();
+    wrapper.vm.scrollToTop = vi.fn();
     wrapper.vm.handlePage({ rows: 100, page: 7 });
     expect(wrapper.vm.pageSize).toBe(100);
     expect(wrapper.vm.currentPage).toBe(7);
   });
 
   it("can handlePage", async () => {
-    wrapper.vm.getUsages = jest.fn();
-    wrapper.vm.scrollToTop = jest.fn();
+    wrapper.vm.getUsages = vi.fn();
+    wrapper.vm.scrollToTop = vi.fn();
     wrapper.vm.handlePage({ rows: 50, page: 7 });
     expect(wrapper.vm.loading).toBe(true);
     expect(wrapper.vm.pageSize).toBe(50);
@@ -154,9 +154,9 @@ describe("UsedIn.vue", () => {
 
   it("can scroll to top", () => {
     const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = jest.fn().mockReturnValue({ height: 100 });
+    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ height: 100 });
     mockElement.scrollTop = 100;
-    mockElement.getElementsByClassName = jest.fn().mockReturnValue([mockElement]);
+    mockElement.getElementsByClassName = vi.fn().mockReturnValue([mockElement]);
     docSpy.mockReturnValue(mockElement);
     wrapper.vm.scrollToTop();
     expect(mockElement.scrollTop).toBe(0);
@@ -164,9 +164,9 @@ describe("UsedIn.vue", () => {
 
   it("can scroll to top ___ container fail", () => {
     const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = jest.fn().mockReturnValue({ height: 100 });
+    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ height: 100 });
     mockElement.scrollTop = 100;
-    mockElement.getElementsByClassName = jest.fn().mockReturnValue([undefined]);
+    mockElement.getElementsByClassName = vi.fn().mockReturnValue([undefined]);
     docSpy.mockReturnValue(undefined);
     wrapper.vm.scrollToTop();
     expect(mockElement.scrollTop).toBe(100);
@@ -174,9 +174,9 @@ describe("UsedIn.vue", () => {
 
   it("can setScrollHeight", () => {
     const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = jest.fn().mockReturnValue({ height: 100 });
+    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ height: 100 });
     mockElement.scrollTop = 100;
-    mockElement.getElementsByClassName = jest.fn().mockReturnValue([mockElement]);
+    mockElement.getElementsByClassName = vi.fn().mockReturnValue([mockElement]);
     docSpy.mockReturnValue(mockElement);
     wrapper.vm.setScrollHeight();
     expect(wrapper.vm.scrollHeight).not.toBe("");
@@ -184,9 +184,9 @@ describe("UsedIn.vue", () => {
 
   it("can setScrollHeight ___ paginator fail", () => {
     const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = jest.fn().mockReturnValue({ height: 100 });
+    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ height: 100 });
     mockElement.scrollTop = 100;
-    mockElement.getElementsByClassName = jest.fn().mockReturnValue([undefined]);
+    mockElement.getElementsByClassName = vi.fn().mockReturnValue([undefined]);
     docSpy.mockReturnValue(mockElement);
     wrapper.vm.setScrollHeight();
     expect(wrapper.vm.scrollHeight).not.toBe("500px");

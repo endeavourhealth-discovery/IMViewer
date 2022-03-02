@@ -6,20 +6,20 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 
 describe("router", () => {
   beforeEach(() => {
-    console.log = jest.fn();
+    console.log = vi.fn();
   });
 
   afterEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
   describe("router ___ no snomed", () => {
     let wrapper;
 
     beforeEach(async () => {
-      jest.resetAllMocks();
+      vi.resetAllMocks();
       window.sessionStorage.clear();
       store.commit("updateSnomedLicenseAccepted", "false");
-      store.dispatch = jest.fn().mockResolvedValue({ authenticated: false });
+      store.dispatch = vi.fn().mockResolvedValue({ authenticated: false });
       router.push("/");
       await router.isReady();
 
@@ -32,7 +32,7 @@ describe("router", () => {
 
       await flushPromises();
       await wrapper.vm.$nextTick();
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
 
     it("routes to snomedLicense if snomedAccepted ___ false", () => {
@@ -45,10 +45,10 @@ describe("router", () => {
     let wrapper;
 
     beforeEach(async () => {
-      jest.resetAllMocks();
+      vi.resetAllMocks();
       window.sessionStorage.clear();
       store.commit("updateSnomedLicenseAccepted", "true");
-      store.dispatch = jest.fn().mockResolvedValue({ authenticated: false });
+      store.dispatch = vi.fn().mockResolvedValue({ authenticated: false });
       router.push("/");
       await router.isReady();
 
@@ -61,7 +61,7 @@ describe("router", () => {
 
       await flushPromises();
       await wrapper.vm.$nextTick();
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
 
     it("routes to home if snomedAccepted ___ true", () => {
@@ -73,10 +73,10 @@ describe("router", () => {
   //   let wrapper;
 
   //   beforeEach(async () => {
-  //     jest.resetAllMocks();
+  //     vi.resetAllMocks();
   //     window.sessionStorage.clear();
   //     store.state.snomedLicenseAccepted = "true";
-  //     store.dispatch = jest.fn().mockResolvedValue({ authenticated: false });
+  //     store.dispatch = vi.fn().mockResolvedValue({ authenticated: false });
   //     router.push("/");
   //     await router.isReady();
 
@@ -89,7 +89,7 @@ describe("router", () => {
 
   //     await flushPromises();
   //     await wrapper.vm.$nextTick();
-  //     jest.clearAllMocks();
+  //     vi.clearAllMocks();
   //   });
 
   //   it("routes to login if false", async () => {
@@ -103,10 +103,10 @@ describe("router", () => {
   //   let wrapper;
 
   //   beforeEach(async () => {
-  //     jest.resetAllMocks();
+  //     vi.resetAllMocks();
   //     window.sessionStorage.clear();
   //     store.state.snomedLicenseAccepted = "true";
-  //     store.dispatch = jest.fn().mockResolvedValue({ authenticated: true });
+  //     store.dispatch = vi.fn().mockResolvedValue({ authenticated: true });
   //     router.push("/");
   //     await router.isReady();
 
@@ -119,7 +119,7 @@ describe("router", () => {
 
   //     await flushPromises();
   //     await wrapper.vm.$nextTick();
-  //     jest.clearAllMocks();
+  //     vi.clearAllMocks();
   //   });
 
   //   it("routes to login if false", async () => {
@@ -133,11 +133,11 @@ describe("router", () => {
     let wrapper;
 
     beforeEach(async () => {
-      jest.resetAllMocks();
+      vi.resetAllMocks();
       window.sessionStorage.clear();
       store.state.snomedLicenseAccepted = "true";
       store.state.blockedIris = ["http://www.w3.org/2001/XMLSchema#string"];
-      store.dispatch = jest.fn().mockResolvedValue({ authenticated: true });
+      store.dispatch = vi.fn().mockResolvedValue({ authenticated: true });
       router.push("/");
       await router.isReady();
 
@@ -150,7 +150,7 @@ describe("router", () => {
 
       await flushPromises();
       await wrapper.vm.$nextTick();
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
 
     it("doesn't route if iri is blocked", async () => {
@@ -164,11 +164,11 @@ describe("router", () => {
     let wrapper;
 
     beforeEach(async () => {
-      jest.resetAllMocks();
+      vi.resetAllMocks();
       window.sessionStorage.clear();
       store.state.snomedLicenseAccepted = "true";
-      store.commit = jest.fn();
-      store.dispatch = jest.fn().mockResolvedValue({ authenticated: true });
+      store.commit = vi.fn();
+      store.dispatch = vi.fn().mockResolvedValue({ authenticated: true });
       router.push("/");
       await router.isReady();
 
@@ -181,7 +181,7 @@ describe("router", () => {
 
       await flushPromises();
       await wrapper.vm.$nextTick();
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
 
     it("updates conceptIri on concept routing", async () => {
