@@ -1,4 +1,4 @@
-import { createApp } from "vue";
+import { createApp, Plugin } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
@@ -81,6 +81,7 @@ import awsconfig from "./aws-exports";
 import axios from "axios";
 
 // IMLibrary imports
+import IMLibrary from "im-library";
 import { Helpers } from "im-library";
 const {
   DataTypeCheckers: { isObjectHasKeys }
@@ -93,6 +94,7 @@ const app = createApp(App)
   .use(store)
   .use(router)
   .use(PrimeVue, { ripple: true })
+  .use(IMLibrary.install as Plugin)
   .use(ConfirmationService)
   .use(ToastService)
   .use(VueClipboard, {

@@ -11,14 +11,10 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { TopBar } from "im-library";
 import { mapState } from "vuex";
 
 export default defineComponent({
   name: "Home",
-  components: {
-    TopBar
-  },
   computed: mapState(["conceptIri", "isLoggedIn", "currentUser"]),
   async mounted() {
     this.updateRoute();
