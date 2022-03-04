@@ -1,11 +1,10 @@
 import axios, { CancelToken } from "axios";
 import { SearchResponse } from "@/models/entityServiceTypes/EntityServiceTypes";
+import Env from '@/services/Env';
 
 export default class SetService {
-  static api = process.env.VUE_APP_API;
-
   public static async download(conceptIri: string, expanded: boolean, v1: boolean) {
-    return await axios.get(this.api + "api/set/public/download", {
+    return await axios.get(Env.api + "api/set/public/download", {
       params: {
         iri: conceptIri,
         expandMembers: expanded,
@@ -18,7 +17,7 @@ export default class SetService {
 
   public static async ECLSearch(searchString: string, includeLegacy: boolean, limit: number, cancelToken: CancelToken): Promise<SearchResponse> {
     try {
-      return await axios.post(this.api + "api/set/public/eclSearch", searchString, {
+      return await axios.post(Env.api + "api/set/public/eclSearch", searchString, {
         headers: { "Content-Type": "text/plain" },
         params: { includeLegacy: includeLegacy, limit: limit },
         cancelToken: cancelToken
@@ -29,7 +28,7 @@ export default class SetService {
   }
 
   public static async publish(conceptIri: string) {
-    return await axios.get(this.api + "api/set/publish", {
+    return await axios.get(Env.api + "api/set/publish", {
       params: { iri: conceptIri }
     });
   }

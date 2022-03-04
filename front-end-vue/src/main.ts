@@ -81,6 +81,7 @@ import awsconfig from "./aws-exports";
 import axios from "axios";
 import { isObjectHasKeys } from "./helpers/DataTypeCheckers";
 import {ImLibrarySample} from 'im-library';
+import Env from '@/services/Env';
 
 Amplify.configure(awsconfig);
 Auth.configure(awsconfig);
@@ -149,7 +150,7 @@ const app = createApp(App)
 const vm = app.mount("#app");
 
 axios.interceptors.request.use(async request => {
-  if (store.state.isLoggedIn && process.env.VUE_APP_API && request.url?.startsWith(process.env.VUE_APP_API)) {
+  if (store.state.isLoggedIn && Env.api && request.url?.startsWith(Env.api)) {
     request.headers.Authorization = "Bearer " + (await Auth.currentSession()).getIdToken().getJwtToken();
   }
   return request;

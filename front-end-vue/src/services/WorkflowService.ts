@@ -1,11 +1,10 @@
 import axios from "axios";
+import Env from '@/services/Env';
 
 export default class WorkflowService {
-  static api = process.env.VUE_APP_API;
-
   public static async getWorkflows(): Promise<any[]> {
     try {
-      return await axios.get(this.api + "workflow");
+      return await axios.get(Env.api + "workflow");
     } catch (error) {
       return [];
     }
@@ -13,7 +12,7 @@ export default class WorkflowService {
 
   public static async getWorkflowTasks(): Promise<any[]> {
     try {
-      return await axios.get(this.api + "workflow/tasks");
+      return await axios.get(Env.api + "workflow/tasks");
     } catch (error) {
       return [];
     }

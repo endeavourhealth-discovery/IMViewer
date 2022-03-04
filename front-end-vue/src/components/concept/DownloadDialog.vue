@@ -96,6 +96,7 @@ import { TermCode } from "@/models/terms/TermCode";
 import { PartialBundle } from "@/models/entityServiceTypes/EntityServiceTypes";
 import { EntityReferenceNode } from "@/models/EntityReferenceNode";
 import { TTIriRef } from "@/models/TripleTree";
+import Env from '@/services/Env';
 
 export default defineComponent({
   name: "DownloadDialog",
@@ -160,7 +161,7 @@ export default defineComponent({
       const modIri = this.conceptIri.replace(/\//gi, "%2F").replace(/#/gi, "%23");
 
       const url =
-        process.env.VUE_APP_API +
+        Env.api +
         "api/entity/download?iri=" +
         modIri +
         "&format=" +
