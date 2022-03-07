@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
 import Datamodel from "../views/Concept.vue";
-import SnomedLicense from "../views/SnomedLicense.vue";
+import { SnomedLicense } from "im-library";
 import store from "@/store/index";
 import { nextTick } from "vue";
 
@@ -29,7 +29,8 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/snomedLicense",
     name: "License",
-    component: SnomedLicense
+    component: SnomedLicense,
+    props: { returnUrl: import.meta.env.VITE_VIEWER_URL }
   }
 ];
 
@@ -43,7 +44,9 @@ router.beforeEach((to, from, next) => {
   if (iri && store.state.blockedIris.includes(iri)) {
     return;
   }
-  store.commit("updateConceptIri", to.params.selectedIri as string);
+  if (iri) {
+    store.commit("updateConceptIri", to.params.selectedIri as string);
+  }
   if (to.matched.some(record => record.meta.requiresAuth)) {
     store.dispatch("authenticateCurrentUser").then(res => {
       console.log("auth guard user authenticated:" + res.authenticated);
