@@ -8,8 +8,8 @@ const { GraphTranslator } = Helpers;
 import ConfigService from "@/services/ConfigService";
 
 describe("Graph.vue", () => {
-  let wrapper: any;
-  let translatorSpy: any;
+  let wrapper;
+  let translatorSpy;
   const TRANSLATED = {
     name: "Scoliosis deformity of spine",
     iri: "http://snomed.info/sct#298382003",
@@ -18,24 +18,25 @@ describe("Graph.vue", () => {
       {
         name: "Necessary and sufficient",
         iri: "http://endhealth.info/im#1251000252106",
-        relToParent: "",
+        relToParent: "definitionalStatus",
         children: [],
         _children: []
       },
       { name: "Curvature of spine", iri: "http://snomed.info/sct#64217002", relToParent: "subClassOf", children: [], _children: [] },
       { name: "Disorder of musculoskeletal system", iri: "http://snomed.info/sct#928000", relToParent: "subClassOf", children: [], _children: [] },
       { name: "Disorder of vertebral column", iri: "http://snomed.info/sct#699699005", relToParent: "subClassOf", children: [], _children: [] },
-      { name: "298382003", iri: "", relToParent: "code", children: [], _children: [] },
-      { name: "", iri: "", relToParent: "role group", children: [], _children: [] },
-      { name: "", iri: "", relToParent: "has map", children: [], _children: [] }
+      { name: "298382003", iri: undefined, relToParent: "code", children: [], _children: [] },
+      { name: "Scoliosis, unspecified", iri: "http://endhealth.info/icd10#M419", relToParent: "mapped to", children: [], _children: [] },
+      { name: "Other forms of scoliosis", iri: "http://endhealth.info/icd10#M418", relToParent: "mapped to", children: [], _children: [] },
+      { name: "Congenital deformity of spine", iri: "http://endhealth.info/icd10#Q675", relToParent: "mapped to", children: [], _children: [] },
     ],
     _children: []
   };
 
   beforeEach(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
-    ConfigService.getGraphExcludePredicates = jest
+    ConfigService.getGraphExcludePredicates = vi
       .fn()
       .mockResolvedValue([
         "http://endhealth.info/im#matchedTo",
@@ -51,7 +52,7 @@ describe("Graph.vue", () => {
         "http://endhealth.info/im#isA"
       ]);
 
-    EntityService.getPartialEntityBundle = jest.fn().mockResolvedValue({
+    EntityService.getPartialEntityBundle = vi.fn().mockResolvedValue({
       entity: {
         "@id": "http://snomed.info/sct#298382003",
         "http://endhealth.info/im#definitionalStatus": {
@@ -118,10 +119,10 @@ describe("Graph.vue", () => {
               {
                 "http://endhealth.info/im#mapAdvice": "ALWAYS M41.9 | FIFTH CHARACTER POSSIBLE",
                 "http://endhealth.info/im#mapPriority": 3,
-                "http://endhealth.info/im#mappedTo": {
+                "http://endhealth.info/im#mappedTo": [{
                   "@id": "http://endhealth.info/icd10#M419",
                   name: "Scoliosis, unspecified"
-                },
+                }],
                 "http://endhealth.info/im#assuranceLevel": {
                   "@id": "http://endhealth.info/im#NationallyAssuredUK",
                   name: "Nationally assured UK level"
@@ -130,10 +131,10 @@ describe("Graph.vue", () => {
               {
                 "http://endhealth.info/im#mapAdvice": "ALWAYS M41.8 | FIFTH CHARACTER POSSIBLE",
                 "http://endhealth.info/im#mapPriority": 2,
-                "http://endhealth.info/im#mappedTo": {
+                "http://endhealth.info/im#mappedTo": [{
                   "@id": "http://endhealth.info/icd10#M418",
                   name: "Other forms of scoliosis"
-                },
+                }],
                 "http://endhealth.info/im#assuranceLevel": {
                   "@id": "http://endhealth.info/im#NationallyAssuredUK",
                   name: "Nationally assured UK level"
@@ -142,10 +143,10 @@ describe("Graph.vue", () => {
               {
                 "http://endhealth.info/im#mapAdvice": "ALWAYS Q67.5",
                 "http://endhealth.info/im#mapPriority": 1,
-                "http://endhealth.info/im#mappedTo": {
+                "http://endhealth.info/im#mappedTo": [{
                   "@id": "http://endhealth.info/icd10#Q675",
                   name: "Congenital deformity of spine"
-                },
+                }],
                 "http://endhealth.info/im#assuranceLevel": {
                   "@id": "http://endhealth.info/im#NationallyAssuredUK",
                   name: "Nationally assured UK level"
@@ -182,10 +183,10 @@ describe("Graph.vue", () => {
       }
     });
 
-    translatorSpy = jest.spyOn(GraphTranslator, "translateFromEntityBundle").mockReturnValue(TRANSLATED);
+    translatorSpy = vi.spyOn(GraphTranslator, "translateFromEntityBundle").mockReturnValue(TRANSLATED);
 
     const warn = console.warn;
-    console.warn = jest.fn();
+    console.warn = vi.fn();
 
     wrapper = shallowMount(Graph, {
       global: { components: { ProgressSpinner, MultiSelect } },
@@ -196,7 +197,7 @@ describe("Graph.vue", () => {
 
     await flushPromises();
     await wrapper.vm.$nextTick();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("mounts", () => {
@@ -205,7 +206,7 @@ describe("Graph.vue", () => {
   });
 
   it("watches conceptIri", async () => {
-    wrapper.vm.getEntityBundle = jest.fn();
+    wrapper.vm.getEntityBundle = vi.fn();
     wrapper.vm.$options.watch.conceptIri.call(wrapper.vm, "http://snomed.info/sct#203639008");
     await flushPromises();
     expect(wrapper.vm.getEntityBundle).toHaveBeenCalledTimes(1);
@@ -213,7 +214,7 @@ describe("Graph.vue", () => {
   });
 
   it("can getEntityBundle", async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     wrapper.vm.getEntityBundle("http://snomed.info/sct#203639008");
     expect(wrapper.vm.loading).toBe(true);
     expect(EntityService.getPartialEntityBundle).toHaveBeenCalledTimes(1);

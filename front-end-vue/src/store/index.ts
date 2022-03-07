@@ -10,7 +10,7 @@ const { Avatars } = Constants;
 export default createStore({
   // update stateType.ts when adding new state!
   state: {
-    conceptIri: IM.MODULE_ONTOLOGY,
+    conceptIri: localStorage.getItem("viewerSelectedConcept") as string,
     currentUser: {} as Models.User,
     isLoggedIn: false as boolean,
     snomedLicenseAccepted: localStorage.getItem("snomedLicenseAccepted") as string,
@@ -24,6 +24,7 @@ export default createStore({
     },
     updateConceptIri(state, conceptIri) {
       state.conceptIri = conceptIri;
+      localStorage.setItem("viewerSelectedConcept", conceptIri);
     },
     updateCurrentUser(state, user) {
       state.currentUser = user;

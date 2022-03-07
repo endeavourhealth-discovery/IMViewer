@@ -9,10 +9,10 @@ import { Vocabulary } from "im-library";
 const { IM } = Vocabulary;
 
 describe("Mappings.vue", () => {
-  let wrapper: any;
-  let mockStore: any;
-  let mockToast: any;
-  let mockRef: any;
+  let wrapper;
+  let mockStore;
+  let mockToast;
+  let mockRef;
 
   const HAS_MAPS = {
     "http://endhealth.info/im#hasMap": [
@@ -41,7 +41,7 @@ describe("Mappings.vue", () => {
         ]
       }
     ]
-  } as any;
+  };
   const NAMESPACES = [
     { iri: "http://endhealth.info/bc#", prefix: "bc", name: "Barts Cerner namespace" },
     { iri: "http://endhealth.info/ceg16#", prefix: "ceg13", name: "CEG ethnicity 16+ category" },
@@ -72,21 +72,21 @@ describe("Mappings.vue", () => {
   ];
 
   beforeEach(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
     mockStore = {
-      state: { loading: { get: jest.fn().mockReturnValue(false) } },
-      commit: jest.fn()
+      state: { loading: { get: vi.fn().mockReturnValue(false) } },
+      commit: vi.fn()
     };
 
-    mockToast = { add: jest.fn() };
+    mockToast = { add: vi.fn() };
 
-    mockRef = { render: () => {}, methods: { toggle: jest.fn() } };
+    mockRef = { render: () => {}, methods: { toggle: vi.fn() } };
 
-    EntityService.getPartialEntity = jest.fn().mockResolvedValue(HAS_MAPS);
+    EntityService.getPartialEntity = vi.fn().mockResolvedValue(HAS_MAPS);
 
-    EntityService.getNamespaces = jest.fn().mockResolvedValue(NAMESPACES);
+    EntityService.getNamespaces = vi.fn().mockResolvedValue(NAMESPACES);
 
-    EntityService.getSimpleMaps = jest.fn().mockResolvedValue(SIMPLE_MAPS);
+    EntityService.getSimpleMaps = vi.fn().mockResolvedValue(SIMPLE_MAPS);
 
     wrapper = shallowMount(Mappings, {
       global: {
@@ -98,12 +98,12 @@ describe("Mappings.vue", () => {
     });
     await flushPromises();
     await wrapper.vm.$nextTick();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("watches conceptIri", async () => {
-    wrapper.vm.getMappings = jest.fn().mockResolvedValue(true);
-    wrapper.vm.createChartStructure = jest.fn();
+    wrapper.vm.getMappings = vi.fn().mockResolvedValue(true);
+    wrapper.vm.createChartStructure = vi.fn();
     wrapper.vm.$options.watch.conceptIri.call(wrapper.vm, "http://snomed.info/sct#723312009");
     expect(wrapper.vm.getMappings).toHaveBeenCalledTimes(1);
     await flushPromises();
@@ -124,7 +124,7 @@ describe("Mappings.vue", () => {
   });
 
   it("can get mappings ___ fail no hasMap", async () => {
-    EntityService.getPartialEntity = jest.fn().mockResolvedValue({ comboOf: [1, 2] });
+    EntityService.getPartialEntity = vi.fn().mockResolvedValue({ comboOf: [1, 2] });
     wrapper.vm.getMappings();
     await flushPromises();
     expect(wrapper.vm.mappings).toStrictEqual([]);
@@ -132,7 +132,7 @@ describe("Mappings.vue", () => {
   });
 
   it("can get mappings ___ no simpleMaps", async () => {
-    EntityService.getPartialEntity = jest.fn().mockResolvedValue({});
+    EntityService.getPartialEntity = vi.fn().mockResolvedValue({});
     wrapper.vm.getMappings();
     await flushPromises();
     expect(wrapper.vm.simpleMaps).toStrictEqual(SIMPLE_MAPS);
@@ -230,13 +230,13 @@ describe("Mappings.vue", () => {
   });
 
   it("can generateChildNodes ___ mapNode fail", () => {
-    wrapper.vm.createChartMapNode = jest.fn().mockReturnValue(undefined);
+    wrapper.vm.createChartMapNode = vi.fn().mockReturnValue(undefined);
     expect(wrapper.vm.generateChildNodes(HAS_MAPS[IM.HAS_MAP])).toStrictEqual([]);
   });
 
   it("can createChartStructure", () => {
-    wrapper.vm.generateChildNodes = jest.fn().mockReturnValue([]);
-    wrapper.vm.generateSimpleMapsNodes = jest.fn().mockReturnValue([]);
+    wrapper.vm.generateChildNodes = vi.fn().mockReturnValue([]);
+    wrapper.vm.generateSimpleMapsNodes = vi.fn().mockReturnValue([]);
     expect(wrapper.vm.createChartStructure(HAS_MAPS[IM.HAS_MAP])).toStrictEqual({
       key: "0",
       type: "hasMap",
@@ -254,8 +254,8 @@ describe("Mappings.vue", () => {
   });
 
   it("can createChartStructure ___ complex only", () => {
-    wrapper.vm.generateChildNodes = jest.fn().mockReturnValue([]);
-    wrapper.vm.generateSimpleMapsNodes = jest.fn().mockReturnValue([]);
+    wrapper.vm.generateChildNodes = vi.fn().mockReturnValue([]);
+    wrapper.vm.generateSimpleMapsNodes = vi.fn().mockReturnValue([]);
     wrapper.vm.simpleMaps = [];
     expect(wrapper.vm.createChartStructure(HAS_MAPS[IM.HAS_MAP])).toStrictEqual({
       key: "0",
@@ -310,7 +310,7 @@ describe("Mappings.vue", () => {
   });
 
   it("can generateSimpleMapsNodes ___ isArrayHasLength", () => {
-    wrapper.vm.createChartTableNode = jest.fn().mockReturnValue({
+    wrapper.vm.createChartTableNode = vi.fn().mockReturnValue({
       data: {
         mapItems: [
           {
@@ -374,7 +374,7 @@ describe("Mappings.vue", () => {
   });
 
   it("can generateSimpleMapsNodes ___ not isArrayHasLength", () => {
-    wrapper.vm.createChartTableNode = jest.fn().mockReturnValue({
+    wrapper.vm.createChartTableNode = vi.fn().mockReturnValue({
       data: {
         mapItems: []
       },
@@ -464,7 +464,7 @@ describe("Mappings.vue", () => {
   });
 
   it("can handleSimpleMapsToggle", () => {
-    wrapper.vm.toggle = jest.fn();
+    wrapper.vm.toggle = vi.fn();
     wrapper.vm.handleSimpleMapsToggle("testEvent", {
       name: "Scoliosis deformity of spine",
       iri: "http://endhealth.info/tpp#Xa6vS",

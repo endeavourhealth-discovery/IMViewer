@@ -5,10 +5,10 @@ import OrganizationChart from "primevue/organizationchart";
 import EntityService from "@/services/EntityService";
 
 describe("Graph.vue", () => {
-  let wrapper: any;
-  let mockRoute: any;
-  let mockRouter: any;
-  let mockToast: any;
+  let wrapper;
+  let mockRoute;
+  let mockRouter;
+  let mockToast;
   const GRAPH = {
     key: "0",
     name: "Accident and emergency encounter (record type)",
@@ -228,16 +228,16 @@ describe("Graph.vue", () => {
   };
 
   beforeEach(() => {
-    jest.resetAllMocks();
-    EntityService.getEntityGraph = jest.fn().mockResolvedValue(GRAPH);
+    vi.resetAllMocks();
+    EntityService.getEntityGraph = vi.fn().mockResolvedValue(GRAPH);
     mockRoute = {
       name: "Concept"
     };
     mockRouter = {
-      push: jest.fn()
+      push: vi.fn()
     };
     mockToast = {
-      add: jest.fn()
+      add: vi.fn()
     };
 
     wrapper = shallowMount(EntityChart, {
@@ -256,7 +256,7 @@ describe("Graph.vue", () => {
   });
 
   it("can watch conceptIri", () => {
-    wrapper.vm.getGraph = jest.fn();
+    wrapper.vm.getGraph = vi.fn();
     wrapper.vm.$options.watch.conceptIri.call(wrapper.vm, "http://endhealth.info/im#DiscoveryOntology");
     expect(wrapper.vm.getGraph).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.getGraph).toHaveBeenCalledWith("http://endhealth.info/im#DiscoveryOntology");

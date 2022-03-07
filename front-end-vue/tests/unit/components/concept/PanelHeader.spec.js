@@ -2,7 +2,7 @@ import { shallowMount } from "@vue/test-utils";
 import PanelHeader from "@/components/concept/PanelHeader.vue";
 
 describe("PanelHeader.vue", () => {
-  let wrapper: any;
+  let wrapper;
 
   beforeEach(() => {
     wrapper = shallowMount(PanelHeader, {

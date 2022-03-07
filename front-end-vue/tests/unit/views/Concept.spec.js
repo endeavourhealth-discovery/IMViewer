@@ -133,13 +133,13 @@ describe("Concept.vue ___ not moduleIri", () => {
   let windowSpy;
 
   beforeEach(async () => {
-    jest.resetAllMocks();
-    clipboardSpy = jest.spyOn(navigator.clipboard, "writeText");
-    EntityService.getDefinitionBundle = jest.fn().mockResolvedValue(INFERRED);
-    EntityService.getPartialEntity = jest.fn().mockResolvedValue(CONCEPT);
-    EntityService.getEntityChildren = jest.fn().mockResolvedValue(CHILDREN);
-    EntityService.getEntityTermCodes = jest.fn().mockResolvedValue(TERMS);
-    ConfigService.getComponentLayout = jest.fn().mockResolvedValue(CONFIG);
+    vi.resetAllMocks();
+    clipboardSpy = vi.spyOn(navigator.clipboard, "writeText");
+    EntityService.getDefinitionBundle = vi.fn().mockResolvedValue(INFERRED);
+    EntityService.getPartialEntity = vi.fn().mockResolvedValue(CONCEPT);
+    EntityService.getEntityChildren = vi.fn().mockResolvedValue(CHILDREN);
+    EntityService.getEntityTermCodes = vi.fn().mockResolvedValue(TERMS);
+    ConfigService.getComponentLayout = vi.fn().mockResolvedValue(CONFIG);
     mockStore = {
       state: {
         conceptIri: "http://endhealth.info/im#CriticalCareEncounter",
@@ -147,21 +147,21 @@ describe("Concept.vue ___ not moduleIri", () => {
         activeModule: "default",
         conceptActivePanel: 6
       },
-      commit: jest.fn(),
-      dispatch: jest.fn()
+      commit: vi.fn(),
+      dispatch: vi.fn()
     };
     mockRouter = {
-      push: jest.fn()
+      push: vi.fn()
     };
     mockToast = {
-      add: jest.fn()
+      add: vi.fn()
     };
-    mockRef = { render: () => {}, methods: { toggle: jest.fn(), show: jest.fn(), hide: jest.fn() } };
+    mockRef = { render: () => {}, methods: { toggle: vi.fn(), show: vi.fn(), hide: vi.fn() } };
 
-    windowSpy = jest.spyOn(window, "getComputedStyle");
-    windowSpy.mockReturnValue({ getPropertyValue: jest.fn().mockReturnValue("16px") });
+    windowSpy = vi.spyOn(window, "getComputedStyle");
+    windowSpy.mockReturnValue({ getPropertyValue: vi.fn().mockReturnValue("16px") });
 
-    docSpy = jest.spyOn(document, "getElementById");
+    docSpy = vi.spyOn(document, "getElementById");
     docSpy.mockReturnValue(undefined);
 
     wrapper = shallowMount(Concept, {
@@ -183,19 +183,19 @@ describe("Concept.vue ___ not moduleIri", () => {
           ProgressSpinner
         },
         mocks: { $store: mockStore, $router: mockRouter, $toast: mockToast },
-        directives: { tooltip: jest.fn() },
+        directives: { tooltip: vi.fn() },
         stubs: { Panel: Panel, Menu: mockRef, FontAwesomeIcon: true }
       }
     });
 
     await flushPromises();
     await wrapper.vm.$nextTick();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterAll(() => {
-    jest.resetAllMocks();
-    jest.clearAllMocks();
+    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   it("starts with data from mounted", async () => {
@@ -224,7 +224,7 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("adds event listener to setContentHeights on resize", async () => {
-    const spy = jest.spyOn(wrapper.vm, "setContentHeight");
+    const spy = vi.spyOn(wrapper.vm, "setContentHeight");
     window.dispatchEvent(new Event("resize"));
     await wrapper.vm.$nextTick();
     expect(spy).toHaveBeenCalledTimes(1);
@@ -232,7 +232,7 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("can remove eventListener", () => {
-    const spy = jest.spyOn(global, "removeEventListener");
+    const spy = vi.spyOn(window, "removeEventListener");
     wrapper.unmount();
     expect(spy).toHaveBeenCalled();
     spy.mockReset();
@@ -246,27 +246,27 @@ describe("Concept.vue ___ not moduleIri", () => {
 
   it("sets container size ___ container success", async () => {
     const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = jest.fn().mockReturnValue({ height: 100 });
-    mockElement.getElementsByClassName = jest.fn().mockReturnValue([mockElement]);
+    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ height: 100 });
+    mockElement.getElementsByClassName = vi.fn().mockReturnValue([mockElement]);
     docSpy.mockReturnValue(mockElement);
     wrapper.vm.setContentHeight();
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.contentHeightValue).not.toBe(800);
     docSpy.mockReset();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("sets container size ___ class element fail", async () => {
     const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = jest.fn().mockReturnValue({ height: 100 });
-    mockElement.getElementsByClassName = jest.fn().mockReturnValue([null]);
+    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ height: 100 });
+    mockElement.getElementsByClassName = vi.fn().mockReturnValue([null]);
     docSpy.mockReturnValue(mockElement);
-    windowSpy.mockReturnValue({ getPropertyValue: jest.fn().mockReturnValue(undefined) });
+    windowSpy.mockReturnValue({ getPropertyValue: vi.fn().mockReturnValue(undefined) });
     wrapper.vm.setContentHeight();
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.contentHeightValue).not.toBe(800);
     docSpy.mockReset();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("can check for a set ___ false", async () => {
@@ -328,14 +328,14 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("inits on iri change", async () => {
-    wrapper.vm.init = jest.fn();
+    wrapper.vm.init = vi.fn();
     wrapper.vm.$options.watch.conceptIri.call(wrapper.vm, "http://endhealth.info/im#DiscoveryOntology");
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.init).toHaveBeenCalledTimes(1);
   });
 
   it("sets active panel on selectedEntityType change", async () => {
-    wrapper.vm.setActivePanel = jest.fn();
+    wrapper.vm.setActivePanel = vi.fn();
     wrapper.vm.$options.watch.selectedEntityType.call(wrapper.vm, "DataModel", "Ontology");
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.setActivePanel).toHaveBeenCalledTimes(1);
@@ -373,13 +373,13 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("can getConcept ___ pass", async () => {
-    EntityService.getPartialEntity = jest.fn().mockResolvedValue({
+    EntityService.getPartialEntity = vi.fn().mockResolvedValue({
       "@id": "http://snomed.info/sct#298382003",
       "http://endhealth.info/im#status": { "@id": "http://endhealth.info/im#Active", name: "Active" },
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2002/07/owl#Class", name: "Class" }],
       "http://www.w3.org/2000/01/rdf-schema#label": "Scoliosis deformity of spine (disorder)"
     });
-    EntityService.getEntityChildren = jest.fn().mockResolvedValue([
+    EntityService.getEntityChildren = vi.fn().mockResolvedValue([
       {
         name: "Acquired scoliosis (disorder)",
         hasChildren: true,
@@ -442,13 +442,13 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("can getConcept ___ no subclass", async () => {
-    EntityService.getPartialEntity = jest.fn().mockResolvedValue({
+    EntityService.getPartialEntity = vi.fn().mockResolvedValue({
       "@id": "http://snomed.info/sct#298382003",
       "http://endhealth.info/im#status": { "@id": "http://endhealth.info/im#Active", name: "Active" },
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2002/07/owl#Class", name: "Class" }],
       "http://www.w3.org/2000/01/rdf-schema#label": "Scoliosis deformity of spine (disorder)"
     });
-    EntityService.getEntityChildren = jest.fn().mockResolvedValue([
+    EntityService.getEntityChildren = vi.fn().mockResolvedValue([
       {
         name: "Acquired scoliosis (disorder)",
         hasChildren: true,
@@ -618,7 +618,7 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("can getConfig ___ missing order property", async () => {
-    LoggerService.error = jest.fn();
+    LoggerService.error = vi.fn();
     ConfigService.getComponentLayout.mockResolvedValue([
       { label: "Divider", predicate: "None", type: "Divider", size: "100%" },
       { label: "Name", predicate: "http://www.w3.org/2000/01/rdf-schema#label", type: "TextWithLabel", size: "50%", order: 0 },
@@ -642,10 +642,10 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("Inits ___ has types", async () => {
-    wrapper.vm.getConcept = jest.fn();
-    wrapper.vm.getConfig = jest.fn();
-    wrapper.vm.getInferred = jest.fn();
-    wrapper.vm.setStoreType = jest.fn();
+    wrapper.vm.getConcept = vi.fn();
+    wrapper.vm.getConfig = vi.fn();
+    wrapper.vm.getInferred = vi.fn();
+    wrapper.vm.setStoreType = vi.fn();
     wrapper.vm.concept = {
       "@id": "http://snomed.info/sct#47518006",
       "http://endhealth.info/im#status": { "@id": "http://endhealth.info/im#Active", name: "Active" },
@@ -670,10 +670,10 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("Inits ___ missing types", async () => {
-    wrapper.vm.getConcept = jest.fn();
-    wrapper.vm.getConfig = jest.fn();
-    wrapper.vm.getInferred = jest.fn();
-    wrapper.vm.setStoreType = jest.fn();
+    wrapper.vm.getConcept = vi.fn();
+    wrapper.vm.getConfig = vi.fn();
+    wrapper.vm.getInferred = vi.fn();
+    wrapper.vm.setStoreType = vi.fn();
     wrapper.vm.concept = {
       "@id": "http://snomed.info/sct#47518006",
       "http://endhealth.info/im#status": { "@id": "http://endhealth.info/im#Active", name: "Active" },
@@ -1071,13 +1071,13 @@ describe("Concept.vue ___ moduleIri", () => {
   let windowSpy;
 
   beforeEach(async () => {
-    jest.resetAllMocks();
-    clipboardSpy = jest.spyOn(navigator.clipboard, "writeText");
-    EntityService.getDefinitionBundle = jest.fn().mockResolvedValue({});
-    EntityService.getPartialEntity = jest.fn().mockResolvedValue(CONCEPT);
-    EntityService.getEntityChildren = jest.fn().mockResolvedValue([]);
-    EntityService.getEntityTermCodes = jest.fn().mockResolvedValue([]);
-    ConfigService.getComponentLayout = jest.fn().mockResolvedValue(CONFIG);
+    vi.resetAllMocks();
+    clipboardSpy = vi.spyOn(navigator.clipboard, "writeText");
+    EntityService.getDefinitionBundle = vi.fn().mockResolvedValue({});
+    EntityService.getPartialEntity = vi.fn().mockResolvedValue(CONCEPT);
+    EntityService.getEntityChildren = vi.fn().mockResolvedValue([]);
+    EntityService.getEntityTermCodes = vi.fn().mockResolvedValue([]);
+    ConfigService.getComponentLayout = vi.fn().mockResolvedValue(CONFIG);
     mockStore = {
       state: {
         conceptIri: "http://endhealth.info/im#DiscoveryOntology",
@@ -1085,21 +1085,21 @@ describe("Concept.vue ___ moduleIri", () => {
         activeModule: "default",
         conceptActivePanel: 6
       },
-      commit: jest.fn(),
-      dispatch: jest.fn()
+      commit: vi.fn(),
+      dispatch: vi.fn()
     };
     mockRouter = {
-      push: jest.fn()
+      push: vi.fn()
     };
     mockToast = {
-      add: jest.fn()
+      add: vi.fn()
     };
-    mockRef = { render: () => {}, methods: { toggle: jest.fn(), show: jest.fn(), hide: jest.fn() } };
+    mockRef = { render: () => {}, methods: { toggle: vi.fn(), show: vi.fn(), hide: vi.fn() } };
 
-    windowSpy = jest.spyOn(window, "getComputedStyle");
-    windowSpy.mockReturnValue({ getPropertyValue: jest.fn().mockReturnValue("16px") });
+    windowSpy = vi.spyOn(window, "getComputedStyle");
+    windowSpy.mockReturnValue({ getPropertyValue: vi.fn().mockReturnValue("16px") });
 
-    docSpy = jest.spyOn(document, "getElementById");
+    docSpy = vi.spyOn(document, "getElementById");
     docSpy.mockReturnValue(undefined);
 
     wrapper = shallowMount(Concept, {
@@ -1121,19 +1121,19 @@ describe("Concept.vue ___ moduleIri", () => {
           ProgressSpinner
         },
         mocks: { $store: mockStore, $router: mockRouter, $toast: mockToast },
-        directives: { tooltip: jest.fn() },
+        directives: { tooltip: vi.fn() },
         stubs: { Panel: Panel, Menu: mockRef }
       }
     });
 
     await flushPromises();
     await wrapper.vm.$nextTick();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterAll(() => {
-    jest.resetAllMocks();
-    jest.clearAllMocks();
+    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   it("can setStoreType ___ concept", async () => {
