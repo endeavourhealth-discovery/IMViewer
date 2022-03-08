@@ -28,11 +28,13 @@ describe("state", () => {
       "currentUser",
       "isLoggedIn",
       "snomedLicenseAccepted",
+      "snomedReturnUrl",
+      "authReturnUrl",
       "blockedIris",
       "selectedEntityType",
       "conceptActivePanel"
     ]);
-    expect(store.state.conceptIri).toBe("http://endhealth.info/im#DiscoveryOntology");
+    expect(store.state.conceptIri).toBe(null);
     expect(store.state.currentUser).toEqual({});
     expect(store.state.isLoggedIn).toBeFalsy();
     expect(store.state.snomedLicenseAccepted).toBeNull();
