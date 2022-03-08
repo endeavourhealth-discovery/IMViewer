@@ -1,8 +1,6 @@
 import axios from "axios";
-import { FilterDefaultsConfig } from "@/models/configs/FilterDefaultsConfig";
-import { DefinitionConfig } from "@/models/configs/DefinitionConfig";
-import { DashboardLayout } from "@/models/configs/DashboardLayout";
-import Env from '@/services/Env';
+import { DefinitionConfig } from "im-library/dist/types/interfaces/Interfaces";
+import Env from "@/services/Env";
 
 export default class ConfigService {
   public static async getComponentLayout(name: string): Promise<DefinitionConfig[]> {
@@ -14,26 +12,6 @@ export default class ConfigService {
       });
     } catch (error) {
       return [] as DefinitionConfig[];
-    }
-  }
-
-  public static async getFilterDefaults(): Promise<FilterDefaultsConfig> {
-    try {
-      return await axios.get(Env.api + "api/config/public/filterDefaults");
-    } catch (error) {
-      return {} as FilterDefaultsConfig;
-    }
-  }
-
-  public static async getDashboardLayout(name: string): Promise<DashboardLayout[]> {
-    try {
-      return await axios.get(Env.api + "api/config/public/dashboardLayout", {
-        params: {
-          name: name
-        }
-      });
-    } catch (error) {
-      return [] as DashboardLayout[];
     }
   }
 

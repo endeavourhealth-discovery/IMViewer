@@ -6,9 +6,9 @@ describe("EclDefinition.vue", () => {
   let wrapper;
 
   beforeEach(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
-    EntityService.getEcl = jest
+    EntityService.getEcl = vi
       .fn()
       .mockResolvedValue(
         "<<108337002 | Islam AND/OR derivative |  OR \n<<1226001 | United Church of Canada |  OR \n<<160234004 | Salvation Army member (person) |"
@@ -34,7 +34,7 @@ describe("EclDefinition.vue", () => {
     });
     await flushPromises();
     await wrapper.vm.$nextTick();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("mounts", () => {
@@ -67,7 +67,7 @@ describe("EclDefinition.vue", () => {
   });
 
   it("inits ___ fail", async () => {
-    EntityService.getEcl = jest.fn().mockResolvedValue(false);
+    EntityService.getEcl = vi.fn().mockResolvedValue(false);
     wrapper.vm.init();
     await flushPromises();
     expect(EntityService.getEcl).toHaveBeenCalledTimes(1);

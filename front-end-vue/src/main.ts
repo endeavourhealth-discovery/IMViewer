@@ -1,4 +1,4 @@
-import { createApp } from "vue";
+import { createApp, Plugin } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
@@ -79,9 +79,15 @@ import Tag from "primevue/tag";
 import { Amplify, Auth } from "aws-amplify";
 import awsconfig from "./aws-exports";
 import axios from "axios";
-import { isObjectHasKeys } from "./helpers/DataTypeCheckers";
-import {ImLibrarySample} from 'im-library';
-import Env from '@/services/Env';
+import Env from "@/services/Env";
+
+// IMLibrary imports
+import IMLibrary from "im-library";
+import "im-library/dist/style.css";
+import { Helpers } from "im-library";
+const {
+  DataTypeCheckers: { isObjectHasKeys }
+} = Helpers;
 
 Amplify.configure(awsconfig);
 Auth.configure(awsconfig);
@@ -90,6 +96,7 @@ const app = createApp(App)
   .use(store)
   .use(router)
   .use(PrimeVue, { ripple: true })
+  .use(IMLibrary.install as Plugin, { store })
   .use(ConfirmationService)
   .use(ToastService)
   .use(VueClipboard, {
@@ -144,8 +151,7 @@ const app = createApp(App)
   .component("RadioButton", RadioButton)
   .component("ConfirmPopup", ConfirmPopup)
   .component("InputSwitch", InputSwitch)
-  .component("Tag", Tag)
-  .component("IMLibrarySample", ImLibrarySample);
+  .component("Tag", Tag);
 
 const vm = app.mount("#app");
 

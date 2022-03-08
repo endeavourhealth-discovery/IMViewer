@@ -46,8 +46,11 @@
 import EntityService from "@/services/EntityService";
 import { defineComponent } from "@vue/runtime-core";
 import { RouteRecordName } from "vue-router";
-import { DataModelProperty, ProcessedDataModelProperty } from "@/models/properties/DataModelProperty";
-import { getContainerElementOptimalHeight } from "@/helpers/GetContainerElementOptimalHeight";
+import { DataModelProperty, ProcessedDataModelProperty } from "im-library/dist/types/interfaces/Interfaces";
+import { Helpers } from "im-library";
+const {
+  ContainerDimensionGetters: { getContainerElementOptimalHeight }
+} = Helpers;
 
 export default defineComponent({
   name: "Properties",

@@ -36,9 +36,12 @@
 <script lang="ts">
 import EntityService from "@/services/EntityService";
 import { defineComponent } from "@vue/runtime-core";
-import { TTIriRef } from "@/models/TripleTree";
-import { isObjectHasKeys } from "@/helpers/DataTypeCheckers";
-import { getContainerElementOptimalHeight } from "@/helpers/GetContainerElementOptimalHeight";
+import { TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
+import { Helpers } from "im-library";
+const {
+  DataTypeCheckers: { isObjectHasKeys },
+  ContainerDimensionGetters: { getContainerElementOptimalHeight }
+} = Helpers;
 
 export default defineComponent({
   name: "UsedIn",

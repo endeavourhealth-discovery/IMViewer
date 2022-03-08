@@ -3,9 +3,6 @@
     <Panel>
       <template #icons>
         <div class="icons-container">
-          <button class="p-panel-header-icon p-link p-mr-2" @click="focusTree" v-tooltip.left="'Focus hierarchy tree to this concept'">
-            <i class="fas fa-sitemap" aria-hidden="true"></i>
-          </button>
           <div v-if="isObjectHasKeysWrapper(concept, ['inferred'])" class="copy-container">
             <Button
               icon="far fa-copy"
@@ -114,25 +111,23 @@ import Members from "../components/concept/Members.vue";
 import PanelHeader from "../components/concept/PanelHeader.vue";
 import Mappings from "../components/concept/Mappings.vue";
 import EclDefinition from "@/components/concept/EclDefinition.vue";
-import { isOfTypes, isValueSet, isProperty } from "@/helpers/ConceptTypeMethods";
 import { mapState } from "vuex";
 import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
 import LoggerService from "@/services/LoggerService";
 import SecondaryTree from "../components/concept/SecondaryTree.vue";
-import { IM } from "@/vocabulary/IM";
-import { RDF } from "@/vocabulary/RDF";
-import { RDFS } from "@/vocabulary/RDFS";
-import { MODULE_IRIS } from "@/helpers/ModuleIris";
-import { SHACL } from "@/vocabulary/SHACL";
 import Properties from "@/components/concept/Properties.vue";
-import { DefinitionConfig } from "@/models/configs/DefinitionConfig";
-import { TTIriRef } from "@/models/TripleTree";
-import { copyConceptToClipboard, conceptObjectToCopyString } from "@/helpers/CopyConceptToClipboard";
-import { isObjectHasKeys } from "@/helpers/DataTypeCheckers";
-import { getContainerElementOptimalHeight } from "@/helpers/GetContainerElementOptimalHeight";
-import { byOrder } from "@/helpers/Sorters";
+import { Helpers, Models, Vocabulary } from "im-library";
+import { DefinitionConfig, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
+const { IM, RDF, RDFS, SHACL } = Vocabulary;
+const {
+  ConceptTypeMethods: { isOfTypes, isProperty, isValueSet },
+  CopyConceptToClipboard: { copyConceptToClipboard, conceptObjectToCopyString },
+  DataTypeCheckers: { isObjectHasKeys },
+  ContainerDimensionGetters: { getContainerElementOptimalHeight },
+  Sorters: { byOrder }
+} = Helpers;
 
 export default defineComponent({
   name: "Concept",
@@ -259,10 +254,6 @@ export default defineComponent({
       this.setContentHeight();
     },
 
-    focusTree(): void {
-      this.$store.commit("updateFocusTree", true);
-    },
-
     directToEditRoute(): void {
       this.$router.push({
         name: "Edit",
@@ -342,12 +333,6 @@ export default defineComponent({
         this.active = 0;
       }
       this.$store.commit("updateSelectedEntityType", type);
-      if (!MODULE_IRIS.includes(this.conceptIri)) {
-        this.$store.commit("updateModuleSelectedEntities", {
-          module: this.isProperty ? "DataModel" : type,
-          iri: this.conceptIri
-        });
-      }
     },
 
     setActivePanel(newType: string, oldType: string): void {

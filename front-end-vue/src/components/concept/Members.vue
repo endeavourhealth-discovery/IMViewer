@@ -68,10 +68,12 @@ import { defineComponent } from "@vue/runtime-core";
 import EntityService from "@/services/EntityService";
 import SetService from "@/services/SetService";
 import LoggerService from "@/services/LoggerService";
-import { ValueSetMember } from "@/models/members/ValueSetMember";
-import { ExportValueSet } from "@/models/members/ExportValueSet";
-import { isArrayHasLength, isObjectHasKeys } from "@/helpers/DataTypeCheckers";
-import { RDFS } from "@/vocabulary/RDFS";
+import { ValueSetMember, ExportValueSet } from "im-library/dist/types/interfaces/Interfaces";
+import { Helpers, Vocabulary } from "im-library";
+const {
+  DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }
+} = Helpers;
+const { RDFS } = Vocabulary;
 
 export default defineComponent({
   name: "Members",

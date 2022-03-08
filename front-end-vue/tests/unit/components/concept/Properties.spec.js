@@ -4,7 +4,6 @@ import DataTable from "primevue/datatable";
 import Button from "primevue/button";
 import Column from "primevue/column";
 import EntityService from "@/services/EntityService";
-import LoggerService from "@/services/LoggerService";
 
 describe("Properties.vue", () => {
   let wrapper;
@@ -14,22 +13,22 @@ describe("Properties.vue", () => {
   let docSpy;
 
   beforeEach(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
     mockRouter = {
-      push: jest.fn()
+      push: vi.fn()
     };
 
     mockRoute = {
       name: "Concept"
     };
 
-    mockRef = { render: () => {}, methods: { exportCSV: jest.fn() } };
+    mockRef = { render: () => {}, methods: { exportCSV: vi.fn() } };
 
-    docSpy = jest.spyOn(document, "getElementById");
+    docSpy = vi.spyOn(document, "getElementById");
     docSpy.mockReturnValue(undefined);
 
-    EntityService.getDataModelProperties = jest.fn().mockResolvedValue([
+    EntityService.getDataModelProperties = vi.fn().mockResolvedValue([
       {
         property: {
           name: "manufacturer",
@@ -121,7 +120,7 @@ describe("Properties.vue", () => {
     ]);
 
     const error = console.error;
-    console.error = jest.fn();
+    console.error = vi.fn();
 
     wrapper = shallowMount(Properties, {
       global: {
@@ -134,20 +133,20 @@ describe("Properties.vue", () => {
 
     await flushPromises();
     await wrapper.vm.$nextTick();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     console.error = error;
   });
 
   it("adds event listener to setScrollHeight on resize", async () => {
-    wrapper.vm.setScrollHeight = jest.fn();
+    wrapper.vm.setScrollHeight = vi.fn();
     window.dispatchEvent(new Event("resize"));
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.setScrollHeight).toHaveBeenCalledTimes(1);
   });
 
   it("can remove eventListener", () => {
-    const spy = jest.spyOn(global, "removeEventListener");
+    const spy = vi.spyOn(window, "removeEventListener");
     wrapper.unmount();
     expect(spy).toHaveBeenCalled();
     spy.mockReset();
@@ -161,37 +160,37 @@ describe("Properties.vue", () => {
 
   it("sets scrollHeight ___ container success", async () => {
     const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = jest.fn().mockReturnValue({ height: 100 });
-    mockElement.getElementsByClassName = jest.fn().mockReturnValue([mockElement]);
+    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ height: 100 });
+    mockElement.getElementsByClassName = vi.fn().mockReturnValue([mockElement]);
     docSpy.mockReturnValue(mockElement);
     wrapper.vm.setScrollHeight();
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.scrollHeight).not.toBe("500px");
     docSpy.mockReset();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("sets scrollHeight ___ container no paginator", async () => {
     const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = jest.fn().mockReturnValue({ height: 100 });
-    mockElement.getElementsByClassName = jest.fn().mockReturnValue([null]);
+    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ height: 100 });
+    mockElement.getElementsByClassName = vi.fn().mockReturnValue([null]);
     docSpy.mockReturnValue(mockElement);
     wrapper.vm.setScrollHeight();
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.scrollHeight).not.toBe("500px");
     docSpy.mockReset();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("getsDataModelProps on conceptIri change", async () => {
-    wrapper.vm.getDataModelProps = jest.fn();
+    wrapper.vm.getDataModelProps = vi.fn();
     wrapper.vm.$options.watch.conceptIri.call(wrapper.vm, "http://endhealth.info/im#DiscoveryOntology");
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.getDataModelProps).toHaveBeenCalledTimes(1);
   });
 
   it("can resize", () => {
-    wrapper.vm.setScrollHeight = jest.fn();
+    wrapper.vm.setScrollHeight = vi.fn();
     wrapper.vm.onResize();
     expect(wrapper.vm.setScrollHeight).toHaveBeenCalledTimes(1);
   });

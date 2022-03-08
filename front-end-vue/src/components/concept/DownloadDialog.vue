@@ -6,12 +6,12 @@
     <div v-if="loading" class="loading-container">
       <ProgressSpinner />
     </div>
-    <div v-else id="content" class="p-d-flex p-flex-column p-jc-center p-ai-center">
+    <div v-else id="content" class="flex flex-column justify-contents-center align-items-center">
       <h4 v-if="concept[RDFS_LABEL]">
         {{ concept[RDFS_LABEL] }}
       </h4>
       <SelectButton class="format-container" v-model="format" :options="formatOptions" datakey="value" optionLabel="name" />
-      <div class="options-container p-d-flex p-flex-row p-flex-wrap p-jc-around">
+      <div class="options-container flex flex-row p-flex-wrap justify-contents-around">
         <div class="checkbox-label">
           <Checkbox :disabled="!definition" id="definition" :binary="true" value="Include is a" v-model="includeDefinition" />
           <label class="label" :class="includeDefinition ? null : 'inactive-text'" for="definition">
@@ -73,7 +73,7 @@
           </label>
         </div>
       </div>
-      <div class="download-button-container p-d-flex p-flex-row p-jc-around">
+      <div class="download-button-container flex flex-row justify-contents-around">
         <Button label="Download Concept" icon="pi pi-download" class="p-button-primary button-download button-left" @click="downloadConcept" />
       </div>
     </div>
@@ -87,16 +87,13 @@
 import EntityService from "@/services/EntityService";
 import LoggerService from "@/services/LoggerService";
 import { defineComponent } from "@vue/runtime-core";
-import { RDFS } from "@/vocabulary/RDFS";
-import { IM } from "@/vocabulary/IM";
-import { isArrayHasLength, isObjectHasKeys } from "@/helpers/DataTypeCheckers";
-import { DataModelProperty } from "@/models/properties/DataModelProperty";
-import { ExportValueSet } from "@/models/members/ExportValueSet";
-import { TermCode } from "@/models/terms/TermCode";
-import { PartialBundle } from "@/models/entityServiceTypes/EntityServiceTypes";
-import { EntityReferenceNode } from "@/models/EntityReferenceNode";
-import { TTIriRef } from "@/models/TripleTree";
-import Env from '@/services/Env';
+import Env from "@/services/Env";
+import { TTIriRef, EntityReferenceNode, PartialBundle, TermCode, ExportValueSet, DataModelProperty } from "im-library/dist/types/interfaces/Interfaces";
+import { Vocabulary, Helpers } from "im-library";
+const { IM, RDFS } = Vocabulary;
+const {
+  DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }
+} = Helpers;
 
 export default defineComponent({
   name: "DownloadDialog",

@@ -1,10 +1,10 @@
 <template>
-  <div class="p-d-flex p-flex-row p-jc-center p-ai-center loading -container" v-if="loading">
+  <div class="flex flex-row justify-contents-center align-items-center loading -container" v-if="loading">
     <ProgressSpinner />
   </div>
   <OrganizationChart v-else :value="graph" :collapsible="true">
     <template #NONE>
-      <p class="p-text-centered">None</p>
+      <p class="text-centered">None</p>
     </template>
     <template #default="slotProps">
       <span>{{ slotProps.node.name }}</span>
@@ -59,10 +59,10 @@
 </template>
 
 <script lang="ts">
-import GraphData from "../../models/GraphData";
 import { defineComponent } from "@vue/runtime-core";
 import EntityService from "@/services/EntityService";
 import { RouteRecordName } from "vue-router";
+import { GraphData } from "im-library/dist/types/interfaces/Interfaces";
 
 export default defineComponent({
   name: "EntityChart",

@@ -1,6 +1,9 @@
 import axios, { CancelToken } from "axios";
-import { SearchResponse } from "@/models/entityServiceTypes/EntityServiceTypes";
-import Env from '@/services/Env';
+import { Models } from "im-library";
+import Env from "@/services/Env";
+const {
+  Search: { SearchResponse }
+} = Models;
 
 export default class SetService {
   public static async download(conceptIri: string, expanded: boolean, v1: boolean) {
@@ -15,7 +18,7 @@ export default class SetService {
     });
   }
 
-  public static async ECLSearch(searchString: string, includeLegacy: boolean, limit: number, cancelToken: CancelToken): Promise<SearchResponse> {
+  public static async ECLSearch(searchString: string, includeLegacy: boolean, limit: number, cancelToken: CancelToken): Promise<Models.Search.SearchResponse> {
     try {
       return await axios.post(Env.api + "api/set/public/eclSearch", searchString, {
         headers: { "Content-Type": "text/plain" },
@@ -23,7 +26,7 @@ export default class SetService {
         cancelToken: cancelToken
       });
     } catch (error) {
-      return {} as SearchResponse;
+      return {} as Models.Search.SearchResponse;
     }
   }
 

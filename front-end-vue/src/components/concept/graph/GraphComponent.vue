@@ -11,15 +11,18 @@
 </template>
 
 <script lang="ts">
-import TTGraphData from "../../../models/TTGraphData";
-import { toggleNodeByName, hasNodeChildrenByName, translateFromEntityBundle } from "../../../helpers/GraphTranslator";
 import { defineComponent, PropType } from "@vue/runtime-core";
 import * as d3 from "d3";
 import svgPanZoom from "svg-pan-zoom";
-import { isArrayHasLength, isObjectHasKeys } from "@/helpers/DataTypeCheckers";
 import EntityService from "@/services/EntityService";
 import { RouteRecordName } from "vue-router";
 import LoggerService from "@/services/LoggerService";
+import { TTGraphData } from "im-library/dist/types/interfaces/Interfaces";
+import { Helpers } from "im-library";
+const {
+  GraphTranslator: { translateFromEntityBundle, toggleNodeByName, hasNodeChildrenByName },
+  DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }
+} = Helpers;
 
 export default defineComponent({
   name: "GraphComponent",
