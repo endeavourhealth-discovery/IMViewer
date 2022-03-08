@@ -7,7 +7,7 @@ export default {
     try {
       await Auth.signOut({ global: true });
       return new CustomAlert(200, "Logged out successfully");
-    } catch (err) {
+    } catch (err : any) {
       return new CustomAlert(400, "Error logging out from auth server", err);
     }
   },
@@ -25,7 +25,7 @@ export default {
       );
       authenticatedUser.setId(cognitoUser.attributes.sub);
       return new CustomAlert(200, "User authenticated successfully", undefined, authenticatedUser);
-    } catch (err) {
+    } catch (err : any) {
       return new CustomAlert(403, "Error authenticating current user", err);
     }
   }
