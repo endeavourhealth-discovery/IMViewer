@@ -1,8 +1,9 @@
 <template>
-  <SideNav />
   <div class="layout-main">
     <div class="main-grid">
-      <SidebarControl />
+      <div class="topbar-container">
+        <TopBar />
+      </div>
       <router-view />
     </div>
   </div>
@@ -10,40 +11,21 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import SideNav from "@/components/home/SideNav.vue";
-import SidebarControl from "@/components/home/SidebarControl.vue";
 import { mapState } from "vuex";
-import { IM } from "@/vocabulary/IM";
 
 export default defineComponent({
   name: "Home",
-  components: {
-    SideNav,
-    SidebarControl
-  },
-  computed: mapState(["sideNavHierarchyFocus"]),
+  computed: mapState(["conceptIri", "isLoggedIn", "currentUser"]),
   async mounted() {
     this.updateRoute();
   },
   methods: {
     updateRoute(): void {
-      if (this.$route.name === "Home" || this.$route.name === "Dashboard") {
-        switch (this.sideNavHierarchyFocus.name) {
-          case "InformationModel":
-            this.$store.commit("updateConceptIri", IM.MODULE_IM);
-            break;
-          case "Ontology":
-            this.$store.commit("updateConceptIri", IM.MODULE_ONTOLOGY);
-            break;
-          case "ValueSets":
-            this.$store.commit("updateConceptIri", IM.MODULE_SETS);
-            break;
-          case "Queries":
-            this.$store.commit("updateConceptIri", IM.MODULE_QUERIES);
-            break;
-        }
-      } else if (this.$route.name === "Concept") {
-        this.$store.commit("updateConceptIri", this.$route.params.selectedIri as string);
+      if (!this.conceptIri) {
+        this.$router.back();
+      } else {
+        this.$store.commit("updateConceptIri", this.conceptIri);
+        this.$router.push({ name: "Concept", params: { selectedIri: this.conceptIri } });
       }
     }
   }
@@ -51,16 +33,20 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.topbar-container {
+  height: 10%;
+  width: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
 .main-grid {
   height: 100%;
   width: 100%;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas: "sidebar content";
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
   column-gap: 7px;
-}
-.header-grow {
-  flex-grow: 1;
 }
 .user-menu {
   height: 100%;

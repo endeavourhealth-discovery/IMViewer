@@ -1,17 +1,22 @@
-import { SearchRequest } from "@/models/search/SearchRequest";
 import axios, { CancelToken } from "axios";
-import GraphData from "@/models/GraphData";
-import { EntityReferenceNode } from "@/models/EntityReferenceNode";
-import { PartialBundle, SearchResponse } from "@/models/entityServiceTypes/EntityServiceTypes";
-import { EntityDefinitionDto } from "@/models/EntityDefinitionDto";
-import { TTBundle, TTIriRef } from "@/models/TripleTree";
-import { ExportValueSet } from "@/models/members/ExportValueSet";
-import { TermCode } from "@/models/terms/TermCode";
-import { DataModelProperty } from "@/models/properties/DataModelProperty";
-import { ConceptSummary } from "@/models/search/ConceptSummary";
-import { Namespace } from "@/models/Namespace";
-import { FiltersAsIris } from "@/models/FiltersAsIris";
-import Env from '@/services/Env';
+import { Models } from "im-library";
+import {
+  Namespace,
+  FiltersAsIris,
+  DataModelProperty,
+  TermCode,
+  ExportValueSet,
+  TTBundle,
+  TTIriRef,
+  EntityDefinitionDto,
+  PartialBundle,
+  EntityReferenceNode,
+  GraphData
+} from "im-library/dist/types/interfaces/Interfaces";
+import Env from "@/services/Env";
+const {
+  Search: { ConceptSummary, SearchRequest }
+} = Models;
 
 export default class EntityService {
   public static async downloadConcept(iri: string, format: string): Promise<any> {
@@ -30,7 +35,7 @@ export default class EntityService {
 
   public static async getFullExportSet(iri: string): Promise<any> {
     const client = axios.create({
-      baseURL: Env.api,
+      baseURL: Env.api as string,
       timeout: 0
     });
 
@@ -104,13 +109,13 @@ export default class EntityService {
     }
   }
 
-  public static async advancedSearch(request: SearchRequest, cancelToken: CancelToken): Promise<ConceptSummary[]> {
+  public static async advancedSearch(request: Models.Search.SearchRequest, cancelToken: CancelToken): Promise<Models.Search.ConceptSummary[]> {
     try {
       return await axios.post(Env.api + "api/entity/public/search", request, {
         cancelToken: cancelToken
       });
     } catch (error) {
-      return [] as ConceptSummary[];
+      return [] as Models.Search.ConceptSummary[];
     }
   }
 
@@ -248,13 +253,13 @@ export default class EntityService {
     }
   }
 
-  public static async getEntitySummary(iri: string): Promise<ConceptSummary> {
+  public static async getEntitySummary(iri: string): Promise<Models.Search.ConceptSummary> {
     try {
       return await axios.get(Env.api + "api/entity/public/summary", {
         params: { iri: iri }
       });
     } catch (error) {
-      return {} as ConceptSummary;
+      return {} as Models.Search.ConceptSummary;
     }
   }
 

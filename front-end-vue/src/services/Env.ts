@@ -1,3 +1,3 @@
 export default class Env {
-  static api = process.env.VUE_APP_API || 'http://localhost:8080/';
+  static api = import.meta.env.VITE_API || "http://localhost:8080/";
 }

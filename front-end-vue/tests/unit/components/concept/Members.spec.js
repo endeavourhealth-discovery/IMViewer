@@ -110,24 +110,24 @@ describe("Members.vue", () => {
   ];
 
   beforeEach(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
-    EntityService.getEntityMembers = jest.fn().mockResolvedValue(testMembers);
-    EntityService.getFullExportSet = jest.fn().mockResolvedValue({ data: true });
-    EntityService.getPartialEntity = jest.fn().mockResolvedValue({ "http://www.w3.org/2000/01/rdf-schema#label": "Test Set" });
-    SetService.download = jest.fn().mockResolvedValue(true);
-    mockRouter = { push: jest.fn() };
-    mockToast = { add: jest.fn() };
-    mockRef = { render: () => {}, methods: { toggle: jest.fn() } };
+    EntityService.getEntityMembers = vi.fn().mockResolvedValue(testMembers);
+    EntityService.getFullExportSet = vi.fn().mockResolvedValue({ data: true });
+    EntityService.getPartialEntity = vi.fn().mockResolvedValue({ "http://www.w3.org/2000/01/rdf-schema#label": "Test Set" });
+    SetService.download = vi.fn().mockResolvedValue(true);
+    mockRouter = { push: vi.fn() };
+    mockToast = { add: vi.fn() };
+    mockRef = { render: () => {}, methods: { toggle: vi.fn() } };
 
-    docSpy = jest.spyOn(document, "getElementById");
+    docSpy = vi.spyOn(document, "getElementById");
     docSpy.mockReturnValue(undefined);
 
     const warn = console.warn;
-    console.warn = jest.fn();
+    console.warn = vi.fn();
 
     const error = console.error;
-    console.error = jest.fn();
+    console.error = vi.fn();
 
     wrapper = shallowMount(Members, {
       global: {
@@ -140,7 +140,7 @@ describe("Members.vue", () => {
 
     await flushPromises();
     await wrapper.vm.$nextTick();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     console.warn = warn;
     console.error = error;
@@ -160,7 +160,7 @@ describe("Members.vue", () => {
   });
 
   it("can run downloadMenu commands", () => {
-    wrapper.vm.download = jest.fn();
+    wrapper.vm.download = vi.fn();
     wrapper.vm.downloadMenu[0].command();
     expect(wrapper.vm.download).toHaveBeenLastCalledWith(false);
     wrapper.vm.downloadMenu[1].command();
@@ -170,9 +170,9 @@ describe("Members.vue", () => {
   });
 
   it("adds event listener to setTableWidth on resize", async () => {
-    console.error = jest.fn();
+    console.error = vi.fn();
     await flushPromises();
-    const spy = jest.spyOn(wrapper.vm, "setTableWidth");
+    const spy = vi.spyOn(wrapper.vm, "setTableWidth");
     window.dispatchEvent(new Event("resize"));
     await wrapper.vm.$nextTick();
     expect(spy).toHaveBeenCalledTimes(1);
@@ -180,43 +180,43 @@ describe("Members.vue", () => {
   });
 
   it("can remove eventListener", () => {
-    console.error = jest.fn();
-    const spy = jest.spyOn(global, "removeEventListener");
+    console.error = vi.fn();
+    const spy = vi.spyOn(window, "removeEventListener");
     wrapper.unmount();
     expect(spy).toHaveBeenCalled();
     spy.mockReset();
   });
 
   it("can resize", () => {
-    console.error = jest.fn();
-    wrapper.vm.setTableWidth = jest.fn();
+    console.error = vi.fn();
+    wrapper.vm.setTableWidth = vi.fn();
     wrapper.vm.onResize();
     expect(wrapper.vm.setTableWidth).toHaveBeenCalledTimes(1);
   });
 
   it("can watch conceptIri", async () => {
-    wrapper.vm.getMembers = jest.fn();
+    wrapper.vm.getMembers = vi.fn();
     wrapper.vm.$options.watch.conceptIri.call(wrapper.vm, "http://snomed.info/sct#92491000000104");
     expect(wrapper.vm.getMembers).toHaveBeenCalledTimes(1);
   });
 
   it("can set width onRowGroupExpand", () => {
-    wrapper.vm.setTableWidth = jest.fn();
+    wrapper.vm.setTableWidth = vi.fn();
     wrapper.vm.onRowGroupExpand();
     expect(wrapper.vm.setTableWidth).toHaveBeenCalledTimes(1);
   });
 
   it("can set width onRowGroupExpand", () => {
-    wrapper.vm.setTableWidth = jest.fn();
+    wrapper.vm.setTableWidth = vi.fn();
     wrapper.vm.onRowGroupCollapse();
     expect(wrapper.vm.setTableWidth).toHaveBeenCalledTimes(1);
   });
 
   it("can getMembers ___ success", async () => {
     wrapper.vm.members = {};
-    wrapper.vm.setTableWidth = jest.fn();
-    wrapper.vm.sortMembers = jest.fn();
-    wrapper.vm.setSubsets = jest.fn();
+    wrapper.vm.setTableWidth = vi.fn();
+    wrapper.vm.sortMembers = vi.fn();
+    wrapper.vm.setSubsets = vi.fn();
     wrapper.vm.getMembers();
     expect(wrapper.vm.loading).toBe(true);
     expect(wrapper.vm.expandedRowGroups).toStrictEqual(["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"]);
@@ -263,7 +263,7 @@ describe("Members.vue", () => {
   });
 
   it("can download ___ success ___ expanded", async () => {
-    wrapper.vm.downloadFile = jest.fn();
+    wrapper.vm.downloadFile = vi.fn();
     wrapper.vm.download(true);
     expect(wrapper.vm.downloading).toBe(true);
     expect(mockToast.add).toHaveBeenCalledTimes(1);
@@ -277,7 +277,7 @@ describe("Members.vue", () => {
   });
 
   it("can download ___ success ___ not expanded", async () => {
-    wrapper.vm.downloadFile = jest.fn();
+    wrapper.vm.downloadFile = vi.fn();
     wrapper.vm.download(false, true);
     expect(wrapper.vm.downloading).toBe(true);
     expect(mockToast.add).toHaveBeenCalledTimes(1);
@@ -291,8 +291,8 @@ describe("Members.vue", () => {
   });
 
   it("can download ___ fail", async () => {
-    wrapper.vm.downloadFile = jest.fn();
-    SetService.download = jest.fn().mockRejectedValue(false);
+    wrapper.vm.downloadFile = vi.fn();
+    SetService.download = vi.fn().mockRejectedValue(false);
     wrapper.vm.download(false);
     expect(wrapper.vm.downloading).toBe(true);
     expect(mockToast.add).toHaveBeenCalledTimes(1);
@@ -367,7 +367,7 @@ describe("Members.vue", () => {
   });
 
   it("resizes", async () => {
-    wrapper.vm.setTableWidth = jest.fn();
+    wrapper.vm.setTableWidth = vi.fn();
     wrapper.vm.onResize();
     await flushPromises();
     expect(wrapper.vm.setTableWidth).toHaveBeenCalledTimes(1);
@@ -375,8 +375,8 @@ describe("Members.vue", () => {
 
   it("can setTableWidth", () => {
     const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = jest.fn().mockReturnValue({ width: 100 });
-    mockElement.getElementsByClassName = jest.fn().mockReturnValue([mockElement]);
+    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ width: 100 });
+    mockElement.getElementsByClassName = vi.fn().mockReturnValue([mockElement]);
     mockElement.style.width = "10px";
     docSpy.mockReturnValue(mockElement);
     wrapper.vm.setTableWidth();
@@ -384,7 +384,7 @@ describe("Members.vue", () => {
   });
 
   it("can setTableWidth ___ container fail", () => {
-    LoggerService.error = jest.fn();
+    LoggerService.error = vi.fn();
     docSpy.mockReturnValue(undefined);
     wrapper.vm.setTableWidth();
     expect(LoggerService.error).toHaveBeenCalledTimes(1);
@@ -393,8 +393,8 @@ describe("Members.vue", () => {
 
   it("can setTableWidth ___ table fail", () => {
     const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = jest.fn().mockReturnValue({ width: 100 });
-    mockElement.getElementsByClassName = jest.fn().mockReturnValue([]);
+    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ width: 100 });
+    mockElement.getElementsByClassName = vi.fn().mockReturnValue([]);
     mockElement.style.width = "10px";
     docSpy.mockReturnValue(mockElement);
     wrapper.vm.setTableWidth();
@@ -467,23 +467,23 @@ describe("Members.vue", () => {
 //   };
 
 //   beforeEach(async () => {
-//     jest.resetAllMocks();
+//     vi.resetAllMocks();
 
-//     EntityService.getEntityMembers = jest.fn().mockResolvedValue(testMembers);
-//     EntityService.getFullExportSet = jest.fn().mockResolvedValue({ data: true });
-//     SetService.download = jest.fn().mockResolvedValue(true);
-//     mockRouter = { push: jest.fn() };
-//     mockToast = { add: jest.fn() };
-//     mockRef = { render: () => {}, methods: { toggle: jest.fn() } };
+//     EntityService.getEntityMembers = vi.fn().mockResolvedValue(testMembers);
+//     EntityService.getFullExportSet = vi.fn().mockResolvedValue({ data: true });
+//     SetService.download = vi.fn().mockResolvedValue(true);
+//     mockRouter = { push: vi.fn() };
+//     mockToast = { add: vi.fn() };
+//     mockRef = { render: () => {}, methods: { toggle: vi.fn() } };
 
-//     docSpy = jest.spyOn(document, "getElementById");
+//     docSpy = vi.spyOn(document, "getElementById");
 //     docSpy.mockReturnValue(undefined);
 
 //     // const warn = console.warn;
-//     // console.warn = jest.fn();
+//     // console.warn = vi.fn();
 
 //     // const error = console.error;
-//     // console.error = jest.fn();
+//     // console.error = vi.fn();
 
 //     wrapper = shallowMount(Members, {
 //       global: {
@@ -496,14 +496,14 @@ describe("Members.vue", () => {
 
 //     await flushPromises();
 //     await wrapper.vm.$nextTick();
-//     jest.clearAllMocks();
+//     vi.clearAllMocks();
 
 //     // console.warn = warn;
 //     // console.error = error;
 //   });
 
 //   it("can downloadFile", async () => {
-//     window.URL.createObjectURL = jest.fn();
+//     window.URL.createObjectURL = vi.fn();
 //     class Link {
 //       name = "";
 //       _download = "";
@@ -524,11 +524,11 @@ describe("Members.vue", () => {
 //         return this._download;
 //       }
 //       click() {
-//         return jest.fn();
+//         return vi.fn();
 //       }
 //     }
 //     const link = new Link("mockLink");
-//     jest.spyOn(document, "createElement").mockReturnValueOnce(link);
+//     vi.spyOn(document, "createElement").mockReturnValueOnce(link);
 //     wrapper.vm.downloadFile("testData");
 //     await wrapper.vm.$nextTick();
 //     await flushPromises();

@@ -6,8 +6,8 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "@vue/runtime-core";
-import { TTBundle } from "@/models/TripleTree";
 import EntityService from "@/services/EntityService";
+import { TTBundle } from "im-library/dist/types/interfaces/Interfaces";
 
 export default defineComponent({
   name: "EclDefinition",

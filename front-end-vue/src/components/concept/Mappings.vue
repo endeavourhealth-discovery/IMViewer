@@ -1,5 +1,5 @@
 <template>
-  <div class="p-d-flex p-flex-row p-jc-center p-ai-center loading -container" v-if="loading">
+  <div class="flex flex-row justify-contents-center align-items-center loading -container" v-if="loading">
     <ProgressSpinner />
   </div>
   <OrganizationChart v-else :value="data">
@@ -44,12 +44,12 @@
       <span v-else>None</span>
     </template>
     <template #default>
-      <p class="p-text-centered">None</p>
+      <p class="text-centered">None</p>
     </template>
   </OrganizationChart>
 
   <OverlayPanel ref="opMap" id="overlay-panel-maps">
-    <div class="p-d-flex p-flex-column p-jc-start map-overlay">
+    <div class="flex flex-column justify-contents-start map-overlay">
       <p><strong>Name: </strong>{{ hoveredResult.name }}</p>
       <p><strong>Iri: </strong>{{ hoveredResult.iri }}</p>
       <p><strong>Priority: </strong>{{ hoveredResult.priority }}</p>
@@ -61,7 +61,7 @@
   </OverlayPanel>
 
   <OverlayPanel ref="opSimpleMaps" id="overlay-panel-simple-maps">
-    <div class="p-d-flex p-flex-column p-jc-start simple-maps-overlay">
+    <div class="flex flex-column justify-contents-start simple-maps-overlay">
       <p><strong>Name: </strong>{{ hoveredResult.name }}</p>
       <p><strong>Iri: </strong>{{ hoveredResult.iri }}</p>
       <p><strong>Namespace: </strong>{{ hoveredResult.scheme }}</p>
@@ -72,16 +72,15 @@
 
 <script lang="ts">
 import EntityService from "@/services/EntityService";
-import { IM } from "@/vocabulary/IM";
 import { defineComponent } from "vue";
 import SimpleMaps from "@/components/concept/mapping/SimpleMaps.vue";
-import { Namespace } from "@/models/Namespace";
-import { SimpleMap } from "@/models/mappings/SimpleMap";
-import { SimpleMapIri } from "@/models/mappings/SimpleMapIri";
-import { MapItem } from "@/models/mappings/MapItem";
-import { ChartTableNode, ChartMapNode } from "@/models/mappings/MapChartTypes";
-import { isArrayHasLength, isObjectHasKeys } from "@/helpers/DataTypeCheckers";
-import { byPriority, byScheme } from "@/helpers/Sorters";
+import { Namespace, SimpleMap, SimpleMapIri, MapItem, ChartTableNode, ChartMapNode } from "im-library/dist/types/interfaces/Interfaces";
+import { Helpers, Vocabulary } from "im-library";
+const {
+  DataTypeCheckers: { isArrayHasLength, isObjectHasKeys },
+  Sorters: { byPriority, byScheme }
+} = Helpers;
+const { IM } = Vocabulary;
 
 export default defineComponent({
   name: "Mappings",
