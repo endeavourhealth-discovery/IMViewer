@@ -14,6 +14,8 @@ export default createStore({
     currentUser: {} as Models.User,
     isLoggedIn: false as boolean,
     snomedLicenseAccepted: localStorage.getItem("snomedLicenseAccepted") as string,
+    snomedReturnUrl: "",
+    authReturnUrl: "",
     blockedIris: [] as string[],
     selectedEntityType: "",
     conceptActivePanel: 0
@@ -35,6 +37,12 @@ export default createStore({
     updateSnomedLicenseAccepted(state, status: string) {
       state.snomedLicenseAccepted = status;
       localStorage.setItem("snomedLicenseAccepted", status);
+    },
+    updateSnomedReturnUrl(state, url: string) {
+      state.snomedReturnUrl = url;
+    },
+    updateAuthReturnUrl(state, url: string) {
+      state.authReturnUrl = url;
     },
     updateSelectedEntityType(state, type) {
       state.selectedEntityType = type;
