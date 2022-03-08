@@ -2,7 +2,7 @@
   <div class="layout-main">
     <div class="main-grid">
       <div class="topbar-container">
-        <TopBar :isLoggedIn="isLoggedIn" :currentUser="currentUser" />
+        <TopBar />
       </div>
       <router-view />
     </div>
