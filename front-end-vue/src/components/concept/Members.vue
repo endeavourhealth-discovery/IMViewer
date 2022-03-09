@@ -21,7 +21,7 @@
         <div class="table-header-bar">
           <div class="checkboxes-container">
             <template v-if="checkAuthorization()">
-              <Button type="button" label="Publish" @click="publish"></Button>
+              <Button type="button" label="Publish" @click="publish" :loading="isPublishing"></Button>
             </template>
             <Button type="button" label="Download..." @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" :loading="downloading" />
             <template id="overlay_menu">
@@ -117,7 +117,8 @@ export default defineComponent({
         { label: "Expanded (v2)", command: () => this.download(true) },
         { label: "Expanded (v1)", command: () => this.download(true, true) },
         { label: "IMv1", command: () => this.downloadIMV1() }
-      ]
+      ],
+      isPublishing: false
     };
   },
   methods: {
@@ -229,8 +230,17 @@ export default defineComponent({
       }
     },
 
-    async publish() {
-      await SetService.publish(this.conceptIri);
+    publish() {
+      this.isPublishing = true;
+      SetService.publish(this.conceptIri)
+          .then(result => {
+            this.isPublishing = false;
+            this.$toast.add(LoggerService.success("Value set published", "Published to IM1 :" + this.conceptIri));
+          })
+          .catch(() => {
+            this.isPublishing = false;
+            this.$toast.add(LoggerService.error("Failed to publish value set", "Publish to IM1 FAILED :" + this.conceptIri));
+          });
     },
 
     getUserRoles() {
