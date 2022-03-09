@@ -3,6 +3,7 @@ import AuthService from "@/services/AuthService";
 import LoggerService from "@/services/LoggerService";
 import ConfigService from "@/services/ConfigService";
 import { Models, Vocabulary, Constants } from "im-library";
+import { RecentActivityItem } from "im-library/dist/types/interfaces/Interfaces";
 const { User, CustomAlert } = Models;
 const { IM } = Vocabulary;
 const { Avatars } = Constants;
@@ -13,6 +14,7 @@ export default createStore({
     conceptIri: localStorage.getItem("viewerSelectedConcept") as string,
     currentUser: {} as Models.User,
     isLoggedIn: false as boolean,
+    recentLocalActivity: localStorage.getItem("recentLocalActivity") as string,
     snomedLicenseAccepted: localStorage.getItem("snomedLicenseAccepted") as string,
     snomedReturnUrl: "",
     authReturnUrl: "",
@@ -21,6 +23,23 @@ export default createStore({
     conceptActivePanel: 0
   },
   mutations: {
+    updateRecentLocalActivity(state, recentActivityItem: RecentActivityItem) {
+      let activity: RecentActivityItem[] = JSON.parse(localStorage.getItem("recentLocalActivity") || "[]");
+      activity.forEach(activityItem => {
+        activityItem.dateTime = new Date(activityItem.dateTime);
+      });
+      const foundIndex = activity.findIndex(activityItem => activityItem.iri === recentActivityItem.iri && activityItem.app === recentActivityItem.app);
+      if (foundIndex !== -1) {
+        activity[foundIndex].dateTime = recentActivityItem.dateTime;
+        activity.sort((a, b) => (a.dateTime.getTime() > b.dateTime.getTime() ? 1 : b.dateTime.getTime() > a.dateTime.getTime() ? -1 : 0));
+      } else {
+        while (activity.length > 4) activity.shift();
+        activity.push(recentActivityItem);
+      }
+
+      localStorage.setItem("recentLocalActivity", JSON.stringify(activity));
+      state.recentLocalActivity = JSON.stringify(activity);
+    },
     updateBlockedIris(state, blockedIris) {
       state.blockedIris = blockedIris;
     },
