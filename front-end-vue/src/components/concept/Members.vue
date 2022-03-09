@@ -24,7 +24,10 @@
               <Button type="button" label="Publish" @click="publish"></Button>
             </template>
             <Button type="button" label="Download..." @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" :loading="downloading" />
-            <Menu id="overlay_menu" ref="menu" :model="downloadMenu" :popup="true" />
+            <template id="overlay_menu">
+              <Menu ref="menu" v-if="checkAuthorization()" :model="downloadMenu1" :popup="true" />
+              <Menu ref="menu" v-else :model="downloadMenu" :popup="true" />
+            </template>
           </div>
         </div>
       </template>
@@ -108,6 +111,12 @@ export default defineComponent({
         { label: "Definition", command: () => this.download(false) },
         { label: "Expanded (v2)", command: () => this.download(true) },
         { label: "Expanded (v1)", command: () => this.download(true, true) }
+      ],
+      downloadMenu1: [
+        { label: "Definition", command: () => this.download(false) },
+        { label: "Expanded (v2)", command: () => this.download(true) },
+        { label: "Expanded (v1)", command: () => this.download(true, true) },
+        { label: "IMv1", command: () => this.downloadIMV1() }
       ]
     };
   },
@@ -146,6 +155,20 @@ export default defineComponent({
           }
         }
       });
+    },
+
+    async downloadIMV1(): Promise<void> {
+      this.downloading = true;
+      try {
+        this.$toast.add(LoggerService.success("Download will begin shortly"));
+        const result = await SetService.IMV1(this.conceptIri);
+        const label: string = ((await EntityService.getPartialEntity(this.conceptIri, [RDFS.LABEL])) as any)[RDFS.LABEL];
+        this.downloadFile(result, label + ".txt");
+      } catch (error) {
+        this.$toast.add(LoggerService.error("Download failed from server"));
+      } finally {
+        this.downloading = false;
+      }
     },
 
     async download(expanded: boolean, v1 = false): Promise<void> {

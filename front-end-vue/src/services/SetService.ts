@@ -35,4 +35,11 @@ export default class SetService {
       params: { iri: conceptIri }
     });
   }
+
+  public static async IMV1(conceptIri: string) {
+    return await axios.get(Env.api + "api/set/public/export", {
+      params: { iri: conceptIri },
+      responseType: "blob"
+    });
+  }
 }
