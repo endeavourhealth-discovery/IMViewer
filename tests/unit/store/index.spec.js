@@ -27,6 +27,7 @@ describe("state", () => {
       "conceptIri",
       "currentUser",
       "isLoggedIn",
+      "recentLocalActivity",
       "snomedLicenseAccepted",
       "snomedReturnUrl",
       "authReturnUrl",

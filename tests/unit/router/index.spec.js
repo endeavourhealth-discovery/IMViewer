@@ -187,7 +187,7 @@ describe("router", () => {
     it("updates conceptIri on concept routing", async () => {
       router.push({ name: "Concept", params: { selectedIri: "http://snomed.info/sct#298382003" } });
       await flushPromises();
-      expect(store.commit).toHaveBeenCalledTimes(3);
+      expect(store.commit).toHaveBeenCalledTimes(4);
       expect(store.commit).toHaveBeenLastCalledWith("updateConceptIri", "http://snomed.info/sct#298382003");
       expect(wrapper.vm.$route.path).toBe("/concept/http:%2F%2Fsnomed.info%2Fsct%23298382003");
     });

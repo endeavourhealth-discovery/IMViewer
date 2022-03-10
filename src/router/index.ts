@@ -4,6 +4,8 @@ import Datamodel from "../views/Concept.vue";
 import { SnomedLicense } from "im-library";
 import store from "@/store/index";
 import { nextTick } from "vue";
+import { Enums } from "im-library";
+const { AppEnum } = Enums;
 
 const APP_TITLE = "IM Viewer";
 
@@ -49,6 +51,7 @@ router.beforeEach((to, from, next) => {
     return;
   }
   if (iri) {
+    store.commit("updateRecentLocalActivity", { iri: iri, dateTime: new Date(), app: AppEnum.VIEWER });
     store.commit("updateConceptIri", to.params.selectedIri as string);
   }
   if (to.matched.some(record => record.meta.requiresAuth)) {
