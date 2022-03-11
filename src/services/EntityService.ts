@@ -74,7 +74,7 @@ export default class EntityService {
 
   public static async getFullEntity(iri: string): Promise<any> {
     try {
-      return await axios.get(this.api + "api/entity/fullEntity", {
+      return await axios.get(Env.api + "api/entity/fullEntity", {
         params: {
           iri: iri
         }
@@ -212,7 +212,7 @@ export default class EntityService {
 
   public static async getEntityMembersAsNode(iri: string, expandMembers?: boolean, expandSubsets?: boolean, limit?: number): Promise<any> {
     try {
-      return await axios.get(this.api + "api/entity/public/membersAsNode", {
+      return await axios.get(Env.api + "api/entity/public/membersAsNode", {
         params: {
           iri: iri,
           expandMembers: expandMembers,
