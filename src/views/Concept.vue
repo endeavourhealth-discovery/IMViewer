@@ -1,4 +1,44 @@
 <template>
+  <div class="topbar-container">
+    <TopBar>
+      <template #content>
+        <span class="title"><strong>IMViewer:</strong> {{header}}</span>
+          <span v-if="isObjectHasKeysWrapper(concept, ['inferred'])">
+            <Button
+                icon="far fa-copy"
+                class="p-button-rounded p-button-text p-button-secondary"
+                @click="toggle($event, 'copyMenu')"
+                v-tooltip="'Copy concept to clipboard'"
+            />
+            <Menu id="copy-options" ref="copyMenu" :model="copyMenuItems" :popup="true" />
+          </span>
+          <Button
+              icon="fas fa-cloud-download-alt"
+              class="p-button-rounded p-button-text p-button-secondary"
+              @click="toggle($event, 'downloadMenu')"
+              v-tooltip.bottom="'Download concept'"
+              aria-haspopup="true"
+              aria-controls="overlay_menu"
+          />
+          <Menu id="overlay_menu" ref="downloadMenu" :model="items" :popup="true" />
+          <!--<button
+            class="p-panel-header-icon p-link p-mr-2"
+            @click="directToCreateRoute"
+            v-tooltip.bottom="'Create new concept'"
+          >
+            <i class="fas fa-plus-circle" aria-hidden="true"></i>
+          </button>
+          <button
+            class="p-panel-header-icon p-link p-mr-2"
+            @click="directToEditRoute"
+            v-tooltip.bottom="'Edit concept'"
+          >
+            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+          </button>-->
+
+      </template>
+    </TopBar>
+  </div>
   <Splitter id="concept-main-container">
     <SplitterPanel :size="20" :minSize="10">
       <div v-if="loading" class="loading-container" :style="contentHeight">
@@ -467,6 +507,10 @@ export default defineComponent({
 
 .left-panel-content {
   padding: 1rem;
+}
+
+.title {
+  font-size: 2rem;
 }
 
 #definition-container {
