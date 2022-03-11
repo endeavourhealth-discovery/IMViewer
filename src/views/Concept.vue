@@ -1,47 +1,14 @@
 <template>
-  <div id="concept-main-container">
-    <Panel>
-      <template #icons>
-        <div class="icons-container">
-          <div v-if="isObjectHasKeysWrapper(concept, ['inferred'])" class="copy-container">
-            <Button
-              icon="far fa-copy"
-              class="p-button-rounded p-button-text p-button-secondary"
-              @click="toggle($event, 'copyMenu')"
-              v-tooltip="'Copy concept to clipboard'"
-            />
-            <Menu id="copy-options" ref="copyMenu" :model="copyMenuItems" :popup="true" />
-          </div>
-          <Button
-            type="button"
-            class="p-panel-header-icon p-link p-mr-2"
-            @click="toggle($event, 'downloadMenu')"
-            v-tooltip.bottom="'Download concept'"
-            aria-haspopup="true"
-            aria-controls="overlay_menu"
-          >
-            <i class="fas fa-cloud-download-alt" aria-hidden="true"></i>
-          </Button>
-          <Menu id="overlay_menu" ref="downloadMenu" :model="items" :popup="true" />
-          <!--<button
-            class="p-panel-header-icon p-link p-mr-2"
-            @click="directToCreateRoute"
-            v-tooltip.bottom="'Create new concept'"
-          >
-            <i class="fas fa-plus-circle" aria-hidden="true"></i>
-          </button>
-          <button
-            class="p-panel-header-icon p-link p-mr-2"
-            @click="directToEditRoute"
-            v-tooltip.bottom="'Edit concept'"
-          >
-            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
-          </button>-->
-        </div>
-      </template>
-      <template #header>
-        <PanelHeader :types="types" :header="header" />
-      </template>
+  <Splitter id="concept-main-container">
+    <SplitterPanel :size="20" :minSize="10">
+      <div v-if="loading" class="loading-container" :style="contentHeight">
+        <ProgressSpinner />
+      </div>
+      <div v-else class="left-panel-content" id="summary-container" :style="contentHeight">
+        <Definition :concept="concept" :configs="summaryConfig" />
+      </div>
+    </SplitterPanel>
+    <SplitterPanel :size="80" :minSize="20">
       <div id="concept-content-dialogs-container">
         <div id="concept-panel-container">
           <TabView v-model:activeIndex="active" :lazy="true">
@@ -50,7 +17,7 @@
                 <ProgressSpinner />
               </div>
               <div v-else class="concept-panel-content" id="definition-container" :style="contentHeight">
-                <Definition :concept="concept" :configs="configs" />
+                <Definition :concept="concept" :configs="definitionConfig" />
               </div>
             </TabPanel>
             <TabPanel header="Maps" v-if="showMappings">
@@ -97,8 +64,8 @@
         </div>
         <DownloadDialog v-if="showDownloadDialog" @closeDownloadDialog="closeDownloadDialog" :showDialog="showDownloadDialog" :conceptIri="conceptIri" />
       </div>
-    </Panel>
-  </div>
+    </SplitterPanel>
+  </Splitter>
 </template>
 
 <script lang="ts">
@@ -225,7 +192,8 @@ export default defineComponent({
       contentHeight: "",
       contentHeightValue: 0,
       copyMenuItems: [] as any,
-      configs: [] as DefinitionConfig[],
+      definitionConfig: [] as DefinitionConfig[],
+      summaryConfig: [] as DefinitionConfig[],
       conceptAsString: "",
       items: [
         {
@@ -266,7 +234,8 @@ export default defineComponent({
     },
 
     async getConcept(iri: string): Promise<void> {
-      const predicates = this.configs
+      const configs = this.definitionConfig.concat(this.summaryConfig);
+      const predicates = configs
         .filter((c: DefinitionConfig) => c.type !== "Divider")
         .filter((c: DefinitionConfig) => c.predicate !== "subtypes")
         .filter((c: DefinitionConfig) => c.predicate !== "inferred")
@@ -294,25 +263,29 @@ export default defineComponent({
       this.concept["inferred"] = result;
     },
 
-    async getConfig(name: string): Promise<void> {
-      this.configs = await ConfigService.getComponentLayout(name);
-      if (this.configs.every(config => isObjectHasKeys(config, ["order"]))) {
-        this.configs.sort(byOrder);
+    async getConfig(name: string): Promise<DefinitionConfig[]> {
+      const configs = await ConfigService.getComponentLayout(name);
+      if (configs.every(config => isObjectHasKeys(config, ["order"]))) {
+        configs.sort(byOrder);
       } else {
         LoggerService.error(undefined, "Failed to sort config for definition component layout. One or more config items are missing 'order' property.");
       }
+
+      return configs;
     },
 
     async init(): Promise<void> {
       this.loading = true;
-      await this.getConfig("definition");
+      this.definitionConfig = await this.getConfig("definition");
+      this.summaryConfig = await this.getConfig("summary");
       await this.getConcept(this.conceptIri);
       await this.getInferred(this.conceptIri);
       this.types = isObjectHasKeys(this.concept, [RDF.TYPE]) ? this.concept[RDF.TYPE] : ([] as TTIriRef[]);
       this.header = this.concept[RDFS.LABEL];
       await this.setCopyMenuItems();
       this.setStoreType();
-      this.conceptAsString = copyConceptToClipboard(this.concept, this.configs, undefined, this.blockedIris);
+      const allConfigs = this.definitionConfig.concat(this.summaryConfig);
+      this.conceptAsString = copyConceptToClipboard(this.concept, allConfigs, undefined, this.blockedIris);
       this.loading = false;
     },
 
@@ -381,7 +354,7 @@ export default defineComponent({
           label: "All",
           command: async () => {
             await navigator.clipboard
-              .writeText(copyConceptToClipboard(this.concept, this.configs, undefined, this.blockedIris))
+              .writeText(copyConceptToClipboard(this.concept, this.definitionConfig.concat(this.summaryConfig), undefined, this.blockedIris))
               .then(() => {
                 this.$toast.add(LoggerService.success("Concept copied to clipboard"));
               })
@@ -395,7 +368,7 @@ export default defineComponent({
       let key: string;
       let value: any;
       for ([key, value] of Object.entries(this.concept)) {
-        let result = conceptObjectToCopyString(key, value, 0, 1, this.configs);
+        let result = conceptObjectToCopyString(key, value, 0, 1, this.definitionConfig.concat(this.summaryConfig));
         if (!result || !result.value) continue;
         const label = result.label;
         const text = result.value;
@@ -490,5 +463,13 @@ export default defineComponent({
   flex-flow: column;
   justify-content: center;
   align-items: center;
+}
+
+.left-panel-content {
+  padding: 1rem;
+}
+
+#definition-container {
+  padding-top: 1rem;
 }
 </style>
