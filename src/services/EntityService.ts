@@ -72,6 +72,18 @@ export default class EntityService {
     }
   }
 
+  public static async getFullEntity(iri: string): Promise<any> {
+    try {
+      return await axios.get(this.api + "api/entity/fullEntity", {
+        params: {
+          iri: iri
+        }
+      });
+    } catch (error) {
+      return {} as any;
+    }
+  }
+
   public static async getPartialEntityBundle(iri: string, predicates: string[]): Promise<PartialBundle> {
     try {
       return await axios.get(Env.api + "api/entity/public/partialBundle", {
@@ -116,33 +128,6 @@ export default class EntityService {
       });
     } catch (error) {
       return [] as Models.Search.ConceptSummary[];
-    }
-  }
-
-  private static getFilter(field: string, data: string[]): any {
-    const types: any[] = [];
-    for (const type of data) {
-      const fieldValue: any = {};
-      fieldValue[field] = type;
-      types.push({ match_phrase: fieldValue });
-    }
-
-    return {
-      bool: {
-        should: types,
-        minimum_should_match: 1
-      }
-    };
-  }
-
-  //obsolete, to be deleted on editor branch merge
-  public static async getEntity(iri: string): Promise<any> {
-    try {
-      return await axios.get(Env.api + "api/public/entity", {
-        params: { iri: iri }
-      });
-    } catch (error) {
-      return {} as any;
     }
   }
 
@@ -222,6 +207,21 @@ export default class EntityService {
       });
     } catch (error) {
       return {} as ExportValueSet;
+    }
+  }
+
+  public static async getEntityMembersAsNode(iri: string, expandMembers?: boolean, expandSubsets?: boolean, limit?: number): Promise<any> {
+    try {
+      return await axios.get(this.api + "api/entity/public/membersAsNode", {
+        params: {
+          iri: iri,
+          expandMembers: expandMembers,
+          expandSubsets: expandSubsets,
+          limit: limit
+        }
+      });
+    } catch (error) {
+      return {} as any;
     }
   }
 

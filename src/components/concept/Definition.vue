@@ -1,7 +1,7 @@
 <template>
   <div class="content-container">
     <div class="summary-container">
-      <template v-for="(config, index) in configs" :key="index">
+      <template v-for="(config, index) of configs" :key="index">
         <component
           :is="config.type"
           :label="config.label"

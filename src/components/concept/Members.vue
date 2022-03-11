@@ -43,7 +43,7 @@
         </template>
       </Column>
       <template #groupheader="slotProps">
-        <span v-for="subSet in subsets" :key="subSet">
+        <span v-for="subSet of subsets" :key="subSet">
           <span v-if="slotProps.data.label === subSet" class="group-header">
             {{ subSet }}
           </span>

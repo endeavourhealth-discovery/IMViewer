@@ -28,7 +28,7 @@
         </thead>
         <tbody>
           <tr
-            v-for="mapItem in slotProps.node.data.mapItems"
+            v-for="mapItem of slotProps.node.data.mapItems"
             :key="mapItem"
             @mouseenter="toggle($event, mapItem, 'opMap')"
             @mouseleave="toggle($event, mapItem, 'opMap')"

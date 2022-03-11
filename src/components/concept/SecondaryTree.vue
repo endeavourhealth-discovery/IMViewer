@@ -2,7 +2,7 @@
   <div class="flex flex-column justify-contents-start" id="secondary-tree-bar-container">
     <div id="alternate-parents-container" class="flex flex-column justify-contents-start align-items-start">
       <Button
-        v-for="altParent in alternateParents"
+        v-for="altParent of alternateParents"
         :key="altParent.iri"
         :label="altParent.name"
         :disabled="loading || altParent.name === ''"
