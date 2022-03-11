@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm link im-library && vite",
+    "dev": "vite",
     "serve": "vite preview",
     "build": "vite build",
     "test:unit": "vitest",

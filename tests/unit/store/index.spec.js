@@ -1,8 +1,10 @@
 import store from "@/store/index";
+import EntityService from "@/services/EntityService";
 import { flushPromises } from "@vue/test-utils";
+import LoggerService from "@/services/LoggerService";
 import AuthService from "@/services/AuthService";
 import ConfigService from "@/services/ConfigService";
-import { Models, Vocabulary, LoggerService } from "im-library";
+import { Models, Vocabulary } from "im-library";
 const {
   User,
   Search: { SearchRequest },

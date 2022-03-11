@@ -16,8 +16,9 @@ import * as d3 from "d3";
 import svgPanZoom from "svg-pan-zoom";
 import EntityService from "@/services/EntityService";
 import { RouteRecordName } from "vue-router";
+import LoggerService from "@/services/LoggerService";
 import { TTGraphData } from "im-library/dist/types/interfaces/Interfaces";
-import { Helpers, LoggerService } from "im-library";
+import { Helpers } from "im-library";
 const {
   GraphTranslator: { translateFromEntityBundle, toggleNodeByName, hasNodeChildrenByName },
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }

@@ -1,7 +1,8 @@
 import { createStore } from "vuex";
 import AuthService from "@/services/AuthService";
+import LoggerService from "@/services/LoggerService";
 import ConfigService from "@/services/ConfigService";
-import { Models, Vocabulary, Constants, LoggerService } from "im-library";
+import { Models, Vocabulary, Constants } from "im-library";
 import { RecentActivityItem } from "im-library/dist/types/interfaces/Interfaces";
 const { User, CustomAlert } = Models;
 const { IM } = Vocabulary;

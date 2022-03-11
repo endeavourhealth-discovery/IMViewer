@@ -18,6 +18,8 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import ArrayObjectNamesToStringWithLabel from "@/components/generics/ArrayObjectNamesToStringWithLabel.vue";
+import TextHTMLWithLabel from "@/components/generics/TextHTMLWithLabel.vue";
+import TextWithLabel from "@/components/generics/TextWithLabel.vue";
 import ObjectNameWithLabel from "@/components/generics/ObjectNameWithLabel.vue";
 import ArrayObjectNameListboxWithLabel from "@/components/generics/ArrayObjectNameListboxWithLabel.vue";
 import TermsTable from "@/components/concept/definition/TermsTable.vue";
@@ -37,6 +39,8 @@ export default defineComponent({
   name: "Definition",
   components: {
     ArrayObjectNamesToStringWithLabel,
+    TextHTMLWithLabel,
+    TextWithLabel,
     ObjectNameWithLabel,
     ArrayObjectNameTagWithLabel,
     ArrayObjectNameListboxWithLabel,

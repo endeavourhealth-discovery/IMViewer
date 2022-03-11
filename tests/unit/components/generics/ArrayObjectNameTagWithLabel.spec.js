@@ -1,7 +1,7 @@
 import ArrayObjectNameTagWithLabel from "@/components/generics/ArrayObjectNameTagWithLabel.vue";
 import { shallowMount } from "@vue/test-utils";
 import Tag from "primevue/tag";
-import {LoggerService} from "im-library"
+import LoggerService from "@/services/LoggerService";
 
 describe("ArraObjectNameTagWithLabel.vue", () => {
   let wrapper;
