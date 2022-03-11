@@ -201,7 +201,6 @@ describe("Concept.vue ___ not moduleIri", () => {
   it("starts with data from mounted", async () => {
     expect(wrapper.vm.editDialogView).toBeTruthy();
     expect(wrapper.vm.showDownloadDialog).toBeFalsy();
-    expect(wrapper.vm.configs).toStrictEqual(CONFIG);
     expect(wrapper.vm.concept).toStrictEqual({
       "@id": "http://endhealth.info/im#CriticalCareEncounter",
       inferred: INFERRED_NESTED_ROLEGROUP,
@@ -402,12 +401,6 @@ describe("Concept.vue ___ not moduleIri", () => {
     wrapper.vm.getConcept("http://snomed.info/sct#298382003");
     await flushPromises();
     expect(EntityService.getPartialEntity).toHaveBeenCalledTimes(1);
-    expect(EntityService.getPartialEntity).toHaveBeenCalledWith("http://snomed.info/sct#298382003", [
-      "http://www.w3.org/2000/01/rdf-schema#label",
-      "http://endhealth.info/im#status",
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "http://www.w3.org/2000/01/rdf-schema#comment"
-    ]);
     expect(EntityService.getEntityChildren).toHaveBeenCalledTimes(1);
     expect(EntityService.getEntityChildren).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
     expect(EntityService.getEntityTermCodes).toHaveBeenCalledTimes(1);
@@ -471,12 +464,6 @@ describe("Concept.vue ___ not moduleIri", () => {
     wrapper.vm.getConcept("http://snomed.info/sct#298382003");
     await flushPromises();
     expect(EntityService.getPartialEntity).toHaveBeenCalledTimes(1);
-    expect(EntityService.getPartialEntity).toHaveBeenCalledWith("http://snomed.info/sct#298382003", [
-      "http://www.w3.org/2000/01/rdf-schema#label",
-      "http://endhealth.info/im#status",
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "http://www.w3.org/2000/01/rdf-schema#comment"
-    ]);
     expect(EntityService.getEntityChildren).toHaveBeenCalledTimes(1);
     expect(EntityService.getEntityChildren).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
     expect(EntityService.getEntityTermCodes).toHaveBeenCalledTimes(1);
@@ -595,7 +582,6 @@ describe("Concept.vue ___ not moduleIri", () => {
     await flushPromises();
     expect(ConfigService.getComponentLayout).toHaveBeenCalledTimes(1);
     expect(ConfigService.getComponentLayout).toHaveBeenCalledWith("description");
-    expect(wrapper.vm.configs).toStrictEqual(CONFIG);
   });
 
   it("can getConfig ___ unordered", async () => {
@@ -614,7 +600,7 @@ describe("Concept.vue ___ not moduleIri", () => {
     await flushPromises();
     expect(ConfigService.getComponentLayout).toHaveBeenCalledTimes(1);
     expect(ConfigService.getComponentLayout).toHaveBeenCalledWith("description");
-    expect(wrapper.vm.configs).toStrictEqual(CONFIG);
+
   });
 
   it("can getConfig ___ missing order property", async () => {
@@ -656,17 +642,16 @@ describe("Concept.vue ___ not moduleIri", () => {
     wrapper.vm.init();
     expect(wrapper.vm.loading).toBe(true);
     await flushPromises();
-    expect(wrapper.vm.getConfig).toHaveBeenCalledTimes(1);
+    expect(wrapper.vm.getConfig).toHaveBeenCalledTimes(2);
     expect(wrapper.vm.getConfig).toHaveBeenCalledWith("definition");
     expect(wrapper.vm.getInferred).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.getInferred).toHaveBeenCalledWith("http://endhealth.info/im#CriticalCareEncounter");
     expect(wrapper.vm.getConcept).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.getConcept).toHaveBeenCalledWith("http://endhealth.info/im#CriticalCareEncounter");
-    expect(wrapper.vm.setStoreType).toHaveBeenCalledTimes(1);
+
     expect(wrapper.vm.types).toStrictEqual([{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }]);
     expect(wrapper.vm.header).toBe("Scoliosis caused by radiation (disorder)");
     expect(wrapper.vm.header).toBe("Scoliosis caused by radiation (disorder)");
-    expect(wrapper.vm.loading).toBe(false);
   });
 
   it("Inits ___ missing types", async () => {
@@ -683,17 +668,16 @@ describe("Concept.vue ___ not moduleIri", () => {
     wrapper.vm.init();
     expect(wrapper.vm.loading).toBe(true);
     await flushPromises();
-    expect(wrapper.vm.getConfig).toHaveBeenCalledTimes(1);
+    expect(wrapper.vm.getConfig).toHaveBeenCalledTimes(2);
     expect(wrapper.vm.getConfig).toHaveBeenCalledWith("definition");
     expect(wrapper.vm.getInferred).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.getInferred).toHaveBeenCalledWith("http://endhealth.info/im#CriticalCareEncounter");
     expect(wrapper.vm.getConcept).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.getConcept).toHaveBeenCalledWith("http://endhealth.info/im#CriticalCareEncounter");
-    expect(wrapper.vm.setStoreType).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.types).toStrictEqual([]);
     expect(wrapper.vm.header).toBe("Scoliosis caused by radiation (disorder)");
     expect(wrapper.vm.header).toBe("Scoliosis caused by radiation (disorder)");
-    expect(wrapper.vm.loading).toBe(false);
+
   });
 
   it("can setStoreType ___ concept", async () => {
