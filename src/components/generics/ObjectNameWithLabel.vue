@@ -9,9 +9,8 @@
 </template>
 
 <script lang="ts">
-import LoggerService from "@/services/LoggerService";
 import { defineComponent } from "vue";
-import { Helpers } from "im-library";
+import { Helpers, LoggerService } from "im-library";
 const {
   DataTypeCheckers: { isObjectHasKeys }
 } = Helpers;

@@ -7,10 +7,9 @@
 </template>
 
 <script lang="ts">
-import LoggerService from "@/services/LoggerService";
 import { defineComponent, PropType } from "vue";
 import { TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
-import { Helpers } from "im-library";
+import { Helpers, LoggerService } from "im-library";
 const {
   DataTypeCheckers: { isObjectHasKeys }
 } = Helpers;

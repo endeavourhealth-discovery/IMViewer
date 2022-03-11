@@ -38,9 +38,8 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { RouteRecordName } from "node_modules/vue-router/dist/vue-router";
-import LoggerService from "@/services/LoggerService";
 import { mapState } from "vuex";
-import { Helpers } from "im-library";
+import { Helpers, LoggerService } from "im-library";
 const {
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }
 } = Helpers;

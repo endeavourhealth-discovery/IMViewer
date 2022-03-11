@@ -6,8 +6,7 @@ import Checkbox from "primevue/checkbox";
 import Button from "primevue/button";
 import ProgressSpinner from "primevue/progressspinner";
 import EntityService from "@/services/EntityService";
-import LoggerService from "@/services/LoggerService";
-import { Vocabulary } from "im-library";
+import { Vocabulary, LoggerService } from "im-library";
 import Env from "@/services/Env";
 const { IM, RDFS } = Vocabulary;
 

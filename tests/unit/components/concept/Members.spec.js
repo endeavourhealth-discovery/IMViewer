@@ -7,7 +7,7 @@ import Column from "primevue/column";
 import Button from "primevue/button";
 import EntityService from "@/services/EntityService";
 import SetService from "@/services/SetService";
-import LoggerService from "@/services/LoggerService";
+import {LoggerService} from "im-library";
 import Menu from "primevue/menu";
 
 describe("Members.vue", () => {
