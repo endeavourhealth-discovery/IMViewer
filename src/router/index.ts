@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
-import Datamodel from "../views/Concept.vue";
+import Concept from "../views/Concept.vue";
 import { SnomedLicense } from "im-library";
 import store from "@/store/index";
 import { nextTick } from "vue";
@@ -21,7 +21,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/concept/:selectedIri",
         name: "Concept",
-        component: Datamodel,
+        component: Concept,
         meta: {
           requiresLicense: true
         }

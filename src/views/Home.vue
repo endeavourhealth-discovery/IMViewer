@@ -1,9 +1,6 @@
 <template>
   <div class="layout-main">
     <div class="main-grid">
-      <div class="topbar-container">
-        <TopBar :title="'IMViewer - ' + title" />
-      </div>
       <router-view />
     </div>
   </div>
