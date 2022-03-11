@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "prod": "vite serve",
     "test:unit": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:unit:ci": "vue-cli-service test:unit > testResult.txt 2>&1",
