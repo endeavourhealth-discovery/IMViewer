@@ -13,22 +13,29 @@ _The proxy expects IMAPI to be running on localhost:8080_
 npm install
 ```
 
-### Compiles and hot-reloads for development
-
+### Run in local/development mode
+This will run a local server for development purposes that will watch the source files and
+recompile on the fly as they're changed & saved.
 ```
 npm run dev
 ```
 
-### Compiles and minifies for production
+### Run unit tests (watch mode)
+Runs the unit tests in watch mode
+```
+npm run test:unit
+```
 
+### Unit test coverage report
+Runs the unit test and generates coverage report (not in watch mode)
+```
+npm run test:coverage
+```
+
+### Build for production
+This will build the final output, ready for deployment to a production server
 ```
 npm run build
-```
-
-### Preview production build
-
-```
-npm run serve
 ```
 
 ### Lints and fixes files
@@ -37,6 +44,3 @@ npm run serve
 npm run lint
 ```
 
-### Customize configuration
-
-See [Configuration Reference](https://cli.vuejs.org/config/).

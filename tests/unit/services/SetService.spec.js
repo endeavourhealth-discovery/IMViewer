@@ -1,7 +1,6 @@
 import SetService from "@/services/SetService";
 import axios from "axios";
-
-const api = import.meta.env.VITE_API;
+import Env from "@/services/Env";
 
 describe("SetService.ts ___ axios success", () => {
   beforeEach(() => {
@@ -13,7 +12,7 @@ describe("SetService.ts ___ axios success", () => {
   it("can download", async () => {
     const result = await SetService.download("testIri", false, false);
     expect(axios.get).toHaveBeenCalledTimes(1);
-    expect(axios.get).toHaveBeenCalledWith(api + "api/set/public/download", {
+    expect(axios.get).toHaveBeenCalledWith(Env.api + "api/set/public/download", {
       params: { iri: "testIri", expandMembers: false, v1: false, format: "excel" },
       responseType: "blob"
     });
@@ -24,7 +23,7 @@ describe("SetService.ts ___ axios success", () => {
     const cancelToken = axios.CancelToken.source().token;
     const result = await SetService.ECLSearch("testString", false, 1000, cancelToken);
     expect(axios.post).toBeCalledTimes(1);
-    expect(axios.post).toHaveBeenCalledWith(api + "api/set/public/eclSearch", "testString", {
+    expect(axios.post).toHaveBeenCalledWith(Env.api + "api/set/public/eclSearch", "testString", {
       headers: { "Content-Type": "text/plain" },
       params: { includeLegacy: false, limit: 1000 },
       cancelToken: cancelToken
@@ -44,7 +43,7 @@ describe("SetService.ts ___ axios fail", () => {
     const cancelToken = axios.CancelToken.source().token;
     const result = await SetService.ECLSearch("testString", false, 1000, cancelToken);
     expect(axios.post).toBeCalledTimes(1);
-    expect(axios.post).toHaveBeenCalledWith(api + "api/set/public/eclSearch", "testString", {
+    expect(axios.post).toHaveBeenCalledWith(Env.api + "api/set/public/eclSearch", "testString", {
       headers: { "Content-Type": "text/plain" },
       params: { includeLegacy: false, limit: 1000 },
       cancelToken: cancelToken
