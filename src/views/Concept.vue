@@ -328,6 +328,7 @@ export default defineComponent({
       const allConfigs = this.definitionConfig.concat(this.summaryConfig);
       this.conceptAsString = copyConceptToClipboard(this.concept, allConfigs, undefined, this.blockedIris);
       this.loading = false;
+      document.title = (this.header as string) || APP_TITLE;
     },
 
     setStoreType(): void {
