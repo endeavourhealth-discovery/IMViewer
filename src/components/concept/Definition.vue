@@ -18,8 +18,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import TermsTable from "@/components/concept/definition/TermsTable.vue";
-import TextSectionHeader from "@/components/generics/TextSectionHeader.vue";
-import SectionDivider from "@/components/generics/SectionDivider.vue";
 import { DefinitionConfig } from "im-library/dist/types/interfaces/Interfaces";
 import { Helpers } from "im-library";
 const {
@@ -29,9 +27,7 @@ const {
 export default defineComponent({
   name: "Definition",
   components: {
-    TermsTable,
-    TextSectionHeader,
-    SectionDivider,
+    TermsTable
   },
   props: {
     concept: { type: Object, required: true },
