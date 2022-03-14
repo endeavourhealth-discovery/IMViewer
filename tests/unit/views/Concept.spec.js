@@ -6,6 +6,9 @@ import PanelHeader from "@/components/concept/PanelHeader.vue";
 import TabView from "primevue/tabview";
 import TabPanel from "primevue/tabpanel";
 import ProgressSpinner from "primevue/progressspinner";
+import Splitter from "primevue/splitter";
+import SplitterPanel from "primevue/splitterpanel";
+import TopBar from "im-library";
 import Definition from "@/components/concept/Definition.vue";
 import Mappings from "@/components/concept/Mappings.vue";
 import UsedIn from "@/components/concept/UsedIn.vue";
@@ -183,7 +186,10 @@ describe("Concept.vue ___ not moduleIri", () => {
           PanelHeader,
           Panel,
           DownloadDialog,
-          ProgressSpinner
+          ProgressSpinner,
+          Splitter,
+          SplitterPanel,
+          TopBar
         },
         mocks: { $store: mockStore, $router: mockRouter, $toast: mockToast },
         directives: { tooltip: vi.fn() },
@@ -1105,7 +1111,10 @@ describe("Concept.vue ___ moduleIri", () => {
           PanelHeader,
           Panel,
           DownloadDialog,
-          ProgressSpinner
+          ProgressSpinner,
+          Splitter,
+          SplitterPanel,
+          TopBar
         },
         mocks: { $store: mockStore, $router: mockRouter, $toast: mockToast },
         directives: { tooltip: vi.fn() },

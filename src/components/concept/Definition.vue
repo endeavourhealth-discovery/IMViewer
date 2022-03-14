@@ -17,15 +17,9 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import ArrayObjectNamesToStringWithLabel from "@/components/generics/ArrayObjectNamesToStringWithLabel.vue";
-import ObjectNameWithLabel from "@/components/generics/ObjectNameWithLabel.vue";
-import ArrayObjectNameListboxWithLabel from "@/components/generics/ArrayObjectNameListboxWithLabel.vue";
 import TermsTable from "@/components/concept/definition/TermsTable.vue";
 import TextSectionHeader from "@/components/generics/TextSectionHeader.vue";
 import SectionDivider from "@/components/generics/SectionDivider.vue";
-import ObjectNameTagWithLabel from "@/components/generics/ObjectNameTagWithLabel.vue";
-import NumberWithLabel from "@/components/generics/NumberWithLabel.vue";
-import ArrayObjectNameTagWithLabel from "@/components/generics/ArrayObjectNameTagWithLabel.vue";
 import { DefinitionConfig } from "im-library/dist/types/interfaces/Interfaces";
 import { Helpers } from "im-library";
 const {
@@ -35,15 +29,9 @@ const {
 export default defineComponent({
   name: "Definition",
   components: {
-    ArrayObjectNamesToStringWithLabel,
-    ObjectNameWithLabel,
-    ArrayObjectNameTagWithLabel,
-    ArrayObjectNameListboxWithLabel,
     TermsTable,
     TextSectionHeader,
     SectionDivider,
-    ObjectNameTagWithLabel,
-    NumberWithLabel
   },
   props: {
     concept: { type: Object, required: true },
