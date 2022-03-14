@@ -2,11 +2,13 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 import Concept from "@/views/Concept.vue";
 import Menu from "primevue/menu";
 import Button from "primevue/button";
-import LoggerService from "@/services/LoggerService";
 import PanelHeader from "@/components/concept/PanelHeader.vue";
 import TabView from "primevue/tabview";
 import TabPanel from "primevue/tabpanel";
 import ProgressSpinner from "primevue/progressspinner";
+import Splitter from "primevue/splitter";
+import SplitterPanel from "primevue/splitterpanel";
+import TopBar from "im-library";
 import Definition from "@/components/concept/Definition.vue";
 import Mappings from "@/components/concept/Mappings.vue";
 import UsedIn from "@/components/concept/UsedIn.vue";
@@ -17,6 +19,7 @@ import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import Panel from "primevue/panel";
 import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
+import {LoggerService} from "im-library"
 
 Object.assign(navigator, {
   clipboard: {
@@ -123,6 +126,8 @@ describe("Concept.vue ___ not moduleIri", () => {
     }
   };
 
+  const DEFAULT_PREDICATE_NAMES = {"http://www.w3.org/2000/01/rdf-schema#subClassOf":"Is subclass of","http://endhealth.info/im#roleGroup":"Where","http://www.w3.org/2002/07/owl#equivalentClass":"Is equivalent to","http://www.w3.org/2002/07/owl#intersectionOf":"Combination of","http://www.w3.org/2002/07/owl#someValuesFrom":"With a value","http://www.w3.org/2002/07/owl#onProperty":"On property","http://www.w3.org/ns/shacl#property":"Properties","http://www.w3.org/ns/shacl#class":"Type","http://www.w3.org/ns/shacl#path":"Property","http://www.w3.org/ns/shacl#datatype":"Type"}
+
   let wrapper;
   let mockStore;
   let mockRouter;
@@ -140,6 +145,7 @@ describe("Concept.vue ___ not moduleIri", () => {
     EntityService.getEntityChildren = vi.fn().mockResolvedValue(CHILDREN);
     EntityService.getEntityTermCodes = vi.fn().mockResolvedValue(TERMS);
     ConfigService.getComponentLayout = vi.fn().mockResolvedValue(CONFIG);
+    ConfigService.getDefaultPredicateNames = vi.fn().mockResolvedValue(DEFAULT_PREDICATE_NAMES);
     mockStore = {
       state: {
         conceptIri: "http://endhealth.info/im#CriticalCareEncounter",
@@ -180,7 +186,10 @@ describe("Concept.vue ___ not moduleIri", () => {
           PanelHeader,
           Panel,
           DownloadDialog,
-          ProgressSpinner
+          ProgressSpinner,
+          Splitter,
+          SplitterPanel,
+          TopBar
         },
         mocks: { $store: mockStore, $router: mockRouter, $toast: mockToast },
         directives: { tooltip: vi.fn() },
@@ -1102,7 +1111,10 @@ describe("Concept.vue ___ moduleIri", () => {
           PanelHeader,
           Panel,
           DownloadDialog,
-          ProgressSpinner
+          ProgressSpinner,
+          Splitter,
+          SplitterPanel,
+          TopBar
         },
         mocks: { $store: mockStore, $router: mockRouter, $toast: mockToast },
         directives: { tooltip: vi.fn() },

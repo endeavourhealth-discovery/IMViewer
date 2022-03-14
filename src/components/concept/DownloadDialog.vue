@@ -85,11 +85,10 @@
 
 <script lang="ts">
 import EntityService from "@/services/EntityService";
-import LoggerService from "@/services/LoggerService";
 import { defineComponent } from "@vue/runtime-core";
 import Env from "@/services/Env";
 import { TTIriRef, EntityReferenceNode, PartialBundle, TermCode, ExportValueSet, DataModelProperty } from "im-library/dist/types/interfaces/Interfaces";
-import { Vocabulary, Helpers } from "im-library";
+import { Vocabulary, Helpers, LoggerService } from "im-library";
 const { IM, RDFS } = Vocabulary;
 const {
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }

@@ -1,10 +1,9 @@
 import store from "@/store/index";
 import EntityService from "@/services/EntityService";
 import { flushPromises } from "@vue/test-utils";
-import LoggerService from "@/services/LoggerService";
 import AuthService from "@/services/AuthService";
 import ConfigService from "@/services/ConfigService";
-import { Models, Vocabulary } from "im-library";
+import { Models, Vocabulary, LoggerService } from "im-library";
 const {
   User,
   Search: { SearchRequest },
@@ -33,7 +32,8 @@ describe("state", () => {
       "authReturnUrl",
       "blockedIris",
       "selectedEntityType",
-      "conceptActivePanel"
+      "conceptActivePanel",
+      "defaultPredicateNames"
     ]);
     expect(store.state.conceptIri).toBe(null);
     expect(store.state.currentUser).toEqual({});
@@ -42,6 +42,7 @@ describe("state", () => {
     expect(store.state.blockedIris).toStrictEqual([]);
     expect(store.state.selectedEntityType).toBe("");
     expect(store.state.conceptActivePanel).toBe(0);
+    expect(store.state.defaultPredicateNames).toStrictEqual([])
   });
 });
 

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev": "npm link im-library && vite",
     "build": "vite build",
     "prod": "vite serve",
     "test:unit": "vitest",
@@ -14,7 +14,6 @@
     "test:e2e:ci": "vue-cli-service test:e2e"
   },
   "dependencies": {
-    "@babel/preset-flow": "7.16.7",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-brands-svg-icons": "^5.15.3",
     "@fortawesome/free-regular-svg-icons": "^5.15.3",
