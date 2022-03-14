@@ -303,6 +303,8 @@ export default defineComponent({
     },
 
     async getConfig(name: string): Promise<DefinitionConfig[]> {
+      const defaultPredicateNames = await ConfigService.getDefaultPredicateNames();
+      this.$store.commit("updateDefaultPredicateNames", defaultPredicateNames)
       const configs = await ConfigService.getComponentLayout(name);
       if (configs.every(config => isObjectHasKeys(config, ["order"]))) {
         configs.sort(byOrder);

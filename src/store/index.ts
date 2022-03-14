@@ -19,7 +19,8 @@ export default createStore({
     authReturnUrl: "",
     blockedIris: [] as string[],
     selectedEntityType: "",
-    conceptActivePanel: 0
+    conceptActivePanel: 0,
+    defaultPredicateNames:[] as string[]
   },
   mutations: {
     updateRecentLocalActivity(state, recentActivityItem: RecentActivityItem) {
@@ -67,6 +68,9 @@ export default createStore({
     },
     updateConceptActivePanel(state, number) {
       state.conceptActivePanel = number;
+    },
+    updateDefaultPredicateNames(state, names) {
+      state.defaultPredicateNames = names;
     }
   },
   actions: {

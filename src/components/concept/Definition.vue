@@ -23,7 +23,6 @@ import ArrayObjectNameListboxWithLabel from "@/components/generics/ArrayObjectNa
 import TermsTable from "@/components/concept/definition/TermsTable.vue";
 import TextSectionHeader from "@/components/generics/TextSectionHeader.vue";
 import SectionDivider from "@/components/generics/SectionDivider.vue";
-import TextDefinition from "@/components/generics/TextDefinition.vue";
 import ObjectNameTagWithLabel from "@/components/generics/ObjectNameTagWithLabel.vue";
 import NumberWithLabel from "@/components/generics/NumberWithLabel.vue";
 import ArrayObjectNameTagWithLabel from "@/components/generics/ArrayObjectNameTagWithLabel.vue";
@@ -43,7 +42,6 @@ export default defineComponent({
     TermsTable,
     TextSectionHeader,
     SectionDivider,
-    TextDefinition,
     ObjectNameTagWithLabel,
     NumberWithLabel
   },
