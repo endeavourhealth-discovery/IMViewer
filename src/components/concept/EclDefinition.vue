@@ -34,6 +34,6 @@ export default defineComponent({
 
 <style scoped>
 .ecl-text {
-  white-space: pre;
+  white-space: break-spaces;
 }
 </style>
