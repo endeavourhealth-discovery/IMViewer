@@ -2,26 +2,26 @@
   <div class="topbar-container">
     <TopBar>
       <template #content>
-        <span class="title"><strong>IMViewer:</strong> {{header}}</span>
-          <span v-if="isObjectHasKeysWrapper(concept, ['inferred'])">
-            <Button
-                icon="far fa-copy"
-                class="p-button-rounded p-button-text p-button-secondary"
-                @click="toggle($event, 'copyMenu')"
-                v-tooltip="'Copy concept to clipboard'"
-            />
-            <Menu id="copy-options" ref="copyMenu" :model="copyMenuItems" :popup="true" />
-          </span>
+        <span class="title"><strong>IMViewer:</strong> {{ header }}</span>
+        <span v-if="isObjectHasKeysWrapper(concept, ['inferred'])">
           <Button
-              icon="fas fa-cloud-download-alt"
-              class="p-button-rounded p-button-text p-button-secondary"
-              @click="toggle($event, 'downloadMenu')"
-              v-tooltip.bottom="'Download concept'"
-              aria-haspopup="true"
-              aria-controls="overlay_menu"
+            icon="far fa-copy"
+            class="p-button-rounded p-button-text p-button-secondary"
+            @click="toggle($event, 'copyMenu')"
+            v-tooltip="'Copy concept to clipboard'"
           />
-          <Menu id="overlay_menu" ref="downloadMenu" :model="items" :popup="true" />
-          <!--<button
+          <Menu id="copy-options" ref="copyMenu" :model="copyMenuItems" :popup="true" />
+        </span>
+        <Button
+          icon="fas fa-cloud-download-alt"
+          class="p-button-rounded p-button-text p-button-secondary"
+          @click="toggle($event, 'downloadMenu')"
+          v-tooltip.bottom="'Download concept'"
+          aria-haspopup="true"
+          aria-controls="overlay_menu"
+        />
+        <Menu id="overlay_menu" ref="downloadMenu" :model="items" :popup="true" />
+        <!--<button
             class="p-panel-header-icon p-link p-mr-2"
             @click="directToCreateRoute"
             v-tooltip.bottom="'Create new concept'"
@@ -35,7 +35,6 @@
           >
             <i class="fas fa-pencil-alt" aria-hidden="true"></i>
           </button>-->
-
       </template>
     </TopBar>
   </div>
@@ -58,6 +57,11 @@
               </div>
               <div v-else class="concept-panel-content" id="definition-container" :style="contentHeight">
                 <Definition :concept="concept" :configs="definitionConfig" />
+              </div>
+            </TabPanel>
+            <TabPanel v-if="terms" header="Terms">
+              <div class="concept-panel-content" id="term-table-container" :style="contentHeight">
+                <TermCodeTable :terms="terms" />
               </div>
             </TabPanel>
             <TabPanel header="Maps" v-if="showMappings">
@@ -234,6 +238,7 @@ export default defineComponent({
       definitionConfig: [] as DefinitionConfig[],
       summaryConfig: [] as DefinitionConfig[],
       conceptAsString: "",
+      terms: [] as any[],
       items: [
         {
           label: "JSON Format",
@@ -272,6 +277,15 @@ export default defineComponent({
       this.$router.push({ name: "Create" });
     },
 
+    async getTerms(iri: string) {
+      const entity = await EntityService.getPartialEntity(iri, [IM.HAS_TERM_CODE]);
+      this.terms = isObjectHasKeys(entity, [IM.HAS_TERM_CODE])
+        ? (entity[IM.HAS_TERM_CODE] as []).map(term => {
+            return { name: term[RDFS.LABEL], code: term[IM.CODE] };
+          })
+        : undefined;
+    },
+
     async getConcept(iri: string): Promise<void> {
       const configs = this.definitionConfig.concat(this.summaryConfig);
       const predicates = configs
@@ -304,7 +318,7 @@ export default defineComponent({
 
     async getConfig(name: string): Promise<DefinitionConfig[]> {
       const defaultPredicateNames = await ConfigService.getDefaultPredicateNames();
-      this.$store.commit("updateDefaultPredicateNames", defaultPredicateNames)
+      this.$store.commit("updateDefaultPredicateNames", defaultPredicateNames);
       const configs = await ConfigService.getComponentLayout(name);
       if (configs.every(config => isObjectHasKeys(config, ["order"]))) {
         configs.sort(byOrder);
@@ -321,6 +335,7 @@ export default defineComponent({
       this.summaryConfig = await this.getConfig("summary");
       await this.getConcept(this.conceptIri);
       await this.getInferred(this.conceptIri);
+      await this.getTerms(this.conceptIri);
       this.types = isObjectHasKeys(this.concept, [RDF.TYPE]) ? this.concept[RDF.TYPE] : ([] as TTIriRef[]);
       this.header = this.concept[RDFS.LABEL];
       await this.setCopyMenuItems();
