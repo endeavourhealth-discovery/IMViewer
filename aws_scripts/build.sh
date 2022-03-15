@@ -1,13 +1,16 @@
 #!/bin/bash
 
+chmod +x ./gradlew
+
 mkdir badges
 
 # Artifact
-artifact=$( xmllint --xpath "/*[local-name() = 'project']/*[local-name() = 'artifactId']/text()" pom.xml )
+artifact='IMViewer'
 
 # Version
-version=$( xmllint --xpath "/*[local-name() = 'project']/*[local-name() = 'version']/text()" pom.xml )
-version=${version/-/--} # Hyphen escaping required by shields.io
+version='1.0.0'
+
+returncode=0
 
 # Update badges pre-build
 echo "https://img.shields.io/badge/Build-In_progress-orange.svg"
@@ -20,11 +23,11 @@ echo "https://img.shields.io/badge/Unit_Tests-Pending-orange.svg"
 curl -s "https://img.shields.io/badge/Unit_Tests-Pending-orange.svg" > badges/unit-test.svg
 
 # Sync with S3
-aws s3 cp badges s3://endeavour-codebuild-output/badges/${artifact}/ --recursive --acl public-read
+aws s3 cp badges s3://endeavour-codebuild-output/badges/${artifact}/ --recursive --acl public-read --region eu-west-2
 
 # Build
 { #try
-    eval $* &&
+    ./gradlew build &&
     buildresult=0
 } || { #catch
     buildresult=1
@@ -34,6 +37,7 @@ aws s3 cp badges s3://endeavour-codebuild-output/badges/${artifact}/ --recursive
 if [[ "$buildresult" -gt "0" ]] ; then
         badge_status=failing
         badge_colour=red
+        returncode=1
 else
         badge_status=passing
         badge_colour=green
@@ -45,11 +49,10 @@ echo "https://img.shields.io/badge/Version-$version-$badge_colour.svg"
 curl -s "https://img.shields.io/badge/Version-$version-$badge_colour.svg" > badges/version.svg
 
 # Unit tests
-failures=$( xmllint --xpath 'string(//testsuite/@failures) + string(//testsuite/@errors)' api/target/surefire-reports/TEST-*.xml )
-
-if [[ "$failures" -gt "0" ]] ; then
+if grep -q FAIL testResult.txt ; then
         badge_status=failing
         badge_colour=red
+        returncode=1
 else
         badge_status=passing
         badge_colour=green
@@ -59,6 +62,6 @@ echo "Generating badge 'https://img.shields.io/badge/Unit_Tests-$badge_status-$b
 curl -s "https://img.shields.io/badge/Unit_Tests-$badge_status-$badge_colour.svg" > badges/unit-test.svg
 
 # Sync with S3
-aws s3 cp badges s3://endeavour-codebuild-output/badges/${artifact}/ --recursive --acl public-read
+aws s3 cp badges s3://endeavour-codebuild-output/badges/${artifact}/ --recursive --acl public-read --region eu-west-2
 
-exit ${buildresult}
+exit ${returncode}

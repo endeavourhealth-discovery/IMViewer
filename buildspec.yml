@@ -2,6 +2,10 @@ version: 0.2
 run-as: root
 
 phases:
+  install:
+    runtime-versions:
+      java: corretto11
+      nodejs: 14
   pre_build:
     commands:
       - IP=$(curl http://checkip.amazonaws.com)/32
@@ -9,8 +13,7 @@ phases:
   build:
     commands:
       - chmod +x aws_scripts/build.sh
-      - aws_scripts/build.sh mvn -B package
-      - mvn sonar:sonar
+      - aws_scripts/build.sh
   post_build:
     commands:
       - IP=$(curl http://checkip.amazonaws.com)/32
@@ -20,4 +23,4 @@ artifacts:
   files:
     - appspec.yml
     - aws_scripts/cleanup
-    - front-end-vue/dist/**/*
+    - dist/**/*
