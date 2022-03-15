@@ -43,7 +43,7 @@
         </template>
       </Column>
       <template #groupheader="slotProps">
-        <span v-for="subSet in subsets" :key="subSet">
+        <span v-for="subSet of subsets" :key="subSet">
           <span v-if="slotProps.data.label === subSet" class="group-header">
             {{ subSet }}
           </span>
@@ -70,9 +70,8 @@ import { Auth } from "aws-amplify";
 import { defineComponent } from "@vue/runtime-core";
 import EntityService from "@/services/EntityService";
 import SetService from "@/services/SetService";
-import LoggerService from "@/services/LoggerService";
 import { ValueSetMember, ExportValueSet } from "im-library/dist/types/interfaces/Interfaces";
-import { Helpers, Vocabulary } from "im-library";
+import { Helpers, Vocabulary, LoggerService } from "im-library";
 const {
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }
 } = Helpers;

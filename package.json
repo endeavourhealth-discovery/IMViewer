@@ -3,18 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev": "npm link im-library && vite",
     "build": "vite build",
     "prod": "vite serve",
     "test:unit": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "test:coverage": "vitest run --coverage && c8 --reporter=lcov report",
     "test:unit:ci": "vue-cli-service test:unit > testResult.txt 2>&1",
     "test:e2e": "cross-env VITE_API=http://localhost:8080/ vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",
     "test:e2e:ci": "vue-cli-service test:e2e"
   },
   "dependencies": {
-    "@babel/preset-flow": "7.16.7",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-brands-svg-icons": "^5.15.3",
     "@fortawesome/free-regular-svg-icons": "^5.15.3",

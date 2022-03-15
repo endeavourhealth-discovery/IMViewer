@@ -122,10 +122,9 @@ import { mapState } from "vuex";
 import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
-import LoggerService from "@/services/LoggerService";
 import SecondaryTree from "../components/concept/SecondaryTree.vue";
 import Properties from "@/components/concept/Properties.vue";
-import { Helpers, Models, Vocabulary } from "im-library";
+import { Helpers, Models, Vocabulary, LoggerService } from "im-library";
 import { DefinitionConfig, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
@@ -304,6 +303,8 @@ export default defineComponent({
     },
 
     async getConfig(name: string): Promise<DefinitionConfig[]> {
+      const defaultPredicateNames = await ConfigService.getDefaultPredicateNames();
+      this.$store.commit("updateDefaultPredicateNames", defaultPredicateNames)
       const configs = await ConfigService.getComponentLayout(name);
       if (configs.every(config => isObjectHasKeys(config, ["order"]))) {
         configs.sort(byOrder);
@@ -327,6 +328,7 @@ export default defineComponent({
       const allConfigs = this.definitionConfig.concat(this.summaryConfig);
       this.conceptAsString = copyConceptToClipboard(this.concept, allConfigs, undefined, this.blockedIris);
       this.loading = false;
+      document.title = (this.header as string) || APP_TITLE;
     },
 
     setStoreType(): void {

@@ -119,33 +119,6 @@ export default class EntityService {
     }
   }
 
-  private static getFilter(field: string, data: string[]): any {
-    const types: any[] = [];
-    for (const type of data) {
-      const fieldValue: any = {};
-      fieldValue[field] = type;
-      types.push({ match_phrase: fieldValue });
-    }
-
-    return {
-      bool: {
-        should: types,
-        minimum_should_match: 1
-      }
-    };
-  }
-
-  //obsolete, to be deleted on editor branch merge
-  public static async getEntity(iri: string): Promise<any> {
-    try {
-      return await axios.get(Env.api + "api/public/entity", {
-        params: { iri: iri }
-      });
-    } catch (error) {
-      return {} as any;
-    }
-  }
-
   public static async getEntityDefinitionDto(iri: string): Promise<EntityDefinitionDto> {
     try {
       return await axios.get(Env.api + "api/entity/public/definition", {

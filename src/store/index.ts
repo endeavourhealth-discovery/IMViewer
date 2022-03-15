@@ -1,8 +1,7 @@
 import { createStore } from "vuex";
 import AuthService from "@/services/AuthService";
-import LoggerService from "@/services/LoggerService";
 import ConfigService from "@/services/ConfigService";
-import { Models, Vocabulary, Constants } from "im-library";
+import { Models, Vocabulary, Constants, LoggerService } from "im-library";
 import { RecentActivityItem } from "im-library/dist/types/interfaces/Interfaces";
 const { User, CustomAlert } = Models;
 const { IM } = Vocabulary;
@@ -20,7 +19,8 @@ export default createStore({
     authReturnUrl: "",
     blockedIris: [] as string[],
     selectedEntityType: "",
-    conceptActivePanel: 0
+    conceptActivePanel: 0,
+    defaultPredicateNames:[] as string[]
   },
   mutations: {
     updateRecentLocalActivity(state, recentActivityItem: RecentActivityItem) {
@@ -68,6 +68,9 @@ export default createStore({
     },
     updateConceptActivePanel(state, number) {
       state.conceptActivePanel = number;
+    },
+    updateDefaultPredicateNames(state, names) {
+      state.defaultPredicateNames = names;
     }
   },
   actions: {
