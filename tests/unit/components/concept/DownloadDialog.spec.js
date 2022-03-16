@@ -6,8 +6,7 @@ import Checkbox from "primevue/checkbox";
 import Button from "primevue/button";
 import ProgressSpinner from "primevue/progressspinner";
 import EntityService from "@/services/EntityService";
-import { Vocabulary, LoggerService } from "im-library";
-import Env from "@/services/Env";
+import { Vocabulary, LoggerService, Env } from "im-library";
 const { IM, RDFS } = Vocabulary;
 
 describe("DownloadDialog.vue", () => {

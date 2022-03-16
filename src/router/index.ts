@@ -4,7 +4,7 @@ import Concept from "../views/Concept.vue";
 import { SnomedLicense } from "im-library";
 import store from "@/store/index";
 import { nextTick } from "vue";
-import { Enums } from "im-library";
+import { Enums, Env } from "im-library";
 const { AppEnum } = Enums;
 
 const APP_TITLE = "IM Viewer";
@@ -42,7 +42,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const iri = to.params.selectedIri as string;
-  const currentUrl = import.meta.env.VITE_VIEWER_URL + "/#" + to.path;
+  const currentUrl = Env.viewerUrl + "/#" + to.path;
   if (to.path !== "/snomedLicense") {
     store.commit("updateSnomedReturnUrl", currentUrl);
     store.commit("updateAuthReturnUrl", currentUrl);
@@ -59,7 +59,7 @@ router.beforeEach((to, from, next) => {
       console.log("auth guard user authenticated:" + res.authenticated);
       if (!res.authenticated) {
         console.log("redirecting to login");
-        window.location.href = import.meta.env.VITE_AUTH_URL + "login?returnUrl=" + currentUrl;
+        window.location.href = Env.authUrl + "login?returnUrl=" + currentUrl;
       } else {
         if (to.matched.some(record => record.meta.requiresLicense)) {
           console.log("snomed license accepted:" + store.state.snomedLicenseAccepted);

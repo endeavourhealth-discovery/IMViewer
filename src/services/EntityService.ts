@@ -1,5 +1,5 @@
 import axios, { CancelToken } from "axios";
-import { Models } from "im-library";
+import { Models, Env } from "im-library";
 import {
   Namespace,
   FiltersAsIris,
@@ -13,7 +13,6 @@ import {
   EntityReferenceNode,
   GraphData
 } from "im-library/dist/types/interfaces/Interfaces";
-import Env from "@/services/Env";
 const {
   Search: { ConceptSummary, SearchRequest }
 } = Models;

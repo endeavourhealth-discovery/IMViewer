@@ -79,12 +79,11 @@ import Tag from "primevue/tag";
 import { Amplify, Auth } from "aws-amplify";
 import awsconfig from "./aws-exports";
 import axios from "axios";
-import Env from "@/services/Env";
 
 // IMLibrary imports
 import IMLibrary from "im-library";
 import "im-library/dist/style.css";
-import { Helpers } from "im-library";
+import { Helpers, Env } from "im-library";
 const {
   DataTypeCheckers: { isObjectHasKeys }
 } = Helpers;

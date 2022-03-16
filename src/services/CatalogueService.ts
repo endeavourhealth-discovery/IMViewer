@@ -1,6 +1,6 @@
 import axios, { CancelToken } from "axios";
 import { SimpleCount, TTBundle } from "im-library/dist/types/interfaces/Interfaces";
-import Env from "@/services/Env";
+import {Env} from "im-library";
 
 export default class CatalogueService {
   public static async getSearchResult(request: string, typesIris: string[], cancelToken: CancelToken): Promise<any[]> {
