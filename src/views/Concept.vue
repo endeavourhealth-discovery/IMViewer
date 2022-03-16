@@ -398,7 +398,7 @@ export default defineComponent({
       let leftWidth = event.sizes[0];
       if (typeof leftWidth !== "number") leftWidth = 20;
       const calcWidth = 100 - leftWidth
-      this.contentWidth = this.contentWidth + "width: calc(" + calcWidth + "vw - 2rem);" + "max-width: calc(" + calcWidth + "vw - 2rem);";
+      this.contentWidth = "width: calc(" + calcWidth + "vw - 2rem);" + "max-width: calc(" + calcWidth + "vw - 2rem);";
       this.contentWidthValue = calcWidth;
     },
 
