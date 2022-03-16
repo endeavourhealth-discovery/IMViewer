@@ -396,8 +396,6 @@ export default defineComponent({
 
     setSplitterDimensions(event: any) {
       let leftWidth = event.sizes[0];
-      console.log(typeof leftWidth);
-      console.log(leftWidth)
       if (typeof leftWidth !== "number") leftWidth = 20;
       const calcWidth = 100 - leftWidth
       this.contentWidth = this.contentWidth + "width: calc(" + calcWidth + "vw - 2rem);" + "max-width: calc(" + calcWidth + "vw - 2rem);";
