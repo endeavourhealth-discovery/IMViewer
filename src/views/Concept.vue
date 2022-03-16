@@ -38,7 +38,7 @@
       </template>
     </TopBar>
   </div>
-  <Splitter id="concept-main-container">
+  <Splitter id="concept-main-container" stateKey="viewerConceptSplitterSizes" stateStorage="local" @resizeend="setSplitterDimensions" >
     <SplitterPanel :size="20" :minSize="10">
       <div v-if="loading" class="loading-container" :style="contentHeight">
         <ProgressSpinner />
@@ -47,8 +47,8 @@
         <Definition :concept="concept" :configs="summaryConfig" />
       </div>
     </SplitterPanel>
-    <SplitterPanel :size="80" :minSize="20">
-      <div id="concept-content-dialogs-container">
+    <SplitterPanel :size="80" :minSize="20" style="overflow: auto;">
+      <div id="concept-content-dialogs-container" :style="contentWidth">
         <div id="concept-panel-container">
           <TabView v-model:activeIndex="active" :lazy="true">
             <TabPanel header="Details">
@@ -216,6 +216,7 @@ export default defineComponent({
     window.addEventListener("resize", this.onResize);
     await this.init();
     this.setContentHeight();
+    this.setSplitterDimensions({sizes:localStorage.getItem("viewerConceptSplitterSizes")});
   },
   beforeUnmount() {
     window.removeEventListener("resize", this.onResize);
@@ -234,6 +235,8 @@ export default defineComponent({
       active: 0,
       contentHeight: "",
       contentHeightValue: 0,
+      contentWidth: "",
+      contentWidthValue: 0,
       copyMenuItems: [] as any,
       definitionConfig: [] as DefinitionConfig[],
       summaryConfig: [] as DefinitionConfig[],
@@ -264,6 +267,7 @@ export default defineComponent({
   methods: {
     onResize(): void {
       this.setContentHeight();
+      this.setSplitterDimensions({sizes:localStorage.getItem("viewerConceptSplitterSizes")})
     },
 
     directToEditRoute(): void {
@@ -283,7 +287,7 @@ export default defineComponent({
         ? (entity[IM.HAS_TERM_CODE] as []).map(term => {
             return { name: term[RDFS.LABEL], code: term[IM.CODE] };
           })
-        : undefined;
+        : [];
     },
 
     async getConcept(iri: string): Promise<void> {
@@ -388,6 +392,14 @@ export default defineComponent({
         this.contentHeight = "height: " + calcHeight + ";" + "max-height: " + calcHeight + ";";
         this.contentHeightValue = parseInt(calcHeight, 10);
       }
+    },
+
+    setSplitterDimensions(event: any) {
+      let leftWidth = event.sizes[0];
+      if (typeof leftWidth !== "number") leftWidth = 20;
+      const calcWidth = 100 - leftWidth
+      this.contentWidth = this.contentWidth + "width: calc(" + calcWidth + "vw - 2rem);" + "max-width: calc(" + calcWidth + "vw - 2rem);";
+      this.contentWidthValue = calcWidth;
     },
 
     openDownloadDialog(): void {
@@ -495,7 +507,14 @@ export default defineComponent({
   height: 100%;
 }
 
+#concept-content-dialogs-container {
+  height: 100%;
+  overflow: auto;
+}
+
 .concept-panel-content {
+  width: 100%;
+  height:100%;
   overflow: auto;
   background-color: #ffffff;
 }
