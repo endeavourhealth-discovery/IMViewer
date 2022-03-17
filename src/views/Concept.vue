@@ -40,12 +40,20 @@
   </div>
   <Splitter id="concept-main-container" stateKey="viewerConceptSplitterSizes" stateStorage="local" @resizeend="setSplitterDimensions">
     <SplitterPanel :size="20" :minSize="10">
-      <div v-if="loading" class="loading-container" :style="contentHeight">
-        <ProgressSpinner />
-      </div>
-      <div v-else class="left-panel-content" id="summary-container" :style="contentHeight">
-        <Definition :concept="concept" :configs="summaryConfig" />
-      </div>
+      <Splitter layout="vertical">
+        <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
+          <div v-if="loading" class="loading-container">
+            <ProgressSpinner />
+          </div>
+          <div v-else class="left-panel-content" id="summary-container">
+            <Definition :concept="concept" :configs="summaryConfig" />
+          </div>
+        </SplitterPanel>
+        <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
+          <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
+          <SecondaryTree :conceptIri="conceptIri" />
+        </SplitterPanel>
+      </Splitter>
     </SplitterPanel>
     <SplitterPanel :size="80" :minSize="20" style="overflow: auto;">
       <div id="concept-content-dialogs-container" :style="contentWidth">
@@ -98,12 +106,7 @@
               <div class="concept-panel-content" id="graph-container" :style="contentHeight">
                 <Graph :conceptIri="conceptIri" />
               </div>
-            </TabPanel>
-            <TabPanel header="Hierarchy position">
-              <div class="concept-panel-content" id="secondary-tree-container" :style="contentHeight">
-                <SecondaryTree :conceptIri="conceptIri" />
-              </div>
-            </TabPanel>
+            </TabPanel> -->
           </TabView>
         </div>
         <DownloadDialog v-if="showDownloadDialog" @closeDownloadDialog="closeDownloadDialog" :showDialog="showDownloadDialog" :conceptIri="conceptIri" />
@@ -550,5 +553,9 @@ export default defineComponent({
 
 #definition-container {
   padding-top: 1rem;
+}
+
+#hierarchy-header {
+  padding: 1rem;
 }
 </style>
