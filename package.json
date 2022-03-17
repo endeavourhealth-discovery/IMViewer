@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "preinstall": "copy package-lock.json.clean package-lock.json || cp package-lock.json.clean package-lock.json",
     "dev": "npm link im-library && vite",
     "build": "vite build",
     "prod": "vite serve",
