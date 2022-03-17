@@ -339,8 +339,8 @@ export default defineComponent({
 }
 
 #secondary-tree-bar-container {
-  height: 100%;
-  border: 1px solid #dee2e6;
+  height: calc(100% - 3.5rem);
+  border-top: 1px solid #dee2e6;
 }
 
 .p-progress-spinner {
