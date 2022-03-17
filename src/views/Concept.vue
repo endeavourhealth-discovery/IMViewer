@@ -38,7 +38,7 @@
       </template>
     </TopBar>
   </div>
-  <Splitter id="concept-main-container" stateKey="viewerConceptSplitterSizes" stateStorage="local" @resizeend="setSplitterDimensions" >
+  <Splitter id="concept-main-container" stateKey="viewerConceptSplitterSizes" stateStorage="local" @resizeend="setSplitterDimensions">
     <SplitterPanel :size="20" :minSize="10">
       <div v-if="loading" class="loading-container" :style="contentHeight">
         <ProgressSpinner />
@@ -57,11 +57,6 @@
               </div>
               <div v-else class="concept-panel-content" id="definition-container" :style="contentHeight">
                 <Definition :concept="concept" :configs="definitionConfig" />
-              </div>
-            </TabPanel>
-            <TabPanel v-if="terms" header="Terms">
-              <div class="concept-panel-content" id="term-table-container" :style="contentHeight">
-                <TermCodeTable :terms="terms" />
               </div>
             </TabPanel>
             <TabPanel header="Maps" v-if="showMappings">
@@ -87,6 +82,11 @@
             <TabPanel header="Members" v-if="isSet">
               <div class="concept-panel-content" id="members-container" :style="contentHeight">
                 <Members :conceptIri="conceptIri" />
+              </div>
+            </TabPanel>
+            <TabPanel header="Terms" v-if="terms">
+              <div class="concept-panel-content" id="term-table-container" :style="contentHeight">
+                <TermCodeTable :terms="terms" />
               </div>
             </TabPanel>
             <TabPanel header="ECL" v-if="isSet && isObjectHasKeysWrapper(concept.inferred)">
@@ -216,7 +216,7 @@ export default defineComponent({
     window.addEventListener("resize", this.onResize);
     await this.init();
     this.setContentHeight();
-    this.setSplitterDimensions({sizes:localStorage.getItem("viewerConceptSplitterSizes")});
+    this.setSplitterDimensions({ sizes: localStorage.getItem("viewerConceptSplitterSizes") });
   },
   beforeUnmount() {
     window.removeEventListener("resize", this.onResize);
@@ -267,7 +267,7 @@ export default defineComponent({
   methods: {
     onResize(): void {
       this.setContentHeight();
-      this.setSplitterDimensions({sizes:localStorage.getItem("viewerConceptSplitterSizes")})
+      this.setSplitterDimensions({ sizes: localStorage.getItem("viewerConceptSplitterSizes") });
     },
 
     directToEditRoute(): void {
@@ -397,7 +397,7 @@ export default defineComponent({
     setSplitterDimensions(event: any) {
       let leftWidth = event.sizes[0];
       if (typeof leftWidth !== "number") leftWidth = 20;
-      const calcWidth = 100 - leftWidth
+      const calcWidth = 100 - leftWidth;
       this.contentWidth = "width: calc(" + calcWidth + "vw - 2rem);" + "max-width: calc(" + calcWidth + "vw - 2rem);";
       this.contentWidthValue = calcWidth;
     },
