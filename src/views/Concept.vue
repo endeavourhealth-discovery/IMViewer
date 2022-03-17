@@ -134,7 +134,7 @@ const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet },
   CopyConceptToClipboard: { copyConceptToClipboard, conceptObjectToCopyString },
-  DataTypeCheckers: { isObjectHasKeys },
+  DataTypeCheckers: { isObjectHasKeys, isArrayHasLength },
   ContainerDimensionGetters: { getContainerElementOptimalHeight },
   Sorters: { byOrder }
 } = Helpers;
@@ -396,8 +396,8 @@ export default defineComponent({
 
     setSplitterDimensions(event: any) {
       let leftWidth;
-      if (isObjectHasKeys(event.sizes, ["0"])) leftWidth = event.sizes[0];
-      if (typeof leftWidth !== "number") leftWidth = 20;
+      if (isArrayHasLength(event.sizes)) leftWidth = event.sizes[0];
+      else leftWidth = 20;
       const calcWidth = 100 - leftWidth;
       this.contentWidth = "width: calc(" + calcWidth + "vw - 2rem);" + "max-width: calc(" + calcWidth + "vw - 2rem);";
       this.contentWidthValue = calcWidth;
