@@ -41,7 +41,7 @@
   <Splitter id="concept-main-container" stateKey="viewerConceptSplitterSizes" stateStorage="local" @resizeend="setSplitterDimensions">
     <SplitterPanel :size="20" :minSize="10">
       <Splitter layout="vertical">
-        <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
+        <SplitterPanel :size="50" :minSize="10">
           <div v-if="loading" class="loading-container">
             <ProgressSpinner />
           </div>
@@ -49,13 +49,13 @@
             <Definition :concept="concept" :configs="summaryConfig" />
           </div>
         </SplitterPanel>
-        <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
+        <SplitterPanel :size="50" :minSize="10">
           <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
           <SecondaryTree :conceptIri="conceptIri" />
         </SplitterPanel>
       </Splitter>
     </SplitterPanel>
-    <SplitterPanel :size="80" :minSize="20" style="overflow: auto;">
+    <SplitterPanel :size="80" :minSize="20">
       <div id="concept-content-dialogs-container" :style="contentWidth">
         <div id="concept-panel-container">
           <TabView v-model:activeIndex="active" :lazy="true">
@@ -388,7 +388,7 @@ export default defineComponent({
     },
 
     setContentHeight(): void {
-      const calcHeight = getContainerElementOptimalHeight("concept-main-container", ["p-panel-header", "p-tabview-nav"], true, 3, 1);
+      const calcHeight = getContainerElementOptimalHeight("concept-panel-container", ["p-tabview-nav"], true, 3, 1);
       if (!calcHeight.length) {
         this.contentHeight = "height: 800px; max-height: 800px;";
         this.contentHeightValue = 800;
@@ -399,9 +399,21 @@ export default defineComponent({
     },
 
     setSplitterDimensions(event: any) {
-      const leftWidth = isArrayHasLength(event.sizes) ? event.sizes[0] : 20;
+      let leftWidth;
+      if (isArrayHasLength(event.sizes) && event.sizes[0] > 10) {
+        leftWidth = event.sizes[0];
+      } else if (typeof event.sizes === "string") {
+        const parsed = JSON.parse(event.sizes);
+        if (isArrayHasLength(parsed) && parsed[0] > 10) {
+          leftWidth = parsed[0];
+        } else {
+          leftWidth = 10;
+        }
+      } else {
+        leftWidth = 10;
+      }
       const calcWidth = 100 - leftWidth;
-      this.contentWidth = "width: calc(" + calcWidth + "vw - 2rem);" + "max-width: calc(" + calcWidth + "vw - 2rem);";
+      this.contentWidth = "width: " + calcWidth + "vw;" + "max-width: " + calcWidth + "vw;";
       this.contentWidthValue = calcWidth;
     },
 
@@ -495,7 +507,6 @@ export default defineComponent({
   grid-area: content;
   height: calc(100vh - 2rem);
   width: 100%;
-  overflow-y: auto;
   background-color: #ffffff;
 }
 
@@ -511,8 +522,13 @@ export default defineComponent({
 }
 
 #concept-content-dialogs-container {
-  height: 100%;
   overflow: auto;
+  height: 100%;
+}
+
+#concept-panel-container {
+  height: 100%;
+  width: 100%;
 }
 
 .concept-panel-content {
