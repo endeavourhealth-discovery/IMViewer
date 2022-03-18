@@ -1,6 +1,6 @@
 <template>
   <div class="layout-main">
-    <div class="main-grid">
+    <div class="main-grid" id="viewer-main-grid">
       <router-view />
     </div>
   </div>

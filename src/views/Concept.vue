@@ -38,10 +38,10 @@
       </template>
     </TopBar>
   </div>
-  <Splitter id="concept-main-container" stateKey="viewerConceptSplitterSizes" stateStorage="local" @resizeend="setSplitterDimensions">
+  <Splitter id="concept-main-container" stateKey="viewerConceptSplitterHorizontal" stateStorage="local" @resizeend="setSplitterContainerHoriz">
     <SplitterPanel :size="20" :minSize="10">
-      <Splitter layout="vertical">
-        <SplitterPanel :size="50" :minSize="10">
+      <Splitter layout="vertical" stateKey="viewerConceptSplitterVertical" stateStorage="local" @resizeend="setSplitterContainerVert">
+        <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
           <div v-if="loading" class="loading-container">
             <ProgressSpinner />
           </div>
@@ -49,14 +49,16 @@
             <Definition :concept="concept" :configs="summaryConfig" />
           </div>
         </SplitterPanel>
-        <SplitterPanel :size="50" :minSize="10">
-          <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
-          <SecondaryTree :conceptIri="conceptIri" />
+        <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
+          <div id="concept-hierarchy-tree-header-container" :style="splitterContentHeight">
+            <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
+            <SecondaryTree :conceptIri="conceptIri" />
+          </div>
         </SplitterPanel>
       </Splitter>
     </SplitterPanel>
-    <SplitterPanel :size="80" :minSize="20">
-      <div id="concept-content-dialogs-container" :style="contentWidth">
+    <SplitterPanel :size="80" :minSize="20" style="overflow: auto;">
+      <div id="concept-content-dialogs-container" :style="splitterContentWidth">
         <div id="concept-panel-container">
           <TabView v-model:activeIndex="active" :lazy="true">
             <TabPanel header="Details">
@@ -220,7 +222,8 @@ export default defineComponent({
     window.addEventListener("resize", this.onResize);
     await this.init();
     this.setContentHeight();
-    this.setSplitterDimensions({ sizes: localStorage.getItem("viewerConceptSplitterSizes") });
+    this.setSplitterContainerHoriz({ sizes: localStorage.getItem("viewerConceptSplitterHorizontal") });
+    this.setSplitterContainerVert({ sizes: localStorage.getItem("viewerConceptSplitterVertical") });
   },
   beforeUnmount() {
     window.removeEventListener("resize", this.onResize);
@@ -239,8 +242,8 @@ export default defineComponent({
       active: 0,
       contentHeight: "",
       contentHeightValue: 0,
-      contentWidth: "",
-      contentWidthValue: 0,
+      splitterContentWidth: "",
+      splitterContentHeight: "",
       copyMenuItems: [] as any,
       definitionConfig: [] as DefinitionConfig[],
       summaryConfig: [] as DefinitionConfig[],
@@ -271,7 +274,8 @@ export default defineComponent({
   methods: {
     onResize(): void {
       this.setContentHeight();
-      this.setSplitterDimensions({ sizes: localStorage.getItem("viewerConceptSplitterSizes") });
+      this.setSplitterContainerHoriz({ sizes: localStorage.getItem("viewerConceptSplitterHorizontal") });
+      this.setSplitterContainerVert({ sizes: localStorage.getItem("viewerConceptSplitterVertical") });
     },
 
     directToEditRoute(): void {
@@ -398,7 +402,7 @@ export default defineComponent({
       }
     },
 
-    setSplitterDimensions(event: any) {
+    setSplitterContainerHoriz(event: any) {
       let leftWidth;
       if (isArrayHasLength(event.sizes) && event.sizes[0] > 10) {
         leftWidth = event.sizes[0];
@@ -413,8 +417,35 @@ export default defineComponent({
         leftWidth = 10;
       }
       const calcWidth = 100 - leftWidth;
-      this.contentWidth = "width: " + calcWidth + "vw;" + "max-width: " + calcWidth + "vw;";
-      this.contentWidthValue = calcWidth;
+      this.splitterContentWidth = "width: calc(" + calcWidth + "vw - 0.5rem);" + "max-width: calc(" + calcWidth + "vw - 0.5rem);";
+    },
+
+    setSplitterContainerVert(event: any) {
+      const header = document.getElementsByClassName("topbar-container")[0] as HTMLElement;
+      let headerHeightWithUnits;
+      if (header) {
+        const headerHeight = header.getBoundingClientRect().height;
+        headerHeightWithUnits = headerHeight + "px";
+      } else {
+        this.$toast.add(LoggerService.error("Hierarchy tree sizing failed", "Error finding topbar for vertical splitter container setter."));
+      }
+      let bottomHeight;
+      if (isArrayHasLength(event.sizes) && event.sizes[0] > 10) {
+        bottomHeight = event.sizes[0];
+      } else if (typeof event.sizes === "string") {
+        const parsed = JSON.parse(event.sizes);
+        if (isArrayHasLength(parsed) && parsed[0] > 10) {
+          bottomHeight = parsed[0];
+        } else {
+          bottomHeight = 10;
+        }
+      } else {
+        bottomHeight = 10;
+      }
+      const calcHeight = 100 - bottomHeight;
+      // this.splitterContentHeight = "height: calc(100% - 40px);";
+      this.splitterContentHeight =
+        "height: calc(" + calcHeight + "vh - " + headerHeightWithUnits + ");" + " max-height: calc(" + calcHeight + "vh - " + headerHeightWithUnits + ");";
     },
 
     openDownloadDialog(): void {
@@ -526,6 +557,11 @@ export default defineComponent({
   height: 100%;
 }
 
+#concept-hierarchy-tree-header-container {
+  width: 100%;
+  overflow: auto;
+}
+
 #concept-panel-container {
   height: 100%;
   width: 100%;
@@ -558,8 +594,9 @@ export default defineComponent({
   align-items: center;
 }
 
-.left-panel-content {
+#summary-container {
   padding: 1rem;
+  overflow: auto;
 }
 
 .title {
