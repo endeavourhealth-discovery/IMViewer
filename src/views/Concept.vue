@@ -106,7 +106,8 @@
               <div class="concept-panel-content" id="graph-container" :style="contentHeight">
                 <Graph :conceptIri="conceptIri" />
               </div>
-            </TabPanel> -->
+            </TabPanel>
+            -->
           </TabView>
         </div>
         <DownloadDialog v-if="showDownloadDialog" @closeDownloadDialog="closeDownloadDialog" :showDialog="showDownloadDialog" :conceptIri="conceptIri" />
@@ -387,7 +388,7 @@ export default defineComponent({
     },
 
     setContentHeight(): void {
-      const calcHeight = getContainerElementOptimalHeight("concept-main-container", ["p-panel-header", "p-tabview-nav"], true, 4, 1);
+      const calcHeight = getContainerElementOptimalHeight("concept-main-container", ["p-panel-header", "p-tabview-nav"], true, 3, 1);
       if (!calcHeight.length) {
         this.contentHeight = "height: 800px; max-height: 800px;";
         this.contentHeightValue = 800;
@@ -398,9 +399,7 @@ export default defineComponent({
     },
 
     setSplitterDimensions(event: any) {
-      let leftWidth;
-      if (isArrayHasLength(event.sizes)) leftWidth = event.sizes[0];
-      else leftWidth = 20;
+      const leftWidth = isArrayHasLength(event.sizes) ? event.sizes[0] : 20;
       const calcWidth = 100 - leftWidth;
       this.contentWidth = "width: calc(" + calcWidth + "vw - 2rem);" + "max-width: calc(" + calcWidth + "vw - 2rem);";
       this.contentWidthValue = calcWidth;
