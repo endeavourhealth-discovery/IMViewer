@@ -1,6 +1,5 @@
 import axios, { CancelToken } from "axios";
-import { Models } from "im-library";
-import Env from "@/services/Env";
+import { Models, Env } from "im-library";
 const {
   Search: { SearchResponse }
 } = Models;

@@ -9,6 +9,8 @@ import ProgressSpinner from "primevue/progressspinner";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 import TopBar from "im-library";
+import TermCodeTable from "im-library";
+import TextSectionHeader from "im-library";
 import Definition from "@/components/concept/Definition.vue";
 import Mappings from "@/components/concept/Mappings.vue";
 import UsedIn from "@/components/concept/UsedIn.vue";
@@ -189,7 +191,9 @@ describe("Concept.vue ___ not moduleIri", () => {
           ProgressSpinner,
           Splitter,
           SplitterPanel,
-          TopBar
+          TopBar,
+          TermCodeTable,
+          TextSectionHeader
         },
         mocks: { $store: mockStore, $router: mockRouter, $toast: mockToast },
         directives: { tooltip: vi.fn() },
@@ -1114,7 +1118,9 @@ describe("Concept.vue ___ moduleIri", () => {
           ProgressSpinner,
           Splitter,
           SplitterPanel,
-          TopBar
+          TopBar,
+          TermCodeTable,
+          TextSectionHeader
         },
         mocks: { $store: mockStore, $router: mockRouter, $toast: mockToast },
         directives: { tooltip: vi.fn() },

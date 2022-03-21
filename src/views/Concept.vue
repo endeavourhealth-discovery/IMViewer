@@ -38,17 +38,27 @@
       </template>
     </TopBar>
   </div>
-  <Splitter id="concept-main-container">
+  <Splitter id="concept-main-container" stateKey="viewerConceptSplitterHorizontal" stateStorage="local" @resizeend="setSplitterContainerHoriz">
     <SplitterPanel :size="20" :minSize="10">
-      <div v-if="loading" class="loading-container" :style="contentHeight">
-        <ProgressSpinner />
-      </div>
-      <div v-else class="left-panel-content" id="summary-container" :style="contentHeight">
-        <Definition :concept="concept" :configs="summaryConfig" />
-      </div>
+      <Splitter layout="vertical" stateKey="viewerConceptSplitterVertical" stateStorage="local" @resizeend="setSplitterContainerVert">
+        <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
+          <div v-if="loading" class="loading-container">
+            <ProgressSpinner />
+          </div>
+          <div v-else class="left-panel-content" id="summary-container">
+            <Definition :concept="concept" :configs="summaryConfig" />
+          </div>
+        </SplitterPanel>
+        <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
+          <div id="concept-hierarchy-tree-header-container" :style="splitterContentHeight">
+            <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
+            <SecondaryTree :conceptIri="conceptIri" />
+          </div>
+        </SplitterPanel>
+      </Splitter>
     </SplitterPanel>
-    <SplitterPanel :size="80" :minSize="20">
-      <div id="concept-content-dialogs-container">
+    <SplitterPanel :size="80" :minSize="20" style="overflow: auto;">
+      <div id="concept-content-dialogs-container" :style="splitterContentWidth">
         <div id="concept-panel-container">
           <TabView v-model:activeIndex="active" :lazy="true">
             <TabPanel header="Details">
@@ -57,11 +67,6 @@
               </div>
               <div v-else class="concept-panel-content" id="definition-container" :style="contentHeight">
                 <Definition :concept="concept" :configs="definitionConfig" />
-              </div>
-            </TabPanel>
-            <TabPanel v-if="terms" header="Terms">
-              <div class="concept-panel-content" id="term-table-container" :style="contentHeight">
-                <TermCodeTable :terms="terms" />
               </div>
             </TabPanel>
             <TabPanel header="Maps" v-if="showMappings">
@@ -89,6 +94,11 @@
                 <Members :conceptIri="conceptIri" />
               </div>
             </TabPanel>
+            <TabPanel header="Terms" v-if="terms">
+              <div class="concept-panel-content" id="term-table-container" :style="contentHeight">
+                <TermCodeTable :terms="terms" />
+              </div>
+            </TabPanel>
             <TabPanel header="ECL" v-if="isSet && isObjectHasKeysWrapper(concept.inferred)">
               <div class="concept-panel-content" id="ecl-container" :style="contentHeight">
                 <EclDefinition :definition="concept.inferred" />
@@ -99,11 +109,7 @@
                 <Graph :conceptIri="conceptIri" />
               </div>
             </TabPanel>
-            <TabPanel header="Hierarchy position">
-              <div class="concept-panel-content" id="secondary-tree-container" :style="contentHeight">
-                <SecondaryTree :conceptIri="conceptIri" />
-              </div>
-            </TabPanel>
+            -->
           </TabView>
         </div>
         <DownloadDialog v-if="showDownloadDialog" @closeDownloadDialog="closeDownloadDialog" :showDialog="showDownloadDialog" :conceptIri="conceptIri" />
@@ -134,7 +140,7 @@ const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet },
   CopyConceptToClipboard: { copyConceptToClipboard, conceptObjectToCopyString },
-  DataTypeCheckers: { isObjectHasKeys },
+  DataTypeCheckers: { isObjectHasKeys, isArrayHasLength },
   ContainerDimensionGetters: { getContainerElementOptimalHeight },
   Sorters: { byOrder }
 } = Helpers;
@@ -216,6 +222,8 @@ export default defineComponent({
     window.addEventListener("resize", this.onResize);
     await this.init();
     this.setContentHeight();
+    this.setSplitterContainerHoriz({ sizes: localStorage.getItem("viewerConceptSplitterHorizontal") });
+    this.setSplitterContainerVert({ sizes: localStorage.getItem("viewerConceptSplitterVertical") });
   },
   beforeUnmount() {
     window.removeEventListener("resize", this.onResize);
@@ -234,6 +242,8 @@ export default defineComponent({
       active: 0,
       contentHeight: "",
       contentHeightValue: 0,
+      splitterContentWidth: "",
+      splitterContentHeight: "",
       copyMenuItems: [] as any,
       definitionConfig: [] as DefinitionConfig[],
       summaryConfig: [] as DefinitionConfig[],
@@ -264,6 +274,8 @@ export default defineComponent({
   methods: {
     onResize(): void {
       this.setContentHeight();
+      this.setSplitterContainerHoriz({ sizes: localStorage.getItem("viewerConceptSplitterHorizontal") });
+      this.setSplitterContainerVert({ sizes: localStorage.getItem("viewerConceptSplitterVertical") });
     },
 
     directToEditRoute(): void {
@@ -283,7 +295,7 @@ export default defineComponent({
         ? (entity[IM.HAS_TERM_CODE] as []).map(term => {
             return { name: term[RDFS.LABEL], code: term[IM.CODE] };
           })
-        : undefined;
+        : [];
     },
 
     async getConcept(iri: string): Promise<void> {
@@ -380,7 +392,7 @@ export default defineComponent({
     },
 
     setContentHeight(): void {
-      const calcHeight = getContainerElementOptimalHeight("concept-main-container", ["p-panel-header", "p-tabview-nav"], true, 4, 1);
+      const calcHeight = getContainerElementOptimalHeight("concept-panel-container", ["p-tabview-nav"], true, 3, 1);
       if (!calcHeight.length) {
         this.contentHeight = "height: 800px; max-height: 800px;";
         this.contentHeightValue = 800;
@@ -388,6 +400,61 @@ export default defineComponent({
         this.contentHeight = "height: " + calcHeight + ";" + "max-height: " + calcHeight + ";";
         this.contentHeightValue = parseInt(calcHeight, 10);
       }
+    },
+
+    setSplitterContainerHoriz(event: any) {
+      let leftWidth;
+      if (isArrayHasLength(event.sizes) && event.sizes[0] > 10) {
+        leftWidth = event.sizes[0];
+      } else if (typeof event.sizes === "string") {
+        const parsed = JSON.parse(event.sizes);
+        if (isArrayHasLength(parsed) && parsed[0] > 10) {
+          leftWidth = parsed[0];
+        } else {
+          leftWidth = 10;
+        }
+      } else {
+        leftWidth = 10;
+      }
+      const calcWidth = 100 - leftWidth;
+      this.splitterContentWidth = "width: calc(" + calcWidth + "vw - 0.5rem);" + "max-width: calc(" + calcWidth + "vw - 0.5rem);";
+    },
+
+    setSplitterContainerVert(event: any) {
+      const header = document.getElementsByClassName("topbar-container")[0] as HTMLElement;
+      let headerHeightWithUnits;
+      if (header) {
+        const headerHeight = header.getBoundingClientRect().height;
+        headerHeightWithUnits = headerHeight + "px";
+      } else {
+        this.$toast.add(LoggerService.error("Hierarchy tree sizing failed", "Error finding topbar for vertical splitter container setter."));
+      }
+      let bottomHeight;
+      if (isArrayHasLength(event.sizes) && event.sizes[0] > 10) {
+        bottomHeight = event.sizes[0];
+      } else if (typeof event.sizes === "string") {
+        const parsed = JSON.parse(event.sizes);
+        if (isArrayHasLength(parsed) && parsed[0] > 10) {
+          bottomHeight = parsed[0];
+        } else {
+          bottomHeight = 10;
+        }
+      } else {
+        bottomHeight = 10;
+      }
+      const calcHeight = 100 - bottomHeight;
+      // this.splitterContentHeight = "height: calc(100% - 40px);";
+      this.splitterContentHeight =
+        "height: calc(" +
+        calcHeight +
+        "vh - " +
+        headerHeightWithUnits +
+        " - 2px);" +
+        " max-height: calc(" +
+        calcHeight +
+        "vh - " +
+        headerHeightWithUnits +
+        " - 2px);";
     },
 
     openDownloadDialog(): void {
@@ -480,7 +547,6 @@ export default defineComponent({
   grid-area: content;
   height: calc(100vh - 2rem);
   width: 100%;
-  overflow-y: auto;
   background-color: #ffffff;
 }
 
@@ -493,6 +559,21 @@ export default defineComponent({
   flex-flow: column nowrap;
   justify-content: flex-start;
   height: 100%;
+}
+
+#concept-content-dialogs-container {
+  overflow: auto;
+  height: 100%;
+}
+
+#concept-hierarchy-tree-header-container {
+  width: 100%;
+  overflow: auto;
+}
+
+#concept-panel-container {
+  height: 100%;
+  width: 100%;
 }
 
 .concept-panel-content {
@@ -522,8 +603,9 @@ export default defineComponent({
   align-items: center;
 }
 
-.left-panel-content {
+#summary-container {
   padding: 1rem;
+  overflow: auto;
 }
 
 .title {
@@ -532,5 +614,9 @@ export default defineComponent({
 
 #definition-container {
   padding-top: 1rem;
+}
+
+#hierarchy-header {
+  padding: 1rem;
 }
 </style>

@@ -48,7 +48,7 @@
             </div>
           </span>
           <ProgressSpinner v-if="slotProps.node.loading" />
-          <span>{{ slotProps.node.label }}</span>
+          <span class="tree-node-label">{{ slotProps.node.label }}</span>
         </div>
       </template>
     </Tree>
@@ -339,8 +339,8 @@ export default defineComponent({
 }
 
 #secondary-tree-bar-container {
-  height: 100%;
-  border: 1px solid #dee2e6;
+  height: calc(100% - 3.5rem);
+  border-top: 1px solid #dee2e6;
 }
 
 .p-progress-spinner {
@@ -358,5 +358,9 @@ export default defineComponent({
   justify-content: flex-start;
   align-items: flex-start;
   gap: 0.25rem;
+}
+
+.tree-node-label {
+  word-break: break-all;
 }
 </style>
