@@ -445,7 +445,16 @@ export default defineComponent({
       const calcHeight = 100 - bottomHeight;
       // this.splitterContentHeight = "height: calc(100% - 40px);";
       this.splitterContentHeight =
-        "height: calc(" + calcHeight + "vh - " + headerHeightWithUnits + ");" + " max-height: calc(" + calcHeight + "vh - " + headerHeightWithUnits + ");";
+        "height: calc(" +
+        calcHeight +
+        "vh - " +
+        headerHeightWithUnits +
+        " - 2px);" +
+        " max-height: calc(" +
+        calcHeight +
+        "vh - " +
+        headerHeightWithUnits +
+        " - 2px);";
     },
 
     openDownloadDialog(): void {
