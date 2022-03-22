@@ -232,14 +232,14 @@ export default defineComponent({
     publish() {
       this.isPublishing = true;
       SetService.publish(this.conceptIri)
-          .then(result => {
-            this.isPublishing = false;
-            this.$toast.add(LoggerService.success("Value set published", "Published to IM1 :" + this.conceptIri));
-          })
-          .catch(() => {
-            this.isPublishing = false;
-            this.$toast.add(LoggerService.error("Failed to publish value set", "Publish to IM1 FAILED :" + this.conceptIri));
-          });
+        .then(result => {
+          this.isPublishing = false;
+          this.$toast.add(LoggerService.success("Value set published", "Published to IM1 :" + this.conceptIri));
+        })
+        .catch(() => {
+          this.isPublishing = false;
+          this.$toast.add(LoggerService.error("Failed to publish value set", "Publish to IM1 FAILED :" + this.conceptIri));
+        });
     },
 
     getUserRoles() {
@@ -253,7 +253,8 @@ export default defineComponent({
     },
 
     checkAuthorization() {
-      return this.userRoles.includes("IM1_PUBLISH");
+      if (this.userRoles) return this.userRoles.includes("IM1_PUBLISH");
+      else return false;
     }
   }
 });
