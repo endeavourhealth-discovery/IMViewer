@@ -1,6 +1,6 @@
 <template>
   <div class="p-fluid">
-    <MultiSelect v-model="selectedPredicates" @change="updatePredicates" :options="predicateOptions" placeholder="Select predicates" />
+    <MultiSelect v-model="selectedPredicates" @change="updatePredicates" :options="options"  option-label="name" placeholder="Select predicates" />
   </div>
   <div class="loading-container" v-if="loading">
     <ProgressSpinner />
@@ -36,10 +36,12 @@ export default defineComponent({
     return {
       loading: false,
       data: {} as TTGraphData,
-      selectedPredicates: [] as string[],
-      predicateOptions: [] as string[],
+      selectedPredicates: [] as {iri:string, name:string}[],
+      selectedIris: [] as string[],
+      predicatesIris: [] as string[],
       bundle: {} as PartialBundle,
-      graphExcludePredicates: [] as string[]
+      graphExcludePredicates: [] as string[],
+      options:[] as {iri:string, name:string}[]
     };
   },
   async mounted() {
@@ -48,7 +50,11 @@ export default defineComponent({
   },
   methods: {
     async updatePredicates() {
-      this.data = translateFromEntityBundle(this.bundle, this.selectedPredicates);
+      this.selectedIris = [];
+      this.selectedPredicates.forEach( i => {
+        this.selectedIris.push(i.iri);
+      })
+      this.data = translateFromEntityBundle(this.bundle, this.selectedIris);
     },
     async getDefaultPredicates() {
       this.graphExcludePredicates = await ConfigService.getGraphExcludePredicates();
@@ -56,9 +62,15 @@ export default defineComponent({
     async getEntityBundle(iri: string) {
       this.loading = true;
       this.bundle = await EntityService.getPartialEntityBundle(iri, []);
-      this.predicateOptions = Object.keys(this.bundle.entity).filter(value => value !== "@id");
-      this.selectedPredicates = this.predicateOptions.filter(value => !this.graphExcludePredicates.includes(value));
-      this.data = translateFromEntityBundle(this.bundle, this.selectedPredicates);
+      this.predicatesIris = Object.keys(this.bundle.entity).filter(value => value !== "@id");
+      this.predicatesIris.forEach( i => {
+        this.options.push({iri:i,name:this.bundle.predicates[i]});
+      });
+      this.selectedPredicates = this.options.filter(value => !this.graphExcludePredicates.includes(value.iri));
+      this.selectedPredicates.forEach( i => {
+        this.selectedIris.push(i.iri);
+      })
+      this.data = translateFromEntityBundle(this.bundle,this.selectedIris);
       this.loading = false;
     }
   }
