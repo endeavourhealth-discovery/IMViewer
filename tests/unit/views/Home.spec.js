@@ -27,8 +27,6 @@ describe("Home.vue ___ route = Concept", () => {
   it("should updateRoute ___ Concept", async () => {
     wrapper.vm.updateRoute();
     await wrapper.vm.$nextTick();
-    expect(mockStore.commit).toBeCalledTimes(1);
-    expect(mockStore.commit).toBeCalledWith("updateConceptIri", "test concept iri");
     expect(mockRouter.push).toHaveBeenCalledTimes(1);
     expect(mockRouter.push).toHaveBeenCalledWith({ name: "Concept", params: { selectedIri: "test concept iri" } });
   });
@@ -58,7 +56,6 @@ describe("Home.vue ___ route = Other", () => {
   it("updateRoute goes back on other routes", async () => {
     wrapper.vm.updateRoute();
     await wrapper.vm.$nextTick();
-    expect(mockStore.commit).toBeCalledTimes(0);
     expect(mockRouter.back).toHaveBeenCalledTimes(1);
   });
 });
