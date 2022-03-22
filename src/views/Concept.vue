@@ -38,84 +38,86 @@
       </template>
     </TopBar>
   </div>
-  <Splitter id="concept-main-container" stateKey="viewerConceptSplitterHorizontal" stateStorage="local" @resizeend="setSplitterContainerHoriz">
-    <SplitterPanel :size="20" :minSize="10">
-      <Splitter layout="vertical" stateKey="viewerConceptSplitterVertical" stateStorage="local" @resizeend="setSplitterContainerVert">
-        <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
-          <div v-if="loading" class="loading-container">
-            <ProgressSpinner />
+  <div id="concept-main-container">
+    <Splitter stateKey="viewerConceptSplitterHorizontal" stateStorage="local" @resizeend="setSplitterContainerHoriz">
+      <SplitterPanel :size="20" :minSize="10">
+        <Splitter layout="vertical" stateKey="viewerConceptSplitterVertical" stateStorage="local" @resizeend="setSplitterContainerVert">
+          <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
+            <div v-if="loading" class="loading-container">
+              <ProgressSpinner />
+            </div>
+            <div v-else class="left-panel-content" id="summary-container">
+              <Definition :concept="concept" :configs="summaryConfig" />
+            </div>
+          </SplitterPanel>
+          <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
+            <div id="concept-hierarchy-tree-header-container" :style="splitterContentHeight">
+              <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
+              <SecondaryTree :conceptIri="conceptIri" />
+            </div>
+          </SplitterPanel>
+        </Splitter>
+      </SplitterPanel>
+      <SplitterPanel :size="80" :minSize="20" style="overflow: auto;">
+        <div id="concept-content-dialogs-container" :style="splitterContentWidth">
+          <div id="concept-panel-container">
+            <TabView v-model:activeIndex="active" :lazy="true">
+              <TabPanel header="Details">
+                <div v-if="loading" class="loading-container" :style="contentHeight">
+                  <ProgressSpinner />
+                </div>
+                <div v-else class="concept-panel-content" id="definition-container" :style="contentHeight">
+                  <Definition :concept="concept" :configs="definitionConfig" />
+                </div>
+              </TabPanel>
+              <TabPanel header="Maps" v-if="showMappings">
+                <div class="concept-panel-content" id="mappings-container" :style="contentHeight">
+                  <Mappings :conceptIri="conceptIri" />
+                </div>
+              </TabPanel>
+              <TabPanel header="Used in">
+                <div class="concept-panel-content" id="usedin-container" :style="contentHeight">
+                  <UsedIn :conceptIri="conceptIri" />
+                </div>
+              </TabPanel>
+              <TabPanel header="Entity chart" v-if="showGraph">
+                <div class="concept-panel-content" id="entity-chart-container" :style="contentHeight">
+                  <EntityChart :conceptIri="conceptIri" />
+                </div>
+              </TabPanel>
+              <TabPanel header="Properties" v-if="isRecordModel">
+                <div class="concept-panel-content" id="properties-container" :style="contentHeight">
+                  <Properties :conceptIri="conceptIri" />
+                </div>
+              </TabPanel>
+              <TabPanel header="Members" v-if="isSet">
+                <div class="concept-panel-content" id="members-container" :style="contentHeight">
+                  <Members :conceptIri="conceptIri" />
+                </div>
+              </TabPanel>
+              <TabPanel header="Terms" v-if="terms">
+                <div class="concept-panel-content" id="term-table-container" :style="contentHeight">
+                  <TermCodeTable :terms="terms" />
+                </div>
+              </TabPanel>
+              <TabPanel header="ECL" v-if="isSet && isObjectHasKeysWrapper(concept.inferred)">
+                <div class="concept-panel-content" id="ecl-container" :style="contentHeight">
+                  <EclDefinition :definition="concept.inferred" />
+                </div>
+              </TabPanel>
+              <TabPanel header="Graph">
+                <div class="concept-panel-content" id="graph-container" :style="contentHeight">
+                  <Graph :conceptIri="conceptIri" />
+                </div>
+              </TabPanel>
+              -->
+            </TabView>
           </div>
-          <div v-else class="left-panel-content" id="summary-container">
-            <Definition :concept="concept" :configs="summaryConfig" />
-          </div>
-        </SplitterPanel>
-        <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
-          <div id="concept-hierarchy-tree-header-container" :style="splitterContentHeight">
-            <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
-            <SecondaryTree :conceptIri="conceptIri" />
-          </div>
-        </SplitterPanel>
-      </Splitter>
-    </SplitterPanel>
-    <SplitterPanel :size="80" :minSize="20" style="overflow: auto;">
-      <div id="concept-content-dialogs-container" :style="splitterContentWidth">
-        <div id="concept-panel-container">
-          <TabView v-model:activeIndex="active" :lazy="true">
-            <TabPanel header="Details">
-              <div v-if="loading" class="loading-container" :style="contentHeight">
-                <ProgressSpinner />
-              </div>
-              <div v-else class="concept-panel-content" id="definition-container" :style="contentHeight">
-                <Definition :concept="concept" :configs="definitionConfig" />
-              </div>
-            </TabPanel>
-            <TabPanel header="Maps" v-if="showMappings">
-              <div class="concept-panel-content" id="mappings-container" :style="contentHeight">
-                <Mappings :conceptIri="conceptIri" />
-              </div>
-            </TabPanel>
-            <TabPanel header="Used in">
-              <div class="concept-panel-content" id="usedin-container" :style="contentHeight">
-                <UsedIn :conceptIri="conceptIri" />
-              </div>
-            </TabPanel>
-            <TabPanel header="Entity chart" v-if="showGraph">
-              <div class="concept-panel-content" id="entity-chart-container" :style="contentHeight">
-                <EntityChart :conceptIri="conceptIri" />
-              </div>
-            </TabPanel>
-            <TabPanel header="Properties" v-if="isRecordModel">
-              <div class="concept-panel-content" id="properties-container" :style="contentHeight">
-                <Properties :conceptIri="conceptIri" />
-              </div>
-            </TabPanel>
-            <TabPanel header="Members" v-if="isSet">
-              <div class="concept-panel-content" id="members-container" :style="contentHeight">
-                <Members :conceptIri="conceptIri" />
-              </div>
-            </TabPanel>
-            <TabPanel header="Terms" v-if="terms">
-              <div class="concept-panel-content" id="term-table-container" :style="contentHeight">
-                <TermCodeTable :terms="terms" />
-              </div>
-            </TabPanel>
-            <TabPanel header="ECL" v-if="isSet && isObjectHasKeysWrapper(concept.inferred)">
-              <div class="concept-panel-content" id="ecl-container" :style="contentHeight">
-                <EclDefinition :definition="concept.inferred" />
-              </div>
-            </TabPanel>
-            <TabPanel header="Graph">
-              <div class="concept-panel-content" id="graph-container" :style="contentHeight">
-                <Graph :conceptIri="conceptIri" />
-              </div>
-            </TabPanel>
-            -->
-          </TabView>
+          <DownloadDialog v-if="showDownloadDialog" @closeDownloadDialog="closeDownloadDialog" :showDialog="showDownloadDialog" :conceptIri="conceptIri" />
         </div>
-        <DownloadDialog v-if="showDownloadDialog" @closeDownloadDialog="closeDownloadDialog" :showDialog="showDownloadDialog" :conceptIri="conceptIri" />
-      </div>
-    </SplitterPanel>
-  </Splitter>
+      </SplitterPanel>
+    </Splitter>
+  </div>
 </template>
 
 <script lang="ts">
@@ -230,7 +232,7 @@ export default defineComponent({
   },
   data() {
     return {
-      loading: false,
+      loading: true,
       editDialogView: true,
       showDownloadDialog: false,
       concept: {} as any,
@@ -355,7 +357,7 @@ export default defineComponent({
       const allConfigs = this.definitionConfig.concat(this.summaryConfig);
       this.conceptAsString = copyConceptToClipboard(this.concept, allConfigs, undefined, this.blockedIris);
       this.loading = false;
-      document.title = (this.header as string) || APP_TITLE;
+      document.title = (this.header as string) || "";
     },
 
     setStoreType(): void {
@@ -545,9 +547,13 @@ export default defineComponent({
 <style scoped>
 #concept-main-container {
   grid-area: content;
-  height: calc(100vh - 2rem);
+  height: calc(100% - 3.5rem);
   width: 100%;
   background-color: #ffffff;
+}
+
+.p-splitter-horizontal {
+  height: 100%;
 }
 
 .p-tabview-panel {
