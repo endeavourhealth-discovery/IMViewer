@@ -416,7 +416,7 @@ export default defineComponent({
           leftWidth = 10;
         }
       } else {
-        leftWidth = 10;
+        leftWidth = 20;
       }
       const calcWidth = 100 - leftWidth;
       this.splitterContentWidth = "width: calc(" + calcWidth + "vw - 0.5rem);" + "max-width: calc(" + calcWidth + "vw - 0.5rem);";
