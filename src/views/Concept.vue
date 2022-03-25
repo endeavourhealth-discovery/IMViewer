@@ -39,74 +39,66 @@
     </TopBar>
   </div>
   <div id="concept-main-container">
-    <Splitter stateKey="viewerConceptSplitterHorizontal" stateStorage="local" @resizeend="setSplitterContainerHoriz">
-      <SplitterPanel :size="20" :minSize="10">
-        <Splitter layout="vertical" stateKey="viewerConceptSplitterVertical" stateStorage="local">
-          <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
+    <Splitter stateKey="viewerConceptSplitterHorizontal" stateStorage="local" class="mainSplitter">
+      <SplitterPanel :size="20" :minSize="10" class="leftSplitterPanel">
             <div v-if="loading" class="loading-container">
               <ProgressSpinner />
             </div>
-            <div v-else class="left-panel-content" id="summary-container">
-              <Definition :concept="concept" :configs="summaryConfig" />
-            </div>
-          </SplitterPanel>
-          <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
-            <div id="concept-hierarchy-tree-header-container" style="height: calc(100% - 25px);">
+            <div v-else class="leftSplitterContent">
+              <Definition :concept="concept" :configs="summaryConfig" class="definition"/>
               <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
-              <SecondaryTree :conceptIri="conceptIri" />
+              <SecondaryTree :conceptIri="conceptIri" class="leftHierarchy"/>
             </div>
-          </SplitterPanel>
-        </Splitter>
       </SplitterPanel>
       <SplitterPanel :size="80" :minSize="20" style="overflow: auto;">
-        <div id="concept-content-dialogs-container" :style="splitterContentWidth">
+        <div id="concept-content-dialogs-container">
           <div id="concept-panel-container">
             <TabView v-model:activeIndex="active" :lazy="true">
               <TabPanel header="Details">
-                <div v-if="loading" class="loading-container" :style="contentHeight">
+                <div v-if="loading" class="loading-container">
                   <ProgressSpinner />
                 </div>
-                <div v-else class="concept-panel-content" id="definition-container" :style="contentHeight">
+                <div v-else class="concept-panel-content" id="definition-container">
                   <Definition :concept="concept" :configs="definitionConfig" />
                 </div>
               </TabPanel>
               <TabPanel header="Maps" v-if="showMappings">
-                <div class="concept-panel-content" id="mappings-container" :style="contentHeight">
+                <div class="concept-panel-content" id="mappings-container">
                   <Mappings :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
               <TabPanel header="Used in">
-                <div class="concept-panel-content" id="usedin-container" :style="contentHeight">
+                <div class="concept-panel-content" id="usedin-container">
                   <UsedIn :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
               <TabPanel header="Entity chart" v-if="showGraph">
-                <div class="concept-panel-content" id="entity-chart-container" :style="contentHeight">
+                <div class="concept-panel-content" id="entity-chart-container">
                   <EntityChart :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
               <TabPanel header="Properties" v-if="isRecordModel">
-                <div class="concept-panel-content" id="properties-container" :style="contentHeight">
+                <div class="concept-panel-content" id="properties-container">
                   <Properties :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
               <TabPanel header="Members" v-if="isSet">
-                <div class="concept-panel-content" id="members-container" :style="contentHeight">
+                <div class="concept-panel-content" id="members-container">
                   <Members :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
               <TabPanel header="Terms" v-if="terms">
-                <div class="concept-panel-content" id="term-table-container" :style="contentHeight">
+                <div class="concept-panel-content" id="term-table-container">
                   <TermCodeTable :terms="terms" />
                 </div>
               </TabPanel>
               <TabPanel header="ECL" v-if="isSet && isObjectHasKeysWrapper(concept.inferred)">
-                <div class="concept-panel-content" id="ecl-container" :style="contentHeight">
+                <div class="concept-panel-content" id="ecl-container">
                   <EclDefinition :definition="concept.inferred" />
                 </div>
               </TabPanel>
               <TabPanel header="Graph">
-                <div class="concept-panel-content" id="graph-container" :style="contentHeight">
+                <div class="concept-panel-content" id="graph-container">
                   <Graph :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
@@ -220,14 +212,7 @@ export default defineComponent({
     }
   },
   async mounted() {
-    this.setContentHeight();
-    window.addEventListener("resize", this.onResize);
     await this.init();
-    this.setContentHeight();
-    this.setSplitterContainerHoriz({ sizes: localStorage.getItem("viewerConceptSplitterHorizontal") });
-  },
-  beforeUnmount() {
-    window.removeEventListener("resize", this.onResize);
   },
   data() {
     return {
@@ -241,9 +226,6 @@ export default defineComponent({
       header: "",
       dialogHeader: "",
       active: 0,
-      contentHeight: "",
-      contentHeightValue: 0,
-      splitterContentWidth: "",
       copyMenuItems: [] as any,
       definitionConfig: [] as DefinitionConfig[],
       summaryConfig: [] as DefinitionConfig[],
@@ -272,10 +254,6 @@ export default defineComponent({
     };
   },
   methods: {
-    onResize(): void {
-      this.setContentHeight();
-      this.setSplitterContainerHoriz({ sizes: localStorage.getItem("viewerConceptSplitterHorizontal") });
-    },
 
     directToEditRoute(): void {
       this.$router.push({
@@ -390,35 +368,6 @@ export default defineComponent({
       }
     },
 
-    setContentHeight(): void {
-      const calcHeight = getContainerElementOptimalHeight("concept-panel-container", ["p-tabview-nav"], true, 3, 1);
-      if (!calcHeight.length) {
-        this.contentHeight = "height: 800px; max-height: 800px;";
-        this.contentHeightValue = 800;
-      } else {
-        this.contentHeight = "height: " + calcHeight + ";" + "max-height: " + calcHeight + ";";
-        this.contentHeightValue = parseInt(calcHeight, 10);
-      }
-    },
-
-    setSplitterContainerHoriz(event: any) {
-      let leftWidth;
-      if (isArrayHasLength(event.sizes) && event.sizes[0] > 10) {
-        leftWidth = event.sizes[0];
-      } else if (typeof event.sizes === "string") {
-        const parsed = JSON.parse(event.sizes);
-        if (isArrayHasLength(parsed) && parsed[0] > 10) {
-          leftWidth = parsed[0];
-        } else {
-          leftWidth = 10;
-        }
-      } else {
-        leftWidth = 20;
-      }
-      const calcWidth = 100 - leftWidth;
-      this.splitterContentWidth = "width: calc(" + calcWidth + "vw - 0.5rem);" + "max-width: calc(" + calcWidth + "vw - 0.5rem);";
-    },
-
     openDownloadDialog(): void {
       this.showDownloadDialog = true;
     },
@@ -512,29 +461,13 @@ export default defineComponent({
   background-color: #ffffff;
 }
 
-.p-splitter-horizontal {
-  height: 100%;
-}
-
-.p-tabview-panel {
-  min-height: 100%;
-}
-
-.p-panel {
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: flex-start;
-  height: 100%;
-}
+.mainSplitter {
+   height: 100%;
+ }
 
 #concept-content-dialogs-container {
   overflow: auto;
   height: 100%;
-}
-
-#concept-hierarchy-tree-header-container {
-  width: 100%;
-  overflow: auto;
 }
 
 #concept-panel-container {
@@ -547,19 +480,6 @@ export default defineComponent({
   background-color: #ffffff;
 }
 
-.copy-container {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.icons-container {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-}
-
 .loading-container {
   height: 100%;
   width: 100%;
@@ -567,11 +487,6 @@ export default defineComponent({
   flex-flow: column;
   justify-content: center;
   align-items: center;
-}
-
-#summary-container {
-  padding: 1rem;
-  overflow: auto;
 }
 
 .title {
@@ -584,5 +499,26 @@ export default defineComponent({
 
 #hierarchy-header {
   padding: 1rem;
+}
+
+
+.leftSplitterPanel {
+  display: flex;
+}
+
+.leftSplitterContent {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.definition {
+  padding: 1rem;
+  flex: 0;
+}
+
+.leftHierarchy {
+  overflow: auto;
+  flex: 0 1 auto;
 }
 </style>

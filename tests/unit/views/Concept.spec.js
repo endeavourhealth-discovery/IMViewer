@@ -235,52 +235,6 @@ describe("Concept.vue ___ not moduleIri", () => {
     expect(wrapper.vm.contentHeightValue).not.toBe(0);
   });
 
-  it("adds event listener to setContentHeights on resize", async () => {
-    const spy = vi.spyOn(wrapper.vm, "setContentHeight");
-    window.dispatchEvent(new Event("resize"));
-    await wrapper.vm.$nextTick();
-    expect(spy).toHaveBeenCalledTimes(1);
-    spy.mockReset();
-  });
-
-  it("can remove eventListener", () => {
-    const spy = vi.spyOn(window, "removeEventListener");
-    wrapper.unmount();
-    expect(spy).toHaveBeenCalled();
-    spy.mockReset();
-  });
-
-  it("sets container size ___ container fail", async () => {
-    wrapper.vm.setContentHeight();
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.contentHeightValue).toBe(800);
-  });
-
-  it("sets container size ___ container success", async () => {
-    const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ height: 100 });
-    mockElement.getElementsByClassName = vi.fn().mockReturnValue([mockElement]);
-    docSpy.mockReturnValue(mockElement);
-    wrapper.vm.setContentHeight();
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.contentHeightValue).not.toBe(800);
-    docSpy.mockReset();
-    vi.clearAllMocks();
-  });
-
-  it("sets container size ___ class element fail", async () => {
-    const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ height: 100 });
-    mockElement.getElementsByClassName = vi.fn().mockReturnValue([null]);
-    docSpy.mockReturnValue(mockElement);
-    windowSpy.mockReturnValue({ getPropertyValue: vi.fn().mockReturnValue(undefined) });
-    wrapper.vm.setContentHeight();
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.contentHeightValue).not.toBe(800);
-    docSpy.mockReset();
-    vi.clearAllMocks();
-  });
-
   it("can check for a set ___ false", async () => {
     expect(Concept.computed.isSet.call({ types: [{ name: "Concept", "@id": "http://endhealth.info/im#Concept" }] })).toBe(false);
   });
