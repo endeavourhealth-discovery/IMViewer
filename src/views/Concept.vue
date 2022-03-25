@@ -50,10 +50,10 @@
               <SecondaryTree :conceptIri="conceptIri" class="leftHierarchy"/>
             </div>
       </SplitterPanel>
-      <SplitterPanel :size="80" :minSize="20" style="overflow: auto;">
+      <SplitterPanel :size="80" :minSize="20" class="rightSplitterPanel">
         <div id="concept-content-dialogs-container">
           <div id="concept-panel-container">
-            <TabView v-model:activeIndex="active" :lazy="true">
+            <TabView v-model:activeIndex="active" :lazy="true" class="tabView">
               <TabPanel header="Details">
                 <div v-if="loading" class="loading-container">
                   <ProgressSpinner />
@@ -67,7 +67,7 @@
                   <Mappings :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
-              <TabPanel header="Used in">
+              <TabPanel header="Used in" style="height: 100%">
                 <div class="concept-panel-content" id="usedin-container">
                   <UsedIn :conceptIri="conceptIri" />
                 </div>
@@ -453,7 +453,7 @@ export default defineComponent({
   }
 });
 </script>
-<style scoped>
+<style>
 #concept-main-container {
   grid-area: content;
   height: calc(100% - 3.5rem);
@@ -466,7 +466,6 @@ export default defineComponent({
  }
 
 #concept-content-dialogs-container {
-  overflow: auto;
   height: 100%;
 }
 
@@ -520,5 +519,24 @@ export default defineComponent({
 .leftHierarchy {
   overflow: auto;
   flex: 0 1 auto;
+}
+
+.tabView {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.p-tabview-panels {
+  overflow: auto;
+  height: 100%;
+}
+
+.p-tabview-panel {
+  height: 100%;
+}
+
+#usedin-container {
+  height: 100%;
 }
 </style>
