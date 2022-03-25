@@ -67,7 +67,7 @@
                   <Mappings :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
-              <TabPanel header="Used in" style="height: 100%">
+              <TabPanel header="Used in">
                 <div class="concept-panel-content" id="usedin-container">
                   <UsedIn :conceptIri="conceptIri" />
                 </div>
