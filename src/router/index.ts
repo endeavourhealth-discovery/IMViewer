@@ -4,8 +4,11 @@ import Concept from "../views/Concept.vue";
 import { SnomedLicense } from "im-library";
 import store from "@/store/index";
 import { nextTick } from "vue";
-import { Enums, Env } from "im-library";
+import { Enums, Env, Helpers } from "im-library";
 const { AppEnum } = Enums;
+const {
+  RouterGuards: { checkAuth, checkLicense }
+} = Helpers;
 
 const APP_TITLE = "IM Viewer";
 
@@ -40,7 +43,8 @@ const router = createRouter({
   routes
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  let hasCalledNext = false;
   const iri = to.params.selectedIri as string;
   const currentUrl = Env.viewerUrl + "#" + to.path;
   if (to.path !== "/snomedLicense") {
@@ -54,39 +58,9 @@ router.beforeEach((to, from, next) => {
     store.commit("updateRecentLocalActivity", { iri: iri, dateTime: new Date(), app: AppEnum.VIEWER });
     store.commit("updateConceptIri", to.params.selectedIri as string);
   }
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    store.dispatch("authenticateCurrentUser").then(res => {
-      console.log("auth guard user authenticated:" + res.authenticated);
-      if (!res.authenticated) {
-        console.log("redirecting to login");
-        window.location.href = Env.authUrl + "login?returnUrl=" + currentUrl;
-      } else {
-        if (to.matched.some(record => record.meta.requiresLicense)) {
-          console.log("snomed license accepted:" + store.state.snomedLicenseAccepted);
-          if (store.state.snomedLicenseAccepted !== "true") {
-            next({
-              path: "/snomedLicense"
-            });
-          } else {
-            next();
-          }
-        } else {
-          next();
-        }
-      }
-    });
-  } else if (to.matched.some(record => record.meta.requiresLicense)) {
-    console.log("snomed license accepted:" + store.state.snomedLicenseAccepted);
-    if (store.state.snomedLicenseAccepted !== "true") {
-      next({
-        path: "/snomedLicense"
-      });
-    } else {
-      next();
-    }
-  } else {
-    next();
-  }
+  hasCalledNext = await checkAuth(to, next, store, hasCalledNext, currentUrl);
+  hasCalledNext = checkLicense(to, next, store, hasCalledNext);
+  if (!hasCalledNext) next();
 });
 
 router.afterEach(to => {
