@@ -498,6 +498,7 @@ export default defineComponent({
 
 #hierarchy-header {
   padding: 1rem;
+  border-top: solid lightgrey 1px;
 }
 
 
@@ -519,6 +520,7 @@ export default defineComponent({
 .leftHierarchy {
   overflow: auto;
   flex: 0 1 auto;
+  border: none !important;
 }
 
 .tabView {
@@ -534,6 +536,10 @@ export default defineComponent({
 
 .p-tabview-panel {
   height: 100%;
+}
+
+.p-treenode-label {
+  width: 100%;
 }
 
 #usedin-container {
