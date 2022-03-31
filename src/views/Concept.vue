@@ -41,14 +41,14 @@
   <div id="concept-main-container">
     <Splitter stateKey="viewerConceptSplitterHorizontal" stateStorage="local" class="mainSplitter">
       <SplitterPanel :size="20" :minSize="10" class="leftSplitterPanel">
-            <div v-if="loading" class="loading-container">
-              <ProgressSpinner />
-            </div>
-            <div v-else class="leftSplitterContent">
-              <Definition :concept="concept" :configs="summaryConfig" class="definition"/>
-              <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
-              <SecondaryTree :conceptIri="conceptIri" class="leftHierarchy"/>
-            </div>
+        <div v-if="loading" class="loading-container">
+          <ProgressSpinner />
+        </div>
+        <div v-else class="leftSplitterContent">
+          <Definition :concept="concept" :configs="summaryConfig" class="definition" />
+          <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
+          <SecondaryTree :conceptIri="conceptIri" class="leftHierarchy" />
+        </div>
       </SplitterPanel>
       <SplitterPanel :size="80" :minSize="20" class="rightSplitterPanel">
         <div id="concept-content-dialogs-container">
@@ -128,14 +128,13 @@ import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
 import SecondaryTree from "../components/concept/SecondaryTree.vue";
 import Properties from "@/components/concept/Properties.vue";
-import { Helpers, Models, Vocabulary, LoggerService } from "im-library";
+import { Helpers, Vocabulary, LoggerService } from "im-library";
 import { DefinitionConfig, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet },
   CopyConceptToClipboard: { copyConceptToClipboard, conceptObjectToCopyString },
-  DataTypeCheckers: { isObjectHasKeys, isArrayHasLength },
-  ContainerDimensionGetters: { getContainerElementOptimalHeight },
+  DataTypeCheckers: { isObjectHasKeys },
   Sorters: { byOrder }
 } = Helpers;
 
@@ -254,7 +253,6 @@ export default defineComponent({
     };
   },
   methods: {
-
     directToEditRoute(): void {
       this.$router.push({
         name: "Edit",
@@ -332,7 +330,7 @@ export default defineComponent({
       const allConfigs = this.definitionConfig.concat(this.summaryConfig);
       this.conceptAsString = copyConceptToClipboard(this.concept, allConfigs, undefined, this.blockedIris);
       this.loading = false;
-      document.title = (this.header as string) || "";
+      document.title = this.header || "";
     },
 
     setStoreType(): void {
@@ -462,8 +460,8 @@ export default defineComponent({
 }
 
 .mainSplitter {
-   height: 100%;
- }
+  height: 100%;
+}
 
 #concept-content-dialogs-container {
   height: 100%;
@@ -500,7 +498,6 @@ export default defineComponent({
   padding: 1rem;
   border-top: solid lightgrey 1px;
 }
-
 
 .leftSplitterPanel {
   display: flex;

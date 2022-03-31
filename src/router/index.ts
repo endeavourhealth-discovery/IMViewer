@@ -43,7 +43,7 @@ const router = createRouter({
   routes
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _from, next) => {
   let hasCalledNext = false;
   const iri = to.params.selectedIri as string;
   const currentUrl = Env.viewerUrl + "#" + to.path;

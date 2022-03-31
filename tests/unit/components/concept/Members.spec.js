@@ -7,7 +7,7 @@ import Column from "primevue/column";
 import Button from "primevue/button";
 import EntityService from "@/services/EntityService";
 import SetService from "@/services/SetService";
-import {LoggerService} from "im-library";
+import { LoggerService } from "im-library";
 import Menu from "primevue/menu";
 
 describe("Members.vue", () => {
@@ -264,7 +264,7 @@ describe("Members.vue", () => {
 
   it("can download ___ success ___ expanded", async () => {
     wrapper.vm.downloadFile = vi.fn();
-    wrapper.vm.download(true);
+    wrapper.vm.download(true, false);
     expect(wrapper.vm.downloading).toBe(true);
     expect(mockToast.add).toHaveBeenCalledTimes(1);
     expect(mockToast.add).toHaveBeenCalledWith(LoggerService.success("Download will begin shortly"));
@@ -293,7 +293,7 @@ describe("Members.vue", () => {
   it("can download ___ fail", async () => {
     wrapper.vm.downloadFile = vi.fn();
     SetService.download = vi.fn().mockRejectedValue(false);
-    wrapper.vm.download(false);
+    wrapper.vm.download(false, false);
     expect(wrapper.vm.downloading).toBe(true);
     expect(mockToast.add).toHaveBeenCalledTimes(1);
     expect(mockToast.add).toHaveBeenCalledWith(LoggerService.success("Download will begin shortly"));

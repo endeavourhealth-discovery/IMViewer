@@ -1,12 +1,9 @@
 import axios, { CancelToken } from "axios";
 import { Models, Env } from "im-library";
-const {
-  Search: { SearchResponse }
-} = Models;
 
 export default class SetService {
   public static async download(conceptIri: string, expanded: boolean, v1: boolean) {
-    return await axios.get(Env.api + "api/set/public/download", {
+    return axios.get(Env.api + "api/set/public/download", {
       params: {
         iri: conceptIri,
         expandMembers: expanded,
@@ -30,13 +27,13 @@ export default class SetService {
   }
 
   public static async publish(conceptIri: string) {
-    return await axios.get(Env.api + "api/set/publish", {
+    return axios.get(Env.api + "api/set/publish", {
       params: { iri: conceptIri }
     });
   }
 
   public static async IMV1(conceptIri: string) {
-    return await axios.get(Env.api + "api/set/public/export", {
+    return axios.get(Env.api + "api/set/public/export", {
       params: { iri: conceptIri },
       responseType: "blob"
     });
