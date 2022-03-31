@@ -1,6 +1,6 @@
 import SetService from "@/services/SetService";
 import axios from "axios";
-import {Env} from "im-library";
+import { Env } from "im-library";
 
 describe("SetService.ts ___ axios success", () => {
   beforeEach(() => {
@@ -9,11 +9,21 @@ describe("SetService.ts ___ axios success", () => {
     axios.post = vi.fn().mockResolvedValue("axios post return");
   });
 
-  it("can download", async () => {
+  it("can download ___ !v1 && !expanded", async () => {
     const result = await SetService.download("testIri", false, false);
     expect(axios.get).toHaveBeenCalledTimes(1);
     expect(axios.get).toHaveBeenCalledWith(Env.api + "api/set/public/download", {
       params: { iri: "testIri", expandMembers: false, v1: false, format: "excel" },
+      responseType: "blob"
+    });
+    expect(result).toBe("axios get return");
+  });
+
+  it("can download ___ v1 &&  expanded", async () => {
+    const result = await SetService.download("testIri", true, true);
+    expect(axios.get).toHaveBeenCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledWith(Env.api + "api/set/public/download", {
+      params: { iri: "testIri", expandMembers: true, v1: true, format: "excel" },
       responseType: "blob"
     });
     expect(result).toBe("axios get return");
@@ -29,6 +39,22 @@ describe("SetService.ts ___ axios success", () => {
       cancelToken: cancelToken
     });
     expect(result).toBe("axios post return");
+  });
+
+  it("can publish", async () => {
+    const result = await SetService.publish("testIri");
+    expect(axios.get).toBeCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledWith(Env.api + "api/set/publish", {
+      params: { iri: "testIri" }
+    });
+    expect(result).toBe("axios get return");
+  });
+
+  it("can get IMV1", async () => {
+    const result = await SetService.IMV1("testIri");
+    expect(axios.get).toBeCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledWith(Env.api + "api/set/public/export", { params: { iri: "testIri" }, responseType: "blob" });
+    expect(result).toBe("axios get return");
   });
 });
 
