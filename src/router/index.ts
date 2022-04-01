@@ -1,10 +1,9 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
 import Concept from "../views/Concept.vue";
-import { SnomedLicense } from "im-library";
 import store from "@/store/index";
 import { nextTick } from "vue";
-import { Enums, Env, Helpers } from "im-library";
+import { Enums, Env, Helpers, SnomedLicense } from "im-library";
 const { AppEnum } = Enums;
 const {
   RouterGuards: { checkAuth, checkLicense }

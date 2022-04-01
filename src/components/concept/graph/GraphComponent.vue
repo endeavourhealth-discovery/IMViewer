@@ -177,7 +177,7 @@ export default defineComponent({
             .style("left", d.x + "px")
             .style("top", d.y + 10 + "px");
         })
-        .on("mouseout", (d: any) => {
+        .on("mouseout", (_d: any) => {
           div
             .transition()
             .duration(500)
@@ -224,7 +224,7 @@ export default defineComponent({
       });
     },
 
-    getFODimensions(d: any) {
+    getFODimensions(_d: any) {
       return { x: -this.radius / 1.1, y: -this.radius / 1.3, height: (2 * this.radius) / 1.3, width: (2 * this.radius) / 1.1 };
     },
 
@@ -272,7 +272,7 @@ export default defineComponent({
     },
 
     drag(simulation: any) {
-      function dragstarted(event: any, d: any) {
+      function dragstarted(event: any, _d: any) {
         if (!event.active) simulation.alphaTarget(0.3).restart();
       }
 
@@ -281,7 +281,7 @@ export default defineComponent({
         d.fy = event.y;
       }
 
-      function dragended(event: any, d: any) {
+      function dragended(event: any, _d: any) {
         if (!event.active) simulation.alphaTarget(0);
       }
 
