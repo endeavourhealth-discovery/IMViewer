@@ -28,6 +28,7 @@ describe("state", () => {
       "isLoggedIn",
       "recentLocalActivity",
       "snomedLicenseAccepted",
+      "favourites",
       "snomedReturnUrl",
       "authReturnUrl",
       "blockedIris",

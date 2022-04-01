@@ -15,14 +15,25 @@ export default createStore({
     isLoggedIn: false as boolean,
     recentLocalActivity: localStorage.getItem("recentLocalActivity") as string,
     snomedLicenseAccepted: localStorage.getItem("snomedLicenseAccepted") as string,
+    favourites: JSON.parse(localStorage.getItem("favourites") || "[]") as string[],
     snomedReturnUrl: "",
     authReturnUrl: "",
     blockedIris: [] as string[],
     selectedEntityType: "",
     conceptActivePanel: 0,
-    defaultPredicateNames:[] as string[]
+    defaultPredicateNames: [] as string[]
   },
   mutations: {
+    updateFavourites(state, favourite: string) {
+      const favourites: string[] = JSON.parse(localStorage.getItem("favourites") || "[]");
+      if (!favourites.includes(favourite)) {
+        favourites.push(favourite);
+      } else {
+        favourites.splice(favourites.indexOf(favourite), 1);
+      }
+      localStorage.setItem("favourites", JSON.stringify(favourites));
+      state.favourites = favourites;
+    },
     updateRecentLocalActivity(state, recentActivityItem: RecentActivityItem) {
       let activity: RecentActivityItem[] = JSON.parse(localStorage.getItem("recentLocalActivity") || "[]");
       activity.forEach(activityItem => {

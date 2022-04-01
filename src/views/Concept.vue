@@ -35,6 +35,15 @@
           >
             <i class="fas fa-pencil-alt" aria-hidden="true"></i>
           </button>-->
+        <Button
+          v-if="isFavourite(concept['@id'])"
+          style="color: #e39a36"
+          icon="pi pi-fw pi-star-fill"
+          class="p-button-rounded p-button-text "
+          @click="updateFavourites(concept)"
+        />
+
+        <Button v-else icon="pi pi-fw pi-star" class="p-button-rounded p-button-text p-button-plain" @click="updateFavourites(concept)" />
       </template>
     </TopBar>
   </div>
@@ -186,7 +195,7 @@ export default defineComponent({
       return isProperty(this.types);
     },
 
-    ...mapState(["conceptIri", "selectedEntityType", "conceptActivePanel", "activeModule", "blockedIris"])
+    ...mapState(["conceptIri", "selectedEntityType", "conceptActivePanel", "activeModule", "blockedIris", "favourites"])
   },
   watch: {
     async conceptIri() {
@@ -253,6 +262,15 @@ export default defineComponent({
     };
   },
   methods: {
+    updateFavourites(data: any) {
+      if (isObjectHasKeys(data)) this.$store.commit("updateFavourites", data["@id"]);
+    },
+
+    isFavourite(iri: string) {
+      if (!this.favourites.length) return false;
+      return this.favourites.includes(iri);
+    },
+
     directToEditRoute(): void {
       this.$router.push({
         name: "Edit",
