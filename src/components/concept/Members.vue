@@ -162,7 +162,7 @@ export default defineComponent({
       try {
         this.$toast.add(LoggerService.success("Download will begin shortly"));
         const result = await SetService.IMV1(this.conceptIri);
-        const label: string = ((await EntityService.getPartialEntity(this.conceptIri, [RDFS.LABEL])) as any)[RDFS.LABEL];
+        const label: string = (await EntityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
         this.downloadFile(result, label + ".txt");
       } catch (error) {
         this.$toast.add(LoggerService.error("Download failed from server"));
@@ -176,7 +176,7 @@ export default defineComponent({
       try {
         this.$toast.add(LoggerService.success("Download will begin shortly"));
         const result = expanded ? (await EntityService.getFullExportSet(this.conceptIri)).data : await SetService.download(this.conceptIri, expanded, v1);
-        const label: string = ((await EntityService.getPartialEntity(this.conceptIri, [RDFS.LABEL])) as any)[RDFS.LABEL];
+        const label: string = (await EntityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
         this.downloadFile(result, this.getFileName(label));
       } catch (error) {
         this.$toast.add(LoggerService.error("Download failed from server"));
@@ -232,7 +232,7 @@ export default defineComponent({
     publish() {
       this.isPublishing = true;
       SetService.publish(this.conceptIri)
-        .then(result => {
+        .then(() => {
           this.isPublishing = false;
           this.$toast.add(LoggerService.success("Value set published", "Published to IM1 :" + this.conceptIri));
         })

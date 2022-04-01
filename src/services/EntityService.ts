@@ -13,9 +13,6 @@ import {
   EntityReferenceNode,
   GraphData
 } from "im-library/dist/types/interfaces/Interfaces";
-const {
-  Search: { ConceptSummary, SearchRequest }
-} = Models;
 
 export default class EntityService {
   public static async downloadConcept(iri: string, format: string): Promise<any> {
@@ -34,7 +31,7 @@ export default class EntityService {
 
   public static async getFullExportSet(iri: string): Promise<any> {
     const client = axios.create({
-      baseURL: Env.api as string,
+      baseURL: Env.api,
       timeout: 0
     });
 
