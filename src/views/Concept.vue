@@ -141,7 +141,7 @@ import { Helpers, Vocabulary, LoggerService } from "im-library";
 import { DefinitionConfig, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
-  ConceptTypeMethods: { isOfTypes, isProperty, isValueSet },
+  ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
   CopyConceptToClipboard: { copyConceptToClipboard, conceptObjectToCopyString },
   DataTypeCheckers: { isObjectHasKeys },
   Sorters: { byOrder }
@@ -172,23 +172,23 @@ export default defineComponent({
     },
 
     showMappings(): boolean {
-      return (isOfTypes(this.types, IM.CONCEPT) || isOfTypes(this.types, RDFS.CLASS)) && !isOfTypes(this.types, SHACL.NODESHAPE);
+      return (isConcept(this.types) || isOfTypes(this.types, RDFS.CLASS)) && !isRecordModel(this.types);
     },
 
     isConcept(): boolean {
-      return isOfTypes(this.types, IM.CONCEPT);
+      return isConcept(this.types);
     },
 
     isQuery(): boolean {
-      return isOfTypes(this.types, IM.QUERY_TEMPLATE);
+      return isQuery(this.types);
     },
 
     isRecordModel(): boolean {
-      return isOfTypes(this.types, SHACL.NODESHAPE);
+      return isRecordModel(this.types);
     },
 
     isFolder(): boolean {
-      return isOfTypes(this.types, IM.FOLDER);
+      return isFolder(this.types);
     },
 
     isProperty(): boolean {
