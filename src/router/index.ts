@@ -3,11 +3,8 @@ import Home from "../views/Home.vue";
 import Concept from "../views/Concept.vue";
 import store from "@/store/index";
 import { nextTick } from "vue";
-import { Enums, Env, Helpers, SnomedLicense } from "im-library";
+import { Enums, Env, SnomedLicense } from "im-library";
 const { AppEnum } = Enums;
-const {
-  RouterGuards: { checkAuth, checkLicense }
-} = Helpers;
 
 const APP_TITLE = "IM Viewer";
 
@@ -42,8 +39,7 @@ const router = createRouter({
   routes
 });
 
-router.beforeEach(async (to, _from, next) => {
-  let hasCalledNext = false;
+router.beforeEach(async (to, from) => {
   const iri = to.params.selectedIri as string;
   const currentUrl = Env.viewerUrl + "#" + to.path;
   if (to.path !== "/snomedLicense") {
@@ -51,15 +47,28 @@ router.beforeEach(async (to, _from, next) => {
     store.commit("updateAuthReturnUrl", currentUrl);
   }
   if (iri && store.state.blockedIris.includes(iri)) {
-    return;
+    return false;
   }
   if (iri) {
     store.commit("updateRecentLocalActivity", { iri: iri, dateTime: new Date(), app: AppEnum.VIEWER });
     store.commit("updateConceptIri", to.params.selectedIri as string);
   }
-  hasCalledNext = await checkAuth(to, next, store, hasCalledNext, currentUrl);
-  hasCalledNext = checkLicense(to, next, store, hasCalledNext);
-  if (!hasCalledNext) next();
+  if (to.matched.some((record: any) => record.meta.requiresAuth)) {
+    const res = await store.dispatch("authenticateCurrentUser");
+    console.log("auth guard user authenticated: " + res.authenticated);
+    if (!res.authenticated) {
+      console.log("redirecting to login");
+      window.location.href = Env.authUrl + "login?returnUrl=" + currentUrl;
+    }
+  }
+  if (to.matched.some((record: any) => record.meta.requiresLicense)) {
+    console.log("snomed license accepted:" + store.state.snomedLicenseAccepted);
+    if (store.state.snomedLicenseAccepted !== "true") {
+      return {
+        path: "/snomedLicense"
+      };
+    }
+  }
 });
 
 router.afterEach(to => {
