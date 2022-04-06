@@ -108,11 +108,13 @@ export default defineComponent({
       expandedRowGroups: ["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"],
       downloadMenu: [
         { label: "Definition", command: () => this.download(false) },
+        { label: "Defined Members", command: () => this.downloadDefinedMembers() },
         { label: "Expanded (v2)", command: () => this.download(true) },
         { label: "Expanded (v1)", command: () => this.download(true, true) }
       ],
       downloadMenu1: [
         { label: "Definition", command: () => this.download(false) },
+        { label: "Defined Members", command: () => this.downloadDefinedMembers() },
         { label: "Expanded (v2)", command: () => this.download(true) },
         { label: "Expanded (v1)", command: () => this.download(true, true) },
         { label: "IMv1", command: () => this.downloadIMV1() }
@@ -171,6 +173,20 @@ export default defineComponent({
       }
     },
 
+    async downloadDefinedMembers(): Promise<void> {
+      this.downloading = true;
+      try {
+        this.$toast.add(LoggerService.success("Download will begin shortly"));
+        const result = (await SetService.getDefinedMembers(this.conceptIri)).data;
+        const label: string = (await EntityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
+        this.downloadFile(result, this.getFileName(label));
+      } catch (error) {
+        this.$toast.add(LoggerService.error("Download failed from server"));
+      } finally {
+        this.downloading = false;
+      }
+    },
+
     async download(expanded: boolean, v1 = false): Promise<void> {
       this.downloading = true;
       try {
@@ -186,6 +202,9 @@ export default defineComponent({
     },
 
     getFileName(label: string) {
+      if(label.length > 100){
+        label = label.substring(0, 100);
+      }
       return (
         label +
         " - " +
