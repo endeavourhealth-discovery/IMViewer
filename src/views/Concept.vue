@@ -2,25 +2,28 @@
   <div class="topbar-container">
     <TopBar>
       <template #content>
-        <span class="title"><strong>IMViewer:</strong> {{ header }}</span>
-        <span v-if="isObjectHasKeysWrapper(concept, ['inferred'])">
+        <div class="topbar-content">
+          <span class="title"><strong>IMViewer:</strong></span>
+          <span class="entity-name" v-tooltip="{ value: header, class: 'name-tooltip' }">{{ header }}</span>
+          <div v-if="isObjectHasKeysWrapper(concept, ['inferred'])">
+            <Button
+              icon="far fa-copy"
+              class="p-button-rounded p-button-text p-button-secondary topbar-content-button"
+              @click="toggle($event, 'copyMenu')"
+              v-tooltip="'Copy concept to clipboard'"
+            />
+            <Menu id="copy-options" ref="copyMenu" :model="copyMenuItems" :popup="true" />
+          </div>
           <Button
-            icon="far fa-copy"
-            class="p-button-rounded p-button-text p-button-secondary"
-            @click="toggle($event, 'copyMenu')"
-            v-tooltip="'Copy concept to clipboard'"
+            icon="fas fa-cloud-download-alt"
+            class="p-button-rounded p-button-text p-button-secondary topbar-content-button"
+            @click="toggle($event, 'downloadMenu')"
+            v-tooltip.bottom="'Download concept'"
+            aria-haspopup="true"
+            aria-controls="overlay_menu"
           />
-          <Menu id="copy-options" ref="copyMenu" :model="copyMenuItems" :popup="true" />
-        </span>
-        <Button
-          icon="fas fa-cloud-download-alt"
-          class="p-button-rounded p-button-text p-button-secondary"
-          @click="toggle($event, 'downloadMenu')"
-          v-tooltip.bottom="'Download concept'"
-          aria-haspopup="true"
-          aria-controls="overlay_menu"
-        />
-        <Menu id="overlay_menu" ref="downloadMenu" :model="items" :popup="true" />
+          <Menu id="overlay_menu" ref="downloadMenu" :model="items" :popup="true" />
+        </div>
         <!--<button
             class="p-panel-header-icon p-link p-mr-2"
             @click="directToCreateRoute"
@@ -541,5 +544,36 @@ export default defineComponent({
 
 #usedin-container {
   height: 100%;
+}
+
+.topbar-container {
+  width: 100%;
+}
+
+.topbar-content {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.entity-name {
+  margin-left: 0.5rem;
+  font-size: 1.5rem;
+  overflow: hidden;
+  height: 1.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 0 1 auto;
+}
+
+.topbar-content-button {
+  flex: 0 0 auto;
+}
+
+.name-tooltip {
+  width: 80vw;
 }
 </style>
