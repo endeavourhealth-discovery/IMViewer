@@ -23,6 +23,15 @@
             aria-controls="overlay_menu"
           />
           <Menu id="overlay_menu" ref="downloadMenu" :model="items" :popup="true" />
+          <Button
+              v-if="isFavourite(concept['@id'])"
+              style="color: #e39a36"
+              icon="pi pi-fw pi-star-fill"
+              class="p-button-rounded p-button-text "
+              @click="updateFavourites(concept)"
+          />
+
+          <Button v-else icon="pi pi-fw pi-star" class="p-button-rounded p-button-text p-button-plain" @click="updateFavourites(concept)" />
         </div>
         <!--<button
             class="p-panel-header-icon p-link p-mr-2"
@@ -38,15 +47,6 @@
           >
             <i class="fas fa-pencil-alt" aria-hidden="true"></i>
           </button>-->
-        <Button
-          v-if="isFavourite(concept['@id'])"
-          style="color: #e39a36"
-          icon="pi pi-fw pi-star-fill"
-          class="p-button-rounded p-button-text "
-          @click="updateFavourites(concept)"
-        />
-
-        <Button v-else icon="pi pi-fw pi-star" class="p-button-rounded p-button-text p-button-plain" @click="updateFavourites(concept)" />
       </template>
     </TopBar>
   </div>
