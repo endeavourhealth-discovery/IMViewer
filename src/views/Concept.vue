@@ -2,25 +2,28 @@
   <div class="topbar-container">
     <TopBar>
       <template #content>
-        <span class="title"><strong>IMViewer:</strong> {{ header }}</span>
-        <span v-if="isObjectHasKeysWrapper(concept, ['inferred'])">
+        <div class="topbar-content">
+          <span class="title"><strong>IMViewer:</strong></span>
+          <span class="entity-name" v-tooltip="{ value: header, class: 'name-tooltip' }">{{ header }}</span>
+          <div v-if="isObjectHasKeysWrapper(concept, ['inferred'])">
+            <Button
+              icon="far fa-copy"
+              class="p-button-rounded p-button-text p-button-secondary topbar-content-button"
+              @click="toggle($event, 'copyMenu')"
+              v-tooltip="'Copy concept to clipboard'"
+            />
+            <Menu id="copy-options" ref="copyMenu" :model="copyMenuItems" :popup="true" />
+          </div>
           <Button
-            icon="far fa-copy"
-            class="p-button-rounded p-button-text p-button-secondary"
-            @click="toggle($event, 'copyMenu')"
-            v-tooltip="'Copy concept to clipboard'"
+            icon="fas fa-cloud-download-alt"
+            class="p-button-rounded p-button-text p-button-secondary topbar-content-button"
+            @click="toggle($event, 'downloadMenu')"
+            v-tooltip.bottom="'Download concept'"
+            aria-haspopup="true"
+            aria-controls="overlay_menu"
           />
-          <Menu id="copy-options" ref="copyMenu" :model="copyMenuItems" :popup="true" />
-        </span>
-        <Button
-          icon="fas fa-cloud-download-alt"
-          class="p-button-rounded p-button-text p-button-secondary"
-          @click="toggle($event, 'downloadMenu')"
-          v-tooltip.bottom="'Download concept'"
-          aria-haspopup="true"
-          aria-controls="overlay_menu"
-        />
-        <Menu id="overlay_menu" ref="downloadMenu" :model="items" :popup="true" />
+          <Menu id="overlay_menu" ref="downloadMenu" :model="items" :popup="true" />
+        </div>
         <!--<button
             class="p-panel-header-icon p-link p-mr-2"
             @click="directToCreateRoute"
@@ -35,78 +38,79 @@
           >
             <i class="fas fa-pencil-alt" aria-hidden="true"></i>
           </button>-->
+        <Button
+          v-if="isFavourite(concept['@id'])"
+          style="color: #e39a36"
+          icon="pi pi-fw pi-star-fill"
+          class="p-button-rounded p-button-text "
+          @click="updateFavourites(concept)"
+        />
+
+        <Button v-else icon="pi pi-fw pi-star" class="p-button-rounded p-button-text p-button-plain" @click="updateFavourites(concept)" />
       </template>
     </TopBar>
   </div>
   <div id="concept-main-container">
-    <Splitter stateKey="viewerConceptSplitterHorizontal" stateStorage="local" @resizeend="setSplitterContainerHoriz">
-      <SplitterPanel :size="20" :minSize="10">
-        <Splitter layout="vertical" stateKey="viewerConceptSplitterVertical" stateStorage="local">
-          <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
-            <div v-if="loading" class="loading-container">
-              <ProgressSpinner />
-            </div>
-            <div v-else class="left-panel-content" id="summary-container">
-              <Definition :concept="concept" :configs="summaryConfig" />
-            </div>
-          </SplitterPanel>
-          <SplitterPanel :size="50" :minSize="10" style="overflow: auto;">
-            <div id="concept-hierarchy-tree-header-container" style="height: calc(100% - 25px);">
-              <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
-              <SecondaryTree :conceptIri="conceptIri" />
-            </div>
-          </SplitterPanel>
-        </Splitter>
+    <Splitter stateKey="viewerConceptSplitterHorizontal" stateStorage="local" class="mainSplitter">
+      <SplitterPanel :size="20" :minSize="10" class="leftSplitterPanel">
+        <div v-if="loading" class="loading-container">
+          <ProgressSpinner />
+        </div>
+        <div v-else class="leftSplitterContent">
+          <Definition :concept="concept" :configs="summaryConfig" class="definition" />
+          <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
+          <SecondaryTree :conceptIri="conceptIri" class="leftHierarchy" />
+        </div>
       </SplitterPanel>
-      <SplitterPanel :size="80" :minSize="20" style="overflow: auto;">
-        <div id="concept-content-dialogs-container" :style="splitterContentWidth">
+      <SplitterPanel :size="80" :minSize="20" class="rightSplitterPanel">
+        <div id="concept-content-dialogs-container">
           <div id="concept-panel-container">
-            <TabView v-model:activeIndex="active" :lazy="true">
+            <TabView v-model:activeIndex="active" :lazy="true" class="tabView">
               <TabPanel header="Details">
-                <div v-if="loading" class="loading-container" :style="contentHeight">
+                <div v-if="loading" class="loading-container">
                   <ProgressSpinner />
                 </div>
-                <div v-else class="concept-panel-content" id="definition-container" :style="contentHeight">
+                <div v-else class="concept-panel-content" id="definition-container">
                   <Definition :concept="concept" :configs="definitionConfig" />
                 </div>
               </TabPanel>
               <TabPanel header="Maps" v-if="showMappings">
-                <div class="concept-panel-content" id="mappings-container" :style="contentHeight">
+                <div class="concept-panel-content" id="mappings-container">
                   <Mappings :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
               <TabPanel header="Used in">
-                <div class="concept-panel-content" id="usedin-container" :style="contentHeight">
+                <div class="concept-panel-content" id="usedin-container">
                   <UsedIn :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
               <TabPanel header="Entity chart" v-if="showGraph">
-                <div class="concept-panel-content" id="entity-chart-container" :style="contentHeight">
+                <div class="concept-panel-content" id="entity-chart-container">
                   <EntityChart :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
               <TabPanel header="Properties" v-if="isRecordModel">
-                <div class="concept-panel-content" id="properties-container" :style="contentHeight">
+                <div class="concept-panel-content" id="properties-container">
                   <Properties :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
               <TabPanel header="Members" v-if="isSet">
-                <div class="concept-panel-content" id="members-container" :style="contentHeight">
+                <div class="concept-panel-content" id="members-container">
                   <Members :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
               <TabPanel header="Terms" v-if="terms">
-                <div class="concept-panel-content" id="term-table-container" :style="contentHeight">
+                <div class="concept-panel-content" id="term-table-container">
                   <TermCodeTable :terms="terms" />
                 </div>
               </TabPanel>
               <TabPanel header="ECL" v-if="isSet && isObjectHasKeysWrapper(concept.inferred)">
-                <div class="concept-panel-content" id="ecl-container" :style="contentHeight">
+                <div class="concept-panel-content" id="ecl-container">
                   <EclDefinition :definition="concept.inferred" />
                 </div>
               </TabPanel>
               <TabPanel header="Graph">
-                <div class="concept-panel-content" id="graph-container" :style="contentHeight">
+                <div class="concept-panel-content" id="graph-container">
                   <Graph :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
@@ -136,14 +140,13 @@ import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
 import SecondaryTree from "../components/concept/SecondaryTree.vue";
 import Properties from "@/components/concept/Properties.vue";
-import { Helpers, Models, Vocabulary, LoggerService } from "im-library";
+import { Helpers, Vocabulary, LoggerService } from "im-library";
 import { DefinitionConfig, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
-  ConceptTypeMethods: { isOfTypes, isProperty, isValueSet },
+  ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
   CopyConceptToClipboard: { copyConceptToClipboard, conceptObjectToCopyString },
-  DataTypeCheckers: { isObjectHasKeys, isArrayHasLength },
-  ContainerDimensionGetters: { getContainerElementOptimalHeight },
+  DataTypeCheckers: { isObjectHasKeys },
   Sorters: { byOrder }
 } = Helpers;
 
@@ -172,30 +175,30 @@ export default defineComponent({
     },
 
     showMappings(): boolean {
-      return (isOfTypes(this.types, IM.CONCEPT) || isOfTypes(this.types, RDFS.CLASS)) && !isOfTypes(this.types, SHACL.NODESHAPE);
+      return (isConcept(this.types) || isOfTypes(this.types, RDFS.CLASS)) && !isRecordModel(this.types);
     },
 
     isConcept(): boolean {
-      return isOfTypes(this.types, IM.CONCEPT);
+      return isConcept(this.types);
     },
 
     isQuery(): boolean {
-      return isOfTypes(this.types, IM.QUERY_TEMPLATE);
+      return isQuery(this.types);
     },
 
     isRecordModel(): boolean {
-      return isOfTypes(this.types, SHACL.NODESHAPE);
+      return isRecordModel(this.types);
     },
 
     isFolder(): boolean {
-      return isOfTypes(this.types, IM.FOLDER);
+      return isFolder(this.types);
     },
 
     isProperty(): boolean {
       return isProperty(this.types);
     },
 
-    ...mapState(["conceptIri", "selectedEntityType", "conceptActivePanel", "activeModule", "blockedIris"])
+    ...mapState(["conceptIri", "selectedEntityType", "conceptActivePanel", "activeModule", "blockedIris", "favourites"])
   },
   watch: {
     async conceptIri() {
@@ -220,14 +223,7 @@ export default defineComponent({
     }
   },
   async mounted() {
-    this.setContentHeight();
-    window.addEventListener("resize", this.onResize);
     await this.init();
-    this.setContentHeight();
-    this.setSplitterContainerHoriz({ sizes: localStorage.getItem("viewerConceptSplitterHorizontal") });
-  },
-  beforeUnmount() {
-    window.removeEventListener("resize", this.onResize);
   },
   data() {
     return {
@@ -241,9 +237,6 @@ export default defineComponent({
       header: "",
       dialogHeader: "",
       active: 0,
-      contentHeight: "",
-      contentHeightValue: 0,
-      splitterContentWidth: "",
       copyMenuItems: [] as any,
       definitionConfig: [] as DefinitionConfig[],
       summaryConfig: [] as DefinitionConfig[],
@@ -272,9 +265,13 @@ export default defineComponent({
     };
   },
   methods: {
-    onResize(): void {
-      this.setContentHeight();
-      this.setSplitterContainerHoriz({ sizes: localStorage.getItem("viewerConceptSplitterHorizontal") });
+    updateFavourites(data: any) {
+      if (isObjectHasKeys(data)) this.$store.commit("updateFavourites", data["@id"]);
+    },
+
+    isFavourite(iri: string) {
+      if (!this.favourites.length) return false;
+      return this.favourites.includes(iri);
     },
 
     directToEditRoute(): void {
@@ -322,7 +319,9 @@ export default defineComponent({
       if (isObjectHasKeys(result, ["entity"]) && isObjectHasKeys(result.entity, [RDFS.SUBCLASS_OF, IM.ROLE_GROUP])) {
         const roleGroup = result.entity[IM.ROLE_GROUP];
         delete result.entity[IM.ROLE_GROUP];
-        result.entity[RDFS.SUBCLASS_OF].push({ "http://endhealth.info/im#roleGroup": roleGroup });
+        const newRoleGroup : any = {};
+        newRoleGroup[IM.ROLE_GROUP] = roleGroup;
+        result.entity[RDFS.SUBCLASS_OF].push(newRoleGroup);
       }
       this.concept["inferred"] = result;
     },
@@ -354,7 +353,7 @@ export default defineComponent({
       const allConfigs = this.definitionConfig.concat(this.summaryConfig);
       this.conceptAsString = copyConceptToClipboard(this.concept, allConfigs, undefined, this.blockedIris);
       this.loading = false;
-      document.title = (this.header as string) || "";
+      document.title = this.header || "";
     },
 
     setStoreType(): void {
@@ -388,35 +387,6 @@ export default defineComponent({
           this.active = 0;
         }
       }
-    },
-
-    setContentHeight(): void {
-      const calcHeight = getContainerElementOptimalHeight("concept-panel-container", ["p-tabview-nav"], true, 3, 1);
-      if (!calcHeight.length) {
-        this.contentHeight = "height: 800px; max-height: 800px;";
-        this.contentHeightValue = 800;
-      } else {
-        this.contentHeight = "height: " + calcHeight + ";" + "max-height: " + calcHeight + ";";
-        this.contentHeightValue = parseInt(calcHeight, 10);
-      }
-    },
-
-    setSplitterContainerHoriz(event: any) {
-      let leftWidth;
-      if (isArrayHasLength(event.sizes) && event.sizes[0] > 10) {
-        leftWidth = event.sizes[0];
-      } else if (typeof event.sizes === "string") {
-        const parsed = JSON.parse(event.sizes);
-        if (isArrayHasLength(parsed) && parsed[0] > 10) {
-          leftWidth = parsed[0];
-        } else {
-          leftWidth = 10;
-        }
-      } else {
-        leftWidth = 20;
-      }
-      const calcWidth = 100 - leftWidth;
-      this.splitterContentWidth = "width: calc(" + calcWidth + "vw - 0.5rem);" + "max-width: calc(" + calcWidth + "vw - 0.5rem);";
     },
 
     openDownloadDialog(): void {
@@ -504,7 +474,7 @@ export default defineComponent({
   }
 });
 </script>
-<style scoped>
+<style>
 #concept-main-container {
   grid-area: content;
   height: calc(100% - 3.5rem);
@@ -512,29 +482,12 @@ export default defineComponent({
   background-color: #ffffff;
 }
 
-.p-splitter-horizontal {
-  height: 100%;
-}
-
-.p-tabview-panel {
-  min-height: 100%;
-}
-
-.p-panel {
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: flex-start;
+.mainSplitter {
   height: 100%;
 }
 
 #concept-content-dialogs-container {
-  overflow: auto;
   height: 100%;
-}
-
-#concept-hierarchy-tree-header-container {
-  width: 100%;
-  overflow: auto;
 }
 
 #concept-panel-container {
@@ -547,19 +500,6 @@ export default defineComponent({
   background-color: #ffffff;
 }
 
-.copy-container {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.icons-container {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-}
-
 .loading-container {
   height: 100%;
   width: 100%;
@@ -567,11 +507,6 @@ export default defineComponent({
   flex-flow: column;
   justify-content: center;
   align-items: center;
-}
-
-#summary-container {
-  padding: 1rem;
-  overflow: auto;
 }
 
 .title {
@@ -584,5 +519,81 @@ export default defineComponent({
 
 #hierarchy-header {
   padding: 1rem;
+  border-top: solid lightgrey 1px;
+}
+
+.leftSplitterPanel {
+  display: flex;
+}
+
+.leftSplitterContent {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.definition {
+  padding: 1rem;
+  flex: 0;
+}
+
+.leftHierarchy {
+  overflow: auto;
+  flex: 0 1 auto;
+  border: none !important;
+}
+
+.tabView {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.p-tabview-panels {
+  overflow: auto;
+  height: 100%;
+}
+
+.p-tabview-panel {
+  height: 100%;
+}
+
+.p-treenode-label {
+  width: 100%;
+}
+
+#usedin-container {
+  height: 100%;
+}
+
+.topbar-container {
+  width: 100%;
+}
+
+.topbar-content {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.entity-name {
+  margin-left: 0.5rem;
+  font-size: 1.5rem;
+  overflow: hidden;
+  height: 1.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 0 1 auto;
+}
+
+.topbar-content-button {
+  flex: 0 0 auto;
+}
+
+.name-tooltip {
+  width: 80vw;
 }
 </style>

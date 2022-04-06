@@ -1,6 +1,6 @@
 import ConfigService from "@/services/ConfigService";
 import axios from "axios";
-import {Env} from "im-library";
+import { Env } from "im-library";
 
 describe("ConfigService.ts ___ axios success", () => {
   beforeEach(() => {
@@ -18,6 +18,13 @@ describe("ConfigService.ts ___ axios success", () => {
     const result = await ConfigService.getDefaultPredicateNames();
     expect(axios.get).toHaveBeenCalledTimes(1);
     expect(axios.get).toHaveBeenCalledWith(Env.api + "api/config/public/defaultPredicateNames");
+    expect(result).toStrictEqual(["test config"]);
+  });
+
+  it("can getGraphExcludedPredicates", async () => {
+    const result = await ConfigService.getGraphExcludePredicates();
+    expect(axios.get).toHaveBeenCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledWith(Env.api + "api/config/public/graphExcludePredicates");
     expect(result).toStrictEqual(["test config"]);
   });
 
@@ -46,6 +53,13 @@ describe("ConfigService.ts ___ axios fail", () => {
     expect(axios.get).toHaveBeenCalledTimes(1);
     expect(axios.get).toHaveBeenCalledWith(Env.api + "api/config/public/defaultPredicateNames");
     expect(result).toStrictEqual({});
+  });
+
+  it("can get graphExcludePredicates", async () => {
+    const result = await ConfigService.getGraphExcludePredicates();
+    expect(axios.get).toHaveBeenCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledWith(Env.api + "api/config/public/graphExcludePredicates");
+    expect(result).toStrictEqual([]);
   });
 
   it("can get xmlSchemaDataTypes", async () => {

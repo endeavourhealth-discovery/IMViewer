@@ -10,19 +10,19 @@ describe("UsedIn.vue", () => {
   let mockToast;
   let docSpy;
   const USAGES = [
-    { name: "Acrodysplasia scoliosis (disorder)", "@id": "http://snomed.info/sct#773773006" },
-    { name: "Anterior vertebral body tethering (procedure)", "@id": "http://snomed.info/sct#788325009" },
-    { name: "Congenital scoliosis due to bony malformation (disorder)", "@id": "http://snomed.info/sct#205045003" },
-    { name: "Distal arthrogryposis type 4 (disorder)", "@id": "http://snomed.info/sct#715575001" },
-    { name: "Duane anomaly, myopathy, scoliosis syndrome (disorder)", "@id": "http://snomed.info/sct#722432000" },
-    { name: "Family history of scoliosis deformity of spine (situation)", "@id": "http://snomed.info/sct#430544007" },
-    { name: "Horizontal gaze palsy with progressive scoliosis (disorder)", "@id": "http://snomed.info/sct#702381007" },
-    { name: "Lordoscoliosis (disorder)", "@id": "http://snomed.info/sct#111268000" },
-    { name: "Post-surgical scoliosis (disorder)", "@id": "http://snomed.info/sct#203647008" },
-    { name: "Scoliosis in neurofibromatosis (disorder)", "@id": "http://snomed.info/sct#203663000" },
-    { name: "Scoliosis in skeletal dysplasia (disorder)", "@id": "http://snomed.info/sct#203661003" }
-  ];
-
+    { "@id": "http://endhealth.info/im#AccidentAndEmergencyEncounter", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2000/01/rdf-schema#Class", "name": "Class" }, { "@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape" }], "http://www.w3.org/2000/01/rdf-schema#label": "Accident and emergency encounter (entry type)" },
+    { "@id": "http://endhealth.info/im#AllergyIntoleranceAndAdverseReaction", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2000/01/rdf-schema#Class", "name": "Class" }, { "@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape" }], "http://www.w3.org/2000/01/rdf-schema#label": "Allergy, intolerance and adverse reaction  (entry type)" },
+    { "@id": "http://endhealth.info/im#Appointment", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2000/01/rdf-schema#Class", "name": "Class" }, { "@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape" }], "http://www.w3.org/2000/01/rdf-schema#label": "Appointment  (entry type)" },
+    { "@id": "http://endhealth.info/im#AppointmentAttendanceHistory", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2000/01/rdf-schema#Class", "name": "Class" }, { "@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape" }], "http://www.w3.org/2000/01/rdf-schema#label": "Appointment attendance history  (entry type)" },
+    { "@id": "http://endhealth.info/im#AppointmentSession", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2000/01/rdf-schema#Class", "name": "Class" }, { "@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape" }], "http://www.w3.org/2000/01/rdf-schema#label": "Appointment session  (entry type)" },
+  ]
+  const TRANSFORMED_USAGES = [
+    { "@id": "http://endhealth.info/im#AccidentAndEmergencyEncounter", "name": "Accident and emergency encounter (entry type)", "icon": ["fas", "project-diagram"], "colour": "#781c8188" },
+    { "@id": "http://endhealth.info/im#AllergyIntoleranceAndAdverseReaction", "name": "Allergy, intolerance and adverse reaction  (entry type)", "icon": ["fas", "project-diagram"], "colour": "#781c8188" },
+    { "@id": "http://endhealth.info/im#Appointment", "name": "Appointment  (entry type)", "icon": ["fas", "project-diagram"], "colour": "#781c8188" },
+    { "@id": "http://endhealth.info/im#AppointmentAttendanceHistory", "name": "Appointment attendance history  (entry type)", "icon": ["fas", "project-diagram"], "colour": "#781c8188" },
+    { "@id": "http://endhealth.info/im#AppointmentSession", "name": "Appointment session  (entry type)", "icon": ["fas", "project-diagram"], "colour": "#781c8188" }
+  ]
   beforeEach(async () => {
     vi.resetAllMocks();
     EntityService.getEntityUsages = vi.fn().mockResolvedValue(USAGES);
@@ -59,7 +59,7 @@ describe("UsedIn.vue", () => {
 
   it("starts with empty values", () => {
     expect(wrapper.vm.selected).toStrictEqual({});
-    expect(wrapper.vm.usages).toStrictEqual(USAGES);
+    expect(wrapper.vm.usages).toStrictEqual(TRANSFORMED_USAGES);
     expect(wrapper.vm.loading).toBe(false);
     expect(wrapper.vm.recordsTotal).toBe(50);
     expect(wrapper.vm.currentPage).toBe(0);
@@ -106,7 +106,7 @@ describe("UsedIn.vue", () => {
     await flushPromises();
     expect(EntityService.getEntityUsages).toHaveBeenCalledTimes(1);
     expect(EntityService.getEntityUsages).toHaveBeenCalledWith("http://snomed.info/sct#298382003", 0, 25);
-    expect(wrapper.vm.usages).toStrictEqual(USAGES);
+    expect(wrapper.vm.usages).toStrictEqual(TRANSFORMED_USAGES);
   });
 
   it("gets recordsSize ___ success", async () => {

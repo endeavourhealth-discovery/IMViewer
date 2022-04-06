@@ -26,8 +26,11 @@
         Loading data. Please wait.
       </template>
       <Column field="name" filter-field="name" header="Name">
-        <template #body="slotProps">
-          {{ slotProps.data.name }}
+        <template #body="{data}">
+          <span :style="'color:' + data.colour" class="p-mx-1 type-icon">
+            <font-awesome-icon :icon="data.icon" />
+          </span>
+          <span class="text-name">{{ data.name }}</span>
         </template>
       </Column>
     </DataTable>
@@ -36,12 +39,13 @@
 <script lang="ts">
 import EntityService from "@/services/EntityService";
 import { defineComponent } from "@vue/runtime-core";
-import { TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
-import { Helpers } from "im-library";
+import { Helpers, Vocabulary } from "im-library";
 const {
   DataTypeCheckers: { isObjectHasKeys },
-  ContainerDimensionGetters: { getContainerElementOptimalHeight }
+  ContainerDimensionGetters: { getContainerElementOptimalHeight },
+  ConceptTypeMethods: { getColourFromType, getFAIconFromType }
 } = Helpers;
+const { RDF, RDFS } = Vocabulary;
 
 export default defineComponent({
   name: "UsedIn",
@@ -62,9 +66,9 @@ export default defineComponent({
   },
   data() {
     return {
-      usages: [] as TTIriRef[],
+      usages: [] as any[],
       loading: false,
-      selected: {} as TTIriRef,
+      selected: {} as any,
       recordsTotal: 0,
       currentPage: 0,
       pageSize: 25,
@@ -82,7 +86,15 @@ export default defineComponent({
     },
 
     async getUsages(iri: string, pageIndex: number, pageSize: number): Promise<void> {
-      this.usages = await EntityService.getEntityUsages(iri, pageIndex, pageSize);
+      const usages = await EntityService.getEntityUsages(iri, pageIndex, pageSize);
+      this.usages = usages.map((usage: any) => {
+        return {
+          "@id": usage["@id"],
+          name: usage[RDFS.LABEL],
+          icon: getFAIconFromType(usage[RDF.TYPE]),
+          colour: getColourFromType(usage[RDF.TYPE])
+        };
+      });
     },
 
     async getRecordsSize(iri: string): Promise<void> {
@@ -130,6 +142,10 @@ export default defineComponent({
 <style scoped>
 #usedin-table-container {
   height: 100%;
+}
+
+.type-icon {
+  padding-right: 0.5rem;
 }
 
 /* #usedin-table-container ::v-deep(.p-datatable) {

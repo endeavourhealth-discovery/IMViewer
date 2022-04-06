@@ -15,14 +15,25 @@ export default createStore({
     isLoggedIn: false as boolean,
     recentLocalActivity: localStorage.getItem("recentLocalActivity") as string,
     snomedLicenseAccepted: localStorage.getItem("snomedLicenseAccepted") as string,
+    favourites: JSON.parse(localStorage.getItem("favourites") || "[]") as string[],
     snomedReturnUrl: "",
     authReturnUrl: "",
     blockedIris: [] as string[],
     selectedEntityType: "",
     conceptActivePanel: 0,
-    defaultPredicateNames:[] as string[]
+    defaultPredicateNames: [] as string[]
   },
   mutations: {
+    updateFavourites(state, favourite: string) {
+      const favourites: string[] = JSON.parse(localStorage.getItem("favourites") || "[]");
+      if (!favourites.includes(favourite)) {
+        favourites.push(favourite);
+      } else {
+        favourites.splice(favourites.indexOf(favourite), 1);
+      }
+      localStorage.setItem("favourites", JSON.stringify(favourites));
+      state.favourites = favourites;
+    },
     updateRecentLocalActivity(state, recentActivityItem: RecentActivityItem) {
       let activity: RecentActivityItem[] = JSON.parse(localStorage.getItem("recentLocalActivity") || "[]");
       activity.forEach(activityItem => {
@@ -31,7 +42,15 @@ export default createStore({
       const foundIndex = activity.findIndex(activityItem => activityItem.iri === recentActivityItem.iri && activityItem.app === recentActivityItem.app);
       if (foundIndex !== -1) {
         activity[foundIndex].dateTime = recentActivityItem.dateTime;
-        activity.sort((a, b) => (a.dateTime.getTime() > b.dateTime.getTime() ? 1 : b.dateTime.getTime() > a.dateTime.getTime() ? -1 : 0));
+        activity.sort((a, b) => {
+          if (a.dateTime.getTime() > b.dateTime.getTime()) {
+            return 1;
+          } else if (b.dateTime.getTime() > a.dateTime.getTime()) {
+            return -1;
+          } else {
+            return 0;
+          }
+        });
       } else {
         while (activity.length > 4) activity.shift();
         activity.push(recentActivityItem);

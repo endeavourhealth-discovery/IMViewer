@@ -1,10 +1,9 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
 import Concept from "../views/Concept.vue";
-import { SnomedLicense } from "im-library";
 import store from "@/store/index";
 import { nextTick } from "vue";
-import { Enums, Env } from "im-library";
+import { Enums, Env, SnomedLicense } from "im-library";
 const { AppEnum } = Enums;
 
 const APP_TITLE = "IM Viewer";
@@ -40,7 +39,7 @@ const router = createRouter({
   routes
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from) => {
   const iri = to.params.selectedIri as string;
   const currentUrl = Env.viewerUrl + "#" + to.path;
   if (to.path !== "/snomedLicense") {
@@ -48,44 +47,27 @@ router.beforeEach((to, from, next) => {
     store.commit("updateAuthReturnUrl", currentUrl);
   }
   if (iri && store.state.blockedIris.includes(iri)) {
-    return;
+    return false;
   }
   if (iri) {
     store.commit("updateRecentLocalActivity", { iri: iri, dateTime: new Date(), app: AppEnum.VIEWER });
     store.commit("updateConceptIri", to.params.selectedIri as string);
   }
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    store.dispatch("authenticateCurrentUser").then(res => {
-      console.log("auth guard user authenticated:" + res.authenticated);
-      if (!res.authenticated) {
-        console.log("redirecting to login");
-        window.location.href = Env.authUrl + "login?returnUrl=" + currentUrl;
-      } else {
-        if (to.matched.some(record => record.meta.requiresLicense)) {
-          console.log("snomed license accepted:" + store.state.snomedLicenseAccepted);
-          if (store.state.snomedLicenseAccepted !== "true") {
-            next({
-              path: "/snomedLicense"
-            });
-          } else {
-            next();
-          }
-        } else {
-          next();
-        }
-      }
-    });
-  } else if (to.matched.some(record => record.meta.requiresLicense)) {
+  if (to.matched.some((record: any) => record.meta.requiresAuth)) {
+    const res = await store.dispatch("authenticateCurrentUser");
+    console.log("auth guard user authenticated: " + res.authenticated);
+    if (!res.authenticated) {
+      console.log("redirecting to login");
+      window.location.href = Env.authUrl + "login?returnUrl=" + currentUrl;
+    }
+  }
+  if (to.matched.some((record: any) => record.meta.requiresLicense)) {
     console.log("snomed license accepted:" + store.state.snomedLicenseAccepted);
     if (store.state.snomedLicenseAccepted !== "true") {
-      next({
+      return {
         path: "/snomedLicense"
-      });
-    } else {
-      next();
+      };
     }
-  } else {
-    next();
   }
 });
 
