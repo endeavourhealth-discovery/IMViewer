@@ -10,7 +10,16 @@ export default defineConfig({
     alias: { "./runtimeConfig": "./runtimeConfig.browser", "@": path.resolve(__dirname, "./src") }
   },
   server: {
-    port: 8082
+    port: 8082,
+    proxy: {
+      '/imapi': {
+          target: 'http://localhost:8080',
+          changeOrigin: true,
+          secure: false,
+          ws: true,
+          rewrite: (p) => p.replace(/^\/imapi/, '')
+      }
+    }
   },
   optimizeDeps: {
     exclude: ["im-library"]
@@ -26,5 +35,5 @@ export default defineConfig({
     coverage: {
       reporter: ["text", "lcov"]
     }
-  }
+  },
 });
