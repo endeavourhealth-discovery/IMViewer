@@ -21,7 +21,14 @@ export default createStore({
     blockedIris: [] as string[],
     selectedEntityType: "",
     conceptActivePanel: 0,
-    defaultPredicateNames: [] as string[]
+    defaultPredicateNames: [] as string[],
+    arrayObjectNameListboxWithLabelStartExpanded: [],
+    tagSeverityMatches: [
+      { "@id": IM.ACTIVE, severity: "success" },
+      { "@id": IM.DRAFT, severity: "warning" },
+      { "@id": IM.INACTIVE, severity: "danger" }
+    ],
+    textDefinitionStartExpanded: ["Definition"]
   },
   mutations: {
     updateFavourites(state, favourite: string) {
@@ -90,6 +97,15 @@ export default createStore({
     },
     updateDefaultPredicateNames(state, names) {
       state.defaultPredicateNames = names;
+    },
+    updateArrayObjectNameListboxWithLabelStartExpanded(state, items) {
+      state.arrayObjectNameListboxWithLabelStartExpanded = items;
+    },
+    updateTagSeverityMatches(state, items) {
+      state.tagSeverityMatches = items;
+    },
+    updateTextDefinitionStartExpanded(state, items) {
+      state.textDefinitionStartExpanded = items;
     }
   },
   actions: {

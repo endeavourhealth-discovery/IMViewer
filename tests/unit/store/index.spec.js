@@ -34,7 +34,9 @@ describe("state", () => {
       "blockedIris",
       "selectedEntityType",
       "conceptActivePanel",
-      "defaultPredicateNames"
+      "defaultPredicateNames",
+      "arrayObjectNameListboxWithLabelStartExpanded",
+      "arrayObjectNameTagWithLabelSeverityMatches"
     ]);
     expect(store.state.conceptIri).toBe(null);
     expect(store.state.currentUser).toEqual({});
@@ -43,7 +45,7 @@ describe("state", () => {
     expect(store.state.blockedIris).toStrictEqual([]);
     expect(store.state.selectedEntityType).toBe("");
     expect(store.state.conceptActivePanel).toBe(0);
-    expect(store.state.defaultPredicateNames).toStrictEqual([])
+    expect(store.state.defaultPredicateNames).toStrictEqual([]);
   });
 });
 
