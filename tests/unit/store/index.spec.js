@@ -36,7 +36,8 @@ describe("state", () => {
       "conceptActivePanel",
       "defaultPredicateNames",
       "arrayObjectNameListboxWithLabelStartExpanded",
-      "arrayObjectNameTagWithLabelSeverityMatches"
+      "tagSeverityMatches",
+      "textDefinitionStartExpanded"
     ]);
     expect(store.state.conceptIri).toBe(null);
     expect(store.state.currentUser).toEqual({});
