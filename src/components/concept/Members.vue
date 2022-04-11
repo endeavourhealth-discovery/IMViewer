@@ -108,15 +108,13 @@ export default defineComponent({
       expandedRowGroups: ["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"],
       downloadMenu: [
         { label: "Definition", command: () => this.download(false) },
-        { label: "Defined Members", command: () => this.downloadDefinedMembers() },
-        { label: "Expanded (v2)", command: () => this.download(true) },
-        { label: "Expanded (v1)", command: () => this.download(true, true) }
+        { label: "Expanded Core", command: () => this.download(true,false) },
+        { label: "Expanded Legacy", command: () => this.download(true, true) }
       ],
       downloadMenu1: [
         { label: "Definition", command: () => this.download(false) },
-        { label: "Defined Members", command: () => this.downloadDefinedMembers() },
-        { label: "Expanded (v2)", command: () => this.download(true) },
-        { label: "Expanded (v1)", command: () => this.download(true, true) },
+        { label: "Expanded Core", command: () => this.download(true,false) },
+        { label: "Expanded Legacy", command: () => this.download(true, true) },
         { label: "IMv1", command: () => this.downloadIMV1() }
       ],
       isPublishing: false
@@ -173,25 +171,11 @@ export default defineComponent({
       }
     },
 
-    async downloadDefinedMembers(): Promise<void> {
+    async download(expanded: boolean, v1: boolean): Promise<void> {
       this.downloading = true;
       try {
         this.$toast.add(LoggerService.success("Download will begin shortly"));
-        const result = (await SetService.getDefinedMembers(this.conceptIri)).data;
-        const label: string = (await EntityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
-        this.downloadFile(result, this.getFileName(label));
-      } catch (error) {
-        this.$toast.add(LoggerService.error("Download failed from server"));
-      } finally {
-        this.downloading = false;
-      }
-    },
-
-    async download(expanded: boolean, v1 = false): Promise<void> {
-      this.downloading = true;
-      try {
-        this.$toast.add(LoggerService.success("Download will begin shortly"));
-        const result = expanded ? (await EntityService.getFullExportSet(this.conceptIri)).data : await SetService.download(this.conceptIri, expanded, v1);
+        const result = expanded ? (await EntityService.getFullExportSet(this.conceptIri, v1)).data : await SetService.download(this.conceptIri, expanded, v1);
         const label: string = (await EntityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
         this.downloadFile(result, this.getFileName(label));
       } catch (error) {

@@ -29,7 +29,7 @@ export default class EntityService {
     }
   }
 
-  public static async getFullExportSet(iri: string): Promise<any> {
+  public static async getFullExportSet(iri: string, v1:boolean): Promise<any> {
     const client = axios.create({
       baseURL: Env.api,
       timeout: 0
@@ -37,7 +37,8 @@ export default class EntityService {
 
     return client.get("api/entity/public/setExport", {
       params: {
-        iri: iri
+        iri: iri,
+        legacy: v1
       },
       responseType: "blob"
     });

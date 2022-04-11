@@ -38,18 +38,4 @@ export default class SetService {
       responseType: "blob"
     });
   }
-
-  public static async getDefinedMembers(iri: string): Promise<any> {
-    const client = axios.create({
-                                  baseURL: Env.api,
-                                  timeout: 0
-                                });
-
-    return client.get("api/set/public/definedMembers", {
-      params: {
-        iri: iri
-      },
-      responseType: "blob"
-    });
-  }
 }
