@@ -28,9 +28,13 @@ export default createStore({
       { "@id": IM.DRAFT, severity: "warning" },
       { "@id": IM.INACTIVE, severity: "danger" }
     ],
-    textDefinitionStartExpanded: ["Definition"]
+    textDefinitionStartExpanded: ["Definition"],
+    activeProfile: { uuid: "", activeClausePath: "" },
   },
   mutations: {
+    updateActiveProfile(state, value) {
+      state.activeProfile = value;
+    },
     updateFavourites(state, favourite: string) {
       const favourites: string[] = JSON.parse(localStorage.getItem("favourites") || "[]");
       if (!favourites.includes(favourite)) {

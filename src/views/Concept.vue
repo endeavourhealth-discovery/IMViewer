@@ -47,6 +47,7 @@
           >
             <i class="fas fa-pencil-alt" aria-hidden="true"></i>
           </button>-->
+
       </template>
     </TopBar>
   </div>
@@ -114,7 +115,12 @@
                   <Graph :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
-              -->
+              <TabPanel header="Query">
+                <div class="concept-panel-content" id="query-container">
+                  <QueryText :conceptIri="conceptIri" />
+                  <Profile theme="light" :modelValue="profile" :activeProfile="activeProfile"/>
+                </div>
+              </TabPanel>
             </TabView>
           </div>
           <DownloadDialog v-if="showDownloadDialog" @closeDownloadDialog="closeDownloadDialog" :showDialog="showDownloadDialog" :conceptIri="conceptIri" />
@@ -128,6 +134,7 @@
 import { defineComponent } from "vue";
 import EntityChart from "../components/concept/EntityChart.vue";
 import Graph from "../components/concept/graph/Graph.vue";
+import QueryText from "../components/concept/query/QueryText.vue";
 import Definition from "../components/concept/Definition.vue";
 import UsedIn from "../components/concept/UsedIn.vue";
 import Members from "../components/concept/Members.vue";
@@ -140,8 +147,9 @@ import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
 import SecondaryTree from "../components/concept/SecondaryTree.vue";
 import Properties from "@/components/concept/Properties.vue";
-import { Helpers, Vocabulary, LoggerService } from "im-library";
+import {Helpers, Vocabulary, LoggerService} from 'im-library';
 import { DefinitionConfig, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
+import { Profile } from "@/components/query/Query";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
@@ -163,9 +171,19 @@ export default defineComponent({
     SecondaryTree,
     Mappings,
     Properties,
-    EclDefinition
+    EclDefinition,
+    QueryText,
   },
   computed: {
+    activeProfile: {
+      get(): any {
+        return this.$store.state.activeProfile;
+      },
+      set(value: any): void {
+        this.$store.commit("updateActiveProfile", value);
+      }
+    },
+
     isSet(): boolean {
       return isValueSet(this.types);
     },
@@ -237,6 +255,7 @@ export default defineComponent({
       header: "",
       dialogHeader: "",
       active: 0,
+      profile: {} as Profile,
       copyMenuItems: [] as any,
       definitionConfig: [] as DefinitionConfig[],
       summaryConfig: [] as DefinitionConfig[],
@@ -306,12 +325,20 @@ export default defineComponent({
         .filter((c: DefinitionConfig) => c.predicate !== undefined)
         .map((c: DefinitionConfig) => c.predicate);
 
+      predicates.push(IM.DEFINITION);
+
       this.concept = await EntityService.getPartialEntity(iri, predicates);
+
+      console.log(predicates);
+      console.log(this.concept);
 
       this.concept["@id"] = iri;
       this.concept["subtypes"] = await EntityService.getEntityChildren(iri);
 
       this.concept["termCodes"] = await EntityService.getEntityTermCodes(iri);
+
+      this.profile = new Profile(this.concept);
+
     },
 
     async getInferred(iri: string): Promise<void> {
@@ -470,7 +497,7 @@ export default defineComponent({
     toggle(event: any, refId: string) {
       const x = this.$refs[refId] as any;
       x.toggle(event);
-    }
+    },
   }
 });
 </script>
