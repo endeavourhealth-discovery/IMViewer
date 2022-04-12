@@ -137,7 +137,7 @@ export class Profile extends Entity {
         super(entity);
 
         //parse definition 
-        if (entity["http://endhealth.info/im#definition"]) {
+        if (entity["http://endhealth.info/im#definition"] && Profile.isJsonString(entity["http://endhealth.info/im#definition"])) {
             const _definition = JSON.parse(entity["http://endhealth.info/im#definition"]);
             this['http://endhealth.info/im#definition'] = _definition;
             this["entityReferences"] = entity?.entityReferences;
@@ -148,6 +148,15 @@ export class Profile extends Entity {
         }
 
         return this;
+    }
+
+    private static isJsonString(str:any) {
+        try {
+            JSON.parse(str);
+        } catch (e) {
+            return false;
+        }
+        return true;
     }
 
 
