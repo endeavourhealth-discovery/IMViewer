@@ -37,7 +37,8 @@ describe("state", () => {
       "defaultPredicateNames",
       "arrayObjectNameListboxWithLabelStartExpanded",
       "tagSeverityMatches",
-      "textDefinitionStartExpanded"
+      "textDefinitionStartExpanded",
+      "activeProfile"
     ]);
     expect(store.state.conceptIri).toBe(null);
     expect(store.state.currentUser).toEqual({});

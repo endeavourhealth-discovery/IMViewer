@@ -84,6 +84,7 @@ import axios from "axios";
 import IMLibrary from "im-library";
 import "im-library/dist/style.css";
 import { Helpers, Env } from "im-library";
+import Profile from '@/components/query/Profile.vue';
 const {
   DataTypeCheckers: { isObjectHasKeys }
 } = Helpers;
@@ -150,7 +151,8 @@ const app = createApp(App)
   .component("RadioButton", RadioButton)
   .component("ConfirmPopup", ConfirmPopup)
   .component("InputSwitch", InputSwitch)
-  .component("Tag", Tag);
+  .component("Tag", Tag)
+  .component("Profile", Profile);
 
 const vm = app.mount("#app");
 

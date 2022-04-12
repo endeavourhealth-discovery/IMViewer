@@ -22,6 +22,7 @@ import Panel from "primevue/panel";
 import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
 import {LoggerService} from "im-library"
+import Profile from '@/components/query/Profile.vue';
 
 Object.assign(navigator, {
   clipboard: {
@@ -193,7 +194,8 @@ describe("Concept.vue ___ not moduleIri", () => {
           SplitterPanel,
           TopBar,
           TermCodeTable,
-          TextSectionHeader
+          TextSectionHeader,
+          Profile
         },
         mocks: { $store: mockStore, $router: mockRouter, $toast: mockToast },
         directives: { tooltip: vi.fn() },
@@ -1074,7 +1076,8 @@ describe("Concept.vue ___ moduleIri", () => {
           SplitterPanel,
           TopBar,
           TermCodeTable,
-          TextSectionHeader
+          TextSectionHeader,
+          Profile
         },
         mocks: { $store: mockStore, $router: mockRouter, $toast: mockToast },
         directives: { tooltip: vi.fn() },
