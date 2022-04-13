@@ -4,7 +4,7 @@
     :list="children"
     item-key="name"
     :class="
-      'clause w-full  before:select-none cursor-pointer dragArea rounded-md order-color-300 ' +
+      'clause w-full  before:select-none cursor-pointer dragArea border-round order-color-300 ' +
         theme +
         themeClasses[theme].bodyClasses +
         ' ' +
@@ -22,15 +22,15 @@
   >
     <!-- Each item in list  -->
     <template #item="{ element, index }">
-      <div :class="'group clause-item flex flex-col relative rounded'">
+      <div :class="'group clause-item flex flex-column relative border-round'">
         <div class="clause-container clause inline-flex">
-          <div :class="'connector-h rounded-sm inline-flex flex'">
+          <div :class="'connector-h border-round inline-flex flex'">
             <!-- Horizontal Line or Space -->
             <div v-if="showLineH(index, element.uuid)" :class="'line-h'"></div>
             <div v-if="showSpaceH(index, element.uuid)" class="space-h"></div>
 
             <!-- Vertical Line, Space Or Label  -->
-            <div class="connector-v relative inline-flex flex-col">
+            <div class="connector-v relative inline-flex flex-column">
               <!-- circle  -->
               <div
                 v-if="showCircle(index, element.uuid)"
@@ -52,21 +52,21 @@
               <div
                 v-if="parent(element) != null && index != siblingCount - 1"
                 v-tooltip.left="parent(element)['name'] == 'not' ? `${tooltip.notor}` : operatorLabel(element) == 'and' ? `${tooltip.and}` : `${tooltip.or}`"
-                :class="'clause-item__operatorlabel inline-block absolute rounded-sm text-lg text-gray-700 font-bold  '"
+                :class="'clause-item__operatorlabel inline-block absolute border-round text-gray-700 font-bold  '"
               >
                 {{ operatorLabel(element) }}
               </div>
             </div>
           </div>
 
-          <div :class="'clause-content w-full inline flex-col rounded-md'">
+          <div :class="'clause-content w-full inline flex-column border-round'">
             <!-- Match Clause - Name  -->
 
             <div v-if="element.type == 'match'">
               <button
                 @click="handleClick(element)"
                 :class="
-                  'clause__matchLabel ml-2 pl-3 pr-4  py-1  relative -top-1 cursor-pointer font-medium text-left md:text-2xl text-xl md:my-1 my-0 block transition duration-300 ease-in-out rounded-md border border-transparent  outline-none' +
+                  'clause__matchLabel ml-2 pl-3 pr-4  py-1  relative -top-1 cursor-pointer font-medium text-left md:my-1 my-0 block transition duration-300 ease-in-out border-round border border-transparent  outline-none' +
                     [activeProfile == profile['@id'] && activeClausePath == element.currentPath ? ' active bg-blue-700 text-white' : ' text-black ']
                 "
               >
@@ -409,4 +409,9 @@ export default defineComponent({
 .profile:hover .clause-item__operatorlabel {
   visibility: visible !important;
 }
+
+button {
+  background: transparent;
+}
+
 </style>

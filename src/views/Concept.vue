@@ -117,8 +117,8 @@
               </TabPanel>
               <TabPanel header="Query" v-if="isQuery">
                 <div class="concept-panel-content" id="query-container">
-                  <QueryText :conceptIri="conceptIri" />
                   <ProfileDisplay theme="light" :modelValue="profile" :activeProfile="activeProfile"/>
+                  <QueryText class="queryText" :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
             </TabView>
@@ -625,4 +625,5 @@ export default defineComponent({
 .name-tooltip {
   width: 80vw;
 }
+
 </style>

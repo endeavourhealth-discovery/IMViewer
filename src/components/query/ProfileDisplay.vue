@@ -6,15 +6,15 @@
     "
   >
     <!-- Left Side  -->
-    <div class="body flex flex-col ">
+    <div class="flex flex-column ">
       <!-- Header -->
-      <div class="header flex items-center mb-5">
+      <div class="flex align-items-center">
         <!-- Icon -->
-        <div :class="' flex justify-center items-center rounded-full w-12 h-12 ml-5  ' + themeClasses[theme].icon">
+        <div :class="'flex justify-center items-center border-circle w-2rem h-2rem ' + themeClasses[theme].icon">
           <svg
             v-if="modelValue.mainEntity['@id'] === 'http://endhealth.info/im#Person'"
             xmlns="http://www.w3.org/2000/svg"
-            :class="'h-7 w-7'"
+            class="icon"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -23,7 +23,7 @@
           <svg
             v-else-if="modelValue.mainEntity['@id'] == 'http://endhealth.info/im#Appointment'"
             xmlns="http://www.w3.org/2000/svg"
-            :class="'h-7 w-7'"
+            class="icon"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -36,7 +36,7 @@
           <svg
             v-else-if="modelValue.mainEntity['@id'] == 'http://endhealth.info/im#Organisation'"
             xmlns="http://www.w3.org/2000/svg"
-            :class="'h-7 w-7'"
+            class="icon"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -47,27 +47,24 @@
             />
           </svg>
 
-          <svg v-else xmlns="http://www.w3.org/2000/svg" :class="'h-7 w-7'" viewBox="0 0 20 20" fill="transparent" stroke="currentColor">
+          <svg v-else xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 20 20" fill="transparent" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
         <!-- Icon -->
 
         <!-- Main Entity  -->
-        <div :class="'select-none font-semibold text-3xl ml-4 ' + themeClasses[theme].text">
+        <div :class="'select-none font-semibold text-xl ml-2 ' + themeClasses[theme].text">
           {{ getMainEntityText() }}
         </div>
-        <!-- Main Entity  -->
-
-        <div class="flex-grow"></div>
       </div>
       <!-- Header -->
 
       <!-- definitionTree  -->
-      <button
+      <div
         type="button"
         :class="
-          'profile-clause overflow-y-auto overflow-x-hidden w-full transition duration-500 ease-in-out py-2 px-2 text-sm font-medium  rounded-lg  outline-none ' +
+          'profile-clause overflow-y-auto overflow-x-hidden w-full transition duration-500 ease-in-out py-2 px-2 text-sm font-medium rounded-lg outline-none ' +
             themeClasses[theme].bodyBackground
         "
       >
@@ -84,14 +81,14 @@
           :definitionTree="definitionTree"
           :children="definitionTree"
         />
-      </button>
+      </div>
 
       <!-- definitionTree  -->
     </div>
     <!-- Left Side  -->
 
     <!-- right side  -->
-    <div v-if="activeProfile.uuid == profile['@id']" class="pl-10 flex flex-col border-l border-l-gray-200">
+    <div v-if="activeProfile.uuid == profile['@id']" class="pl-10 flex flex-column border-l border-l-gray-200">
       <!-- Header -->
 
       <div :class="'select-none flex space-x-5 font-semibold text-2xl mb-8 mt-1' + themeClasses[theme].text">
@@ -99,7 +96,7 @@
           v-for="tab in tabs"
           :key="tab.uuid"
           @click="activeTab = tab.name"
-          :class="'inline rounded-md px-3 py-1' + [activeTab == tab.name ? ' text-white bg-blue-700 ' : ' text-gray-400']"
+          :class="'inline border-round px-3 py-1' + [activeTab == tab.name ? ' text-white bg-blue-700 ' : ' text-gray-400']"
         >
           {{ tab.visible ? tab.name : "" }}
         </div>
@@ -118,7 +115,7 @@
       />
       <!-- Text Templates  -->
       <!-- References  -->
-      <div v-show="activeTab == 'References'" class="references flex-col pl-3">
+      <div v-show="activeTab == 'References'" class="references flex-column pl-3">
         <div
           @click="click(reference.entityData)"
           v-for="reference in profile.entityReferences"
@@ -173,7 +170,10 @@ export default defineComponent({
       return;
     },
     getMainEntityText(): string {
-      return this.profile.mainEntity ? this.profile.mainEntity[RDFS.LABEL] : "Search Profile";
+      if (!this.profile.mainEntity)
+        return "Search Profile";
+
+      return this.profile.mainEntity[RDFS.LABEL] ? this.profile.mainEntity[RDFS.LABEL] : this.profile.mainEntity['@id'];
     }
   },
   watch: {
@@ -301,6 +301,10 @@ export default defineComponent({
 .textdefinition,
 .references {
   max-width: 600px;
+}
+
+.icon {
+  padding: 4px;
 }
 
 .references {

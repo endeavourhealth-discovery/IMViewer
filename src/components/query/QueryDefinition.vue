@@ -1,13 +1,13 @@
 <template>
   <div class="text-definition text-black text-xl text-bold">
-    <div class="flex flex-col">
+    <div class="flex flex-column">
       <!-- A sentence from the template    -->
       <div v-for="(sentence, sentenceIndex) in children.data" :key="sentence.uuid" class="sentence flex flex-wrap">
         <!-- Words in a sentence   -->
         <template v-for="(phrase, phraseIndex) in sentence" :key="phrase.uuid">
           <!-- References  -->
 
-          <div v-if="phrase.type == 'reference'" :class="'reference flex flex-col'">
+          <div v-if="phrase.type == 'reference'" :class="'reference flex flex-column'">
             <!-- Array of References  -->
             <template v-if="Array.isArray(phrase.data)">
               <div v-for="(entity, entityIndex) in phrase.data" :key="entity['@id']" :class="'entity flex '">
