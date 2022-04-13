@@ -13,17 +13,17 @@ export class QueryBuilder {
   //all other properties belonging to this class
 
   // all entities
-entities = new Map<string, any>();
+  entities = new Map<string, any>();
 
   // #todo use Set to hold unique items?
   // all filetypes (http://www.w3.org/1999/02/22-rdf-syntax-ns#type)
-#entityTypes = [] as any[];
+  #entityTypes = [] as any[];
   get entityTypes(): any[] {
     return this.#entityTypes;
   }
 
   // profiles
-#profiles = new Map<string, any>();
+  #profiles = new Map<string, any>();
   get profiles(): Map<string, any> {
     return this.#profiles;
   }
@@ -41,14 +41,14 @@ entities = new Map<string, any>();
     return this.#clauses;
   }
 
-#reset(): void {
+  #reset(): void {
     this.entities.clear();
     this.#entityTypes = [] as any[];
     this.#profiles = new Map<string, any>();
     this.#clauses = new Map<string, any>();
   }
 
-#addEntity(entity: any): void {
+  #addEntity(entity: any): void {
     const _type = entity[RDF.TYPE][0]["@id"];
 
     // add entities
@@ -91,12 +91,12 @@ entities = new Map<string, any>();
 
 // Entity
 class Entity {
-"@id"?: string | null;
+  "@id"?: string | null;
 
-"http://www.w3.org/2000/01/rdf-schema#label"?: string | null;
-"http://www.w3.org/1999/02/22-rdf-syntax-ns#type"?: Entity | null;
-"http://www.w3.org/2000/01/rdf-schema#comment"?: string | null;
-"http://endhealth.info/im#isContainedIn"?: Entity | null;
+  "http://www.w3.org/2000/01/rdf-schema#label"?: string | null;
+  "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"?: Entity | null;
+  "http://www.w3.org/2000/01/rdf-schema#comment"?: string | null;
+  "http://endhealth.info/im#isContainedIn"?: Entity | null;
 
   constructor(entity?: any);
   constructor(entity: any) {
@@ -128,9 +128,9 @@ function isJsonString(str: any) {
 
 // Profile\\\\\
 export class Profile extends Entity {
-"http://endhealth.info/im#definition"?: any | null;
-"entityReferences" = [];
-"entitiesWithoutData" = [];
+  "http://endhealth.info/im#definition"?: any | null;
+  "entityReferences" = [];
+  "entitiesWithoutData" = [];
 
   constructor(entity?: any);
   constructor(entity: any) {
@@ -173,13 +173,13 @@ export class Profile extends Entity {
     this["http://endhealth.info/im#definition"].entityType = value;
   }
 
-#definitionTree: any;
+  #definitionTree: any;
   get definitionTree(): any {
     return this.#definitionTree;
     // return this._definitionTree;
   }
 
-#convertToDefinitionTree(definition: any): void {
+  #convertToDefinitionTree(definition: any): void {
     let _definitionTree: any[] = [];
 
     const _operators = ["and", "or", "not"];
@@ -311,7 +311,7 @@ export class Profile extends Entity {
     this.#definitionTree = _definitionTree;
   }
 
-toTemplates(clausePath: string): any {
+  toTemplates(clausePath: string): any {
     // console.log("this.mainEntity", this.mainEntity)
     const _templates = Templates.toTemplates(this.mainEntity, this.#definitionTree, clausePath);
 
