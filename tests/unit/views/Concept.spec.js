@@ -22,7 +22,7 @@ import Panel from "primevue/panel";
 import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
 import {LoggerService} from "im-library"
-import Profile from '@/components/query/Profile.vue';
+import ProfileDisplay from '@/components/query/ProfileDisplay.vue';
 
 Object.assign(navigator, {
   clipboard: {
@@ -195,7 +195,7 @@ describe("Concept.vue ___ not moduleIri", () => {
           TopBar,
           TermCodeTable,
           TextSectionHeader,
-          Profile
+          ProfileDisplay
         },
         mocks: { $store: mockStore, $router: mockRouter, $toast: mockToast },
         directives: { tooltip: vi.fn() },
@@ -666,7 +666,7 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("can setStoreType ___ query", async () => {
-    wrapper.vm.types = [{ "@id": "http://endhealth.info/im#QueryTemplate", name: "Query template" }];
+    wrapper.vm.types = [{ "@id": "http://endhealth.info/im#Query", name: "Query" }];
     await wrapper.vm.$nextTick();
     wrapper.vm.setStoreType();
     expect(mockStore.commit).toHaveBeenCalledTimes(1);
@@ -1077,7 +1077,7 @@ describe("Concept.vue ___ moduleIri", () => {
           TopBar,
           TermCodeTable,
           TextSectionHeader,
-          Profile
+          ProfileDisplay
         },
         mocks: { $store: mockStore, $router: mockRouter, $toast: mockToast },
         directives: { tooltip: vi.fn() },

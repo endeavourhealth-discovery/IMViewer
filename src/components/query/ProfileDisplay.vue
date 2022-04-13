@@ -147,7 +147,7 @@ import {Vocabulary} from "im-library";
 const { IM, RDFS } = Vocabulary;
 
 export default defineComponent({
-  name: "Profile",
+  name: "ProfileDisplay",
   props: ["theme", "modelValue", "activeProfile"],
   components: {
     QueryDefinition,

@@ -115,10 +115,10 @@
                   <Graph :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
-              <TabPanel header="Query">
+              <TabPanel header="Query" v-if="isQuery">
                 <div class="concept-panel-content" id="query-container">
                   <QueryText :conceptIri="conceptIri" />
-                  <Profile theme="light" :modelValue="profile" :activeProfile="activeProfile"/>
+                  <ProfileDisplay theme="light" :modelValue="profile" :activeProfile="activeProfile"/>
                 </div>
               </TabPanel>
             </TabView>
@@ -150,6 +150,7 @@ import Properties from "@/components/concept/Properties.vue";
 import {Helpers, Vocabulary, LoggerService} from 'im-library';
 import { DefinitionConfig, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
 import { Profile } from "@/components/query/Query";
+import ProfileDisplay from '@/components/query/ProfileDisplay.vue';
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
@@ -173,6 +174,7 @@ export default defineComponent({
     Properties,
     EclDefinition,
     QueryText,
+    ProfileDisplay
   },
   computed: {
     activeProfile: {
