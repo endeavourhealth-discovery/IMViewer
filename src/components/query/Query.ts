@@ -131,13 +131,12 @@ export class Profile extends Entity {
     public 'entityReferences' = [];
     public 'entitiesWithoutData' = [];
 
-
     constructor(entity?: any)
     constructor(entity: any) {
         super(entity);
 
         //parse definition 
-        if (entity["http://endhealth.info/im#definition"] && this.isJsonString(entity["http://endhealth.info/im#definition"])) {
+        if (entity["http://endhealth.info/im#definition"]) {
             const _definition = JSON.parse(entity["http://endhealth.info/im#definition"]);
             this['http://endhealth.info/im#definition'] = _definition;
             this["entityReferences"] = entity?.entityReferences;
@@ -149,16 +148,6 @@ export class Profile extends Entity {
 
         return this;
     }
-
-    private isJsonString(str:any) {
-        try {
-            JSON.parse(str);
-        } catch (e) {
-            return false;
-        }
-        return true;
-    }
-
 
     get mainEntity(): any {
 
