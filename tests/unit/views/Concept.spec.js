@@ -22,7 +22,7 @@ import Panel from "primevue/panel";
 import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
 import {LoggerService} from "im-library"
-import ProfileDisplay from '@/components/query/ProfileDisplay.vue';
+import ProfileDisplay from 'im-library';
 
 Object.assign(navigator, {
   clipboard: {

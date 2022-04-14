@@ -39,7 +39,6 @@
     "vue": "^3.2.25",
     "vue-router": "^4.0.9",
     "vue3-clipboard": "^1.0.0",
-    "vuedraggable": "^4.1.0",
     "vuex": "^4.0.1"
   },
   "devDependencies": {
