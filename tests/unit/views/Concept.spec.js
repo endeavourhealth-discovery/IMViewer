@@ -218,7 +218,7 @@ describe("Concept.vue ___ not moduleIri", () => {
     expect(wrapper.vm.showDownloadDialog).toBeFalsy();
     expect(wrapper.vm.concept).toStrictEqual({
       "@id": "http://endhealth.info/im#CriticalCareEncounter",
-      inferred: INFERRED_NESTED_ROLEGROUP,
+      "http://endhealth.info/im#definition": INFERRED_NESTED_ROLEGROUP,
       "http://endhealth.info/im#status": { "@id": "http://endhealth.info/im#Active", name: "Active" },
       "http://www.w3.org/2000/01/rdf-schema#comment":
         "An entry recording information about a criticial care encounter.<p>common data model attributes for Critical care encounter",
@@ -494,12 +494,12 @@ describe("Concept.vue ___ not moduleIri", () => {
         "http://www.w3.org/2002/07/owl#equivalentClass": "Is equivalent to"
       }
     });
-    wrapper.vm.getInferred("http://snomed.info/sct#298382003");
+    wrapper.vm.getDefinition("http://snomed.info/sct#298382003");
     await flushPromises();
     await wrapper.vm.$nextTick();
     expect(EntityService.getDefinitionBundle).toHaveBeenCalledTimes(1);
     expect(EntityService.getDefinitionBundle).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
-    expect(wrapper.vm.concept.inferred).toStrictEqual({
+    expect(wrapper.vm.concept["http://endhealth.info/im#definition"]).toStrictEqual({
       entity: {
         "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
           { "@id": "http://snomed.info/sct#928000", name: "Disorder of musculoskeletal system" },
@@ -530,20 +530,20 @@ describe("Concept.vue ___ not moduleIri", () => {
 
   it("can getInferred ___ pass ___ empty bundle", async () => {
     EntityService.getDefinitionBundle.mockResolvedValue({ entity: {} });
-    wrapper.vm.getInferred("http://snomed.info/sct#298382003");
+    wrapper.vm.getDefinition("http://snomed.info/sct#298382003");
     await flushPromises();
     expect(EntityService.getDefinitionBundle).toHaveBeenCalledTimes(1);
     expect(EntityService.getDefinitionBundle).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
-    expect(wrapper.vm.concept.inferred).toStrictEqual({ entity: {} });
+    expect(wrapper.vm.concept["http://endhealth.info/im#definition"]).toStrictEqual({ entity: {} });
   });
 
   it("can getInferred ___ pass ___ not bundle", async () => {
     EntityService.getDefinitionBundle.mockResolvedValue({});
-    wrapper.vm.getInferred("http://snomed.info/sct#298382003");
+    wrapper.vm.getDefinition("http://snomed.info/sct#298382003");
     await flushPromises();
     expect(EntityService.getDefinitionBundle).toHaveBeenCalledTimes(1);
     expect(EntityService.getDefinitionBundle).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
-    expect(wrapper.vm.concept.inferred).toStrictEqual({});
+    expect(wrapper.vm.concept["http://endhealth.info/im#definition"]).toStrictEqual({});
   });
 
   it("can getConfig ___ pass", async () => {
@@ -599,7 +599,7 @@ describe("Concept.vue ___ not moduleIri", () => {
   it("Inits ___ has types", async () => {
     wrapper.vm.getConcept = vi.fn();
     wrapper.vm.getConfig = vi.fn();
-    wrapper.vm.getInferred = vi.fn();
+    wrapper.vm.getDefinition = vi.fn();
     wrapper.vm.setStoreType = vi.fn();
     wrapper.vm.concept = {
       "@id": "http://snomed.info/sct#47518006",
@@ -613,8 +613,8 @@ describe("Concept.vue ___ not moduleIri", () => {
     await flushPromises();
     expect(wrapper.vm.getConfig).toHaveBeenCalledTimes(2);
     expect(wrapper.vm.getConfig).toHaveBeenCalledWith("definition");
-    expect(wrapper.vm.getInferred).toHaveBeenCalledTimes(1);
-    expect(wrapper.vm.getInferred).toHaveBeenCalledWith("http://endhealth.info/im#CriticalCareEncounter");
+    expect(wrapper.vm.getDefinition).toHaveBeenCalledTimes(1);
+    expect(wrapper.vm.getDefinition).toHaveBeenCalledWith("http://endhealth.info/im#CriticalCareEncounter");
     expect(wrapper.vm.getConcept).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.getConcept).toHaveBeenCalledWith("http://endhealth.info/im#CriticalCareEncounter");
 
@@ -626,7 +626,7 @@ describe("Concept.vue ___ not moduleIri", () => {
   it("Inits ___ missing types", async () => {
     wrapper.vm.getConcept = vi.fn();
     wrapper.vm.getConfig = vi.fn();
-    wrapper.vm.getInferred = vi.fn();
+    wrapper.vm.getDefinition = vi.fn();
     wrapper.vm.setStoreType = vi.fn();
     wrapper.vm.concept = {
       "@id": "http://snomed.info/sct#47518006",
@@ -639,8 +639,8 @@ describe("Concept.vue ___ not moduleIri", () => {
     await flushPromises();
     expect(wrapper.vm.getConfig).toHaveBeenCalledTimes(2);
     expect(wrapper.vm.getConfig).toHaveBeenCalledWith("definition");
-    expect(wrapper.vm.getInferred).toHaveBeenCalledTimes(1);
-    expect(wrapper.vm.getInferred).toHaveBeenCalledWith("http://endhealth.info/im#CriticalCareEncounter");
+    expect(wrapper.vm.getDefinition).toHaveBeenCalledTimes(1);
+    expect(wrapper.vm.getDefinition).toHaveBeenCalledWith("http://endhealth.info/im#CriticalCareEncounter");
     expect(wrapper.vm.getConcept).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.getConcept).toHaveBeenCalledWith("http://endhealth.info/im#CriticalCareEncounter");
     expect(wrapper.vm.types).toStrictEqual([]);
