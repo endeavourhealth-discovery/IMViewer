@@ -147,10 +147,8 @@ import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
 import SecondaryTree from "../components/concept/SecondaryTree.vue";
 import Properties from "@/components/concept/Properties.vue";
-import {Helpers, Vocabulary, LoggerService} from 'im-library';
+import {Helpers, Vocabulary, LoggerService, Models} from 'im-library';
 import { DefinitionConfig, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
-import { Profile } from "@/components/query/Query";
-import ProfileDisplay from '@/components/query/ProfileDisplay.vue';
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
@@ -173,8 +171,7 @@ export default defineComponent({
     Mappings,
     Properties,
     EclDefinition,
-    QueryText,
-    ProfileDisplay
+    QueryText
   },
   computed: {
     activeProfile: {
@@ -257,7 +254,7 @@ export default defineComponent({
       header: "",
       dialogHeader: "",
       active: 0,
-      profile: {} as Profile,
+      profile: {} as Models.Query.Profile,
       copyMenuItems: [] as any,
       definitionConfig: [] as DefinitionConfig[],
       summaryConfig: [] as DefinitionConfig[],
@@ -339,7 +336,7 @@ export default defineComponent({
 
       this.concept["termCodes"] = await EntityService.getEntityTermCodes(iri);
 
-      this.profile = new Profile(this.concept);
+      this.profile = new Models.Query.Profile(this.concept);
 
     },
 
