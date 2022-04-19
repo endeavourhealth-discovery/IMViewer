@@ -1,5 +1,6 @@
 <template>
-  <p>{{sql}}</p>
+  <h4>Generated SQL</h4>
+  <pre>{{sql}}</pre>
 </template>
 
 <script lang="ts">
@@ -40,5 +41,11 @@ export default defineComponent({
   align-items: center;
   width: 100%;
   height: 100%;
+}
+
+pre {
+  border: solid grey 1px;
+  border-radius: 4px;
+  padding: 4px;
 }
 </style>

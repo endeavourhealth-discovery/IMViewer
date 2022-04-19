@@ -151,8 +151,7 @@ const app = createApp(App)
   .component("RadioButton", RadioButton)
   .component("ConfirmPopup", ConfirmPopup)
   .component("InputSwitch", InputSwitch)
-  .component("Tag", Tag)
-  .component("Profile", Profile);
+  .component("Tag", Tag);
 
 const vm = app.mount("#app");
 
