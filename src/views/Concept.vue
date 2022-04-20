@@ -5,7 +5,7 @@
         <div class="topbar-content">
           <span class="title"><strong>IMViewer:</strong></span>
           <span class="entity-name" v-tooltip="{ value: header, class: 'name-tooltip' }">{{ header }}</span>
-          <div v-if="isObjectHasKeysWrapper(concept, ['inferred'])">
+          <div v-if="isObjectHasKeysWrapper(concept, ['http://endhealth.info/im#definition'])">
             <Button
               icon="far fa-copy"
               class="p-button-rounded p-button-text p-button-secondary topbar-content-button"
@@ -105,9 +105,9 @@
                   <TermCodeTable :terms="terms" />
                 </div>
               </TabPanel>
-              <TabPanel header="ECL" v-if="isSet && isObjectHasKeysWrapper(concept.inferred)">
+              <TabPanel header="ECL" v-if="isSet && isObjectHasKeysWrapper(concept['http://endhealth.info/im#definition'])">
                 <div class="concept-panel-content" id="ecl-container">
-                  <EclDefinition :definition="concept.inferred" />
+                  <EclDefinition :definition="concept['http://endhealth.info/im#definition']" />
                 </div>
               </TabPanel>
               <TabPanel header="Graph">
@@ -317,14 +317,11 @@ export default defineComponent({
       const predicates = configs
         .filter((c: DefinitionConfig) => c.type !== "Divider")
         .filter((c: DefinitionConfig) => c.predicate !== "subtypes")
-        .filter((c: DefinitionConfig) => c.predicate !== "inferred")
         .filter((c: DefinitionConfig) => c.predicate !== "termCodes")
         .filter((c: DefinitionConfig) => c.predicate !== "@id")
         .filter((c: DefinitionConfig) => c.predicate !== "None")
         .filter((c: DefinitionConfig) => c.predicate !== undefined)
         .map((c: DefinitionConfig) => c.predicate);
-
-      predicates.push(IM.DEFINITION);
 
       this.concept = await EntityService.getPartialEntity(iri, predicates);
 
@@ -340,7 +337,7 @@ export default defineComponent({
 
     },
 
-    async getInferred(iri: string): Promise<void> {
+    async getDefinition(iri: string): Promise<void> {
       const result = await EntityService.getDefinitionBundle(iri);
       if (isObjectHasKeys(result, ["entity"]) && isObjectHasKeys(result.entity, [RDFS.SUBCLASS_OF, IM.ROLE_GROUP])) {
         const roleGroup = result.entity[IM.ROLE_GROUP];
@@ -349,7 +346,7 @@ export default defineComponent({
         newRoleGroup[IM.ROLE_GROUP] = roleGroup;
         result.entity[RDFS.SUBCLASS_OF].push(newRoleGroup);
       }
-      this.concept["inferred"] = result;
+      this.concept[IM.DEFINITION] = result;
     },
 
     async getConfig(name: string): Promise<DefinitionConfig[]> {
@@ -370,7 +367,7 @@ export default defineComponent({
       this.definitionConfig = await this.getConfig("definition");
       this.summaryConfig = await this.getConfig("summary");
       await this.getConcept(this.conceptIri);
-      await this.getInferred(this.conceptIri);
+      await this.getDefinition(this.conceptIri);
       await this.getTerms(this.conceptIri);
       this.types = isObjectHasKeys(this.concept, [RDF.TYPE]) ? this.concept[RDF.TYPE] : ([] as TTIriRef[]);
       this.header = this.concept[RDFS.LABEL];
