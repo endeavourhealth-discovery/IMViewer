@@ -155,8 +155,8 @@ describe("Members.vue", () => {
     expect(wrapper.vm.expandedRowGroups).toStrictEqual(["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"]);
     expect(wrapper.vm.downloadMenu).toHaveLength(3);
     expect(wrapper.vm.downloadMenu[0].label).toBe("Definition");
-    expect(wrapper.vm.downloadMenu[1].label).toBe("Expanded (v2)");
-    expect(wrapper.vm.downloadMenu[2].label).toBe("Expanded (v1)");
+    expect(wrapper.vm.downloadMenu[1].label).toBe("Expanded Core");
+    expect(wrapper.vm.downloadMenu[2].label).toBe("Expanded Legacy");
   });
 
   it("can run downloadMenu commands", () => {
@@ -164,7 +164,7 @@ describe("Members.vue", () => {
     wrapper.vm.downloadMenu[0].command();
     expect(wrapper.vm.download).toHaveBeenLastCalledWith(false);
     wrapper.vm.downloadMenu[1].command();
-    expect(wrapper.vm.download).toHaveBeenLastCalledWith(true);
+    expect(wrapper.vm.download).toHaveBeenLastCalledWith(true, false);
     wrapper.vm.downloadMenu[2].command();
     expect(wrapper.vm.download).toHaveBeenLastCalledWith(true, true);
   });
@@ -270,7 +270,7 @@ describe("Members.vue", () => {
     expect(mockToast.add).toHaveBeenCalledWith(LoggerService.success("Download will begin shortly"));
     await flushPromises();
     expect(EntityService.getFullExportSet).toHaveBeenCalledTimes(1);
-    expect(EntityService.getFullExportSet).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16");
+    expect(EntityService.getFullExportSet).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", false);
     expect(wrapper.vm.downloadFile).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.downloadFile).toHaveBeenCalledWith(true, wrapper.vm.getFileName("Test Set"));
     expect(wrapper.vm.downloading).toBe(false);
