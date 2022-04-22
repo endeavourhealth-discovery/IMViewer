@@ -84,6 +84,7 @@ import axios from "axios";
 import IMLibrary from "im-library";
 import "im-library/dist/style.css";
 import { Helpers, Env } from "im-library";
+import Profile from '@/components/query/Profile.vue';
 const {
   DataTypeCheckers: { isObjectHasKeys }
 } = Helpers;
