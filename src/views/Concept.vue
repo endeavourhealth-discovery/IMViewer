@@ -3,7 +3,7 @@
     <TopBar>
       <template #content>
         <div class="topbar-content">
-          <span class="title"><strong>IMViewer:</strong></span>
+          <span class="title"><strong>IM Viewer:</strong></span>
           <span class="entity-name" v-tooltip="{ value: header, class: 'name-tooltip' }">{{ header }}</span>
           <div v-if="isObjectHasKeysWrapper(concept, ['http://endhealth.info/im#definition'])">
             <Button
@@ -24,11 +24,11 @@
           />
           <Menu id="overlay_menu" ref="downloadMenu" :model="items" :popup="true" />
           <Button
-              v-if="isFavourite(concept['@id'])"
-              style="color: #e39a36"
-              icon="pi pi-fw pi-star-fill"
-              class="p-button-rounded p-button-text "
-              @click="updateFavourites(concept)"
+            v-if="isFavourite(concept['@id'])"
+            style="color: #e39a36"
+            icon="pi pi-fw pi-star-fill"
+            class="p-button-rounded p-button-text "
+            @click="updateFavourites(concept)"
           />
 
           <Button v-else icon="pi pi-fw pi-star" class="p-button-rounded p-button-text p-button-plain" @click="updateFavourites(concept)" />
@@ -47,7 +47,6 @@
           >
             <i class="fas fa-pencil-alt" aria-hidden="true"></i>
           </button>-->
-
       </template>
     </TopBar>
   </div>
@@ -117,7 +116,7 @@
               </TabPanel>
               <TabPanel header="Query" v-if="isQuery">
                 <div class="concept-panel-content" id="query-container">
-                  <ProfileDisplay theme="light" :modelValue="profile" :activeProfile="activeProfile"/>
+                  <ProfileDisplay theme="light" :modelValue="profile" :activeProfile="activeProfile" />
                   <QueryText class="queryText" :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
@@ -147,7 +146,7 @@ import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
 import SecondaryTree from "../components/concept/SecondaryTree.vue";
 import Properties from "@/components/concept/Properties.vue";
-import {Helpers, Vocabulary, LoggerService, Models} from 'im-library';
+import { Helpers, Vocabulary, LoggerService, Models } from "im-library";
 import { DefinitionConfig, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
@@ -334,7 +333,6 @@ export default defineComponent({
       this.concept["termCodes"] = await EntityService.getEntityTermCodes(iri);
 
       this.profile = new Models.Query.Profile(this.concept);
-
     },
 
     async getDefinition(iri: string): Promise<void> {
@@ -342,7 +340,7 @@ export default defineComponent({
       if (isObjectHasKeys(result, ["entity"]) && isObjectHasKeys(result.entity, [RDFS.SUBCLASS_OF, IM.ROLE_GROUP])) {
         const roleGroup = result.entity[IM.ROLE_GROUP];
         delete result.entity[IM.ROLE_GROUP];
-        const newRoleGroup : any = {};
+        const newRoleGroup: any = {};
         newRoleGroup[IM.ROLE_GROUP] = roleGroup;
         result.entity[RDFS.SUBCLASS_OF].push(newRoleGroup);
       }
@@ -493,7 +491,7 @@ export default defineComponent({
     toggle(event: any, refId: string) {
       const x = this.$refs[refId] as any;
       x.toggle(event);
-    },
+    }
   }
 });
 </script>
@@ -534,6 +532,7 @@ export default defineComponent({
 
 .title {
   font-size: 2rem;
+  white-space: nowrap;
 }
 
 #definition-container {
@@ -619,5 +618,4 @@ export default defineComponent({
 .name-tooltip {
   width: 80vw;
 }
-
 </style>
