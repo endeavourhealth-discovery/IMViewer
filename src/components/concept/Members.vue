@@ -48,11 +48,14 @@
             {{ subSet }}
           </span>
         </span>
-        <span v-if="slotProps.data.type === 'INCLUDED'" class="group-header">
-          Included Members
+        <span v-if="slotProps.data.type === 'INCLUDED_SELF'" class="group-header">
+          Included Members (self only)
+        </span>
+        <span v-if="slotProps.data.type === 'INCLUDED_DESC'" class="group-header">
+          Included Members (and their descendants)
         </span>
         <span v-if="slotProps.data.type === 'EXCLUDED'" class="group-header">
-          Excluded Members
+          Excluded Members (and their descendants)
         </span>
         <span v-if="slotProps.data.type === 'EXPANDED'" class="group-header">
           Expanded Members
