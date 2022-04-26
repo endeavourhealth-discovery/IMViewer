@@ -144,7 +144,6 @@ import { mapState } from "vuex";
 import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
-import SecondaryTree from "../components/concept/SecondaryTree.vue";
 import Properties from "@/components/concept/Properties.vue";
 import { Helpers, Vocabulary, LoggerService, Models } from "im-library";
 import { DefinitionConfig, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
@@ -166,7 +165,6 @@ export default defineComponent({
     Members,
     Definition,
     DownloadDialog,
-    SecondaryTree,
     Mappings,
     Properties,
     EclDefinition,
@@ -313,6 +311,7 @@ export default defineComponent({
 
     async getConcept(iri: string): Promise<void> {
       const configs = this.definitionConfig.concat(this.summaryConfig);
+
       const predicates = configs
         .filter((c: DefinitionConfig) => c.type !== "Divider")
         .filter((c: DefinitionConfig) => c.predicate !== "subtypes")
@@ -322,11 +321,10 @@ export default defineComponent({
         .filter((c: DefinitionConfig) => c.predicate !== undefined)
         .map((c: DefinitionConfig) => c.predicate);
 
+      if (predicates.includes("inferred")) {
+        predicates.splice(predicates.indexOf("inferred"), 1, "http://endhealth.info/im#definition");
+      }
       this.concept = await EntityService.getPartialEntity(iri, predicates);
-
-      console.log(predicates);
-      console.log(this.concept);
-
       this.concept["@id"] = iri;
       this.concept["subtypes"] = await EntityService.getEntityChildren(iri);
 
@@ -356,7 +354,6 @@ export default defineComponent({
       } else {
         LoggerService.error(undefined, "Failed to sort config for definition component layout. One or more config items are missing 'order' property.");
       }
-
       return configs;
     },
 

@@ -16,17 +16,16 @@ import Mappings from "@/components/concept/Mappings.vue";
 import UsedIn from "@/components/concept/UsedIn.vue";
 import EntityChart from "@/components/concept/EntityChart.vue";
 import Members from "@/components/concept/Members.vue";
-import SecondaryTree from "@/components/concept/SecondaryTree.vue";
 import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import Panel from "primevue/panel";
 import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
-import {LoggerService} from "im-library"
+import { LoggerService } from "im-library"
 import ProfileDisplay from 'im-library';
 
 Object.assign(navigator, {
   clipboard: {
-    writeText: () => {}
+    writeText: () => { }
   }
 });
 
@@ -129,7 +128,7 @@ describe("Concept.vue ___ not moduleIri", () => {
     }
   };
 
-  const DEFAULT_PREDICATE_NAMES = {"http://www.w3.org/2000/01/rdf-schema#subClassOf":"Is subclass of","http://endhealth.info/im#roleGroup":"Where","http://www.w3.org/2002/07/owl#equivalentClass":"Is equivalent to","http://www.w3.org/2002/07/owl#intersectionOf":"Combination of","http://www.w3.org/2002/07/owl#someValuesFrom":"With a value","http://www.w3.org/2002/07/owl#onProperty":"On property","http://www.w3.org/ns/shacl#property":"Properties","http://www.w3.org/ns/shacl#class":"Type","http://www.w3.org/ns/shacl#path":"Property","http://www.w3.org/ns/shacl#datatype":"Type"}
+  const DEFAULT_PREDICATE_NAMES = { "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Is subclass of", "http://endhealth.info/im#roleGroup": "Where", "http://www.w3.org/2002/07/owl#equivalentClass": "Is equivalent to", "http://www.w3.org/2002/07/owl#intersectionOf": "Combination of", "http://www.w3.org/2002/07/owl#someValuesFrom": "With a value", "http://www.w3.org/2002/07/owl#onProperty": "On property", "http://www.w3.org/ns/shacl#property": "Properties", "http://www.w3.org/ns/shacl#class": "Type", "http://www.w3.org/ns/shacl#path": "Property", "http://www.w3.org/ns/shacl#datatype": "Type" }
 
   let wrapper;
   let mockStore;
@@ -165,7 +164,7 @@ describe("Concept.vue ___ not moduleIri", () => {
     mockToast = {
       add: vi.fn()
     };
-    mockRef = { render: () => {}, methods: { toggle: vi.fn(), show: vi.fn(), hide: vi.fn() } };
+    mockRef = { render: () => { }, methods: { toggle: vi.fn(), show: vi.fn(), hide: vi.fn() } };
 
     windowSpy = vi.spyOn(window, "getComputedStyle");
     windowSpy.mockReturnValue({ getPropertyValue: vi.fn().mockReturnValue("16px") });
@@ -182,7 +181,6 @@ describe("Concept.vue ___ not moduleIri", () => {
           Button,
           TabPanel,
           TabView,
-          SecondaryTree,
           UsedIn,
           Members,
           EntityChart,
@@ -1047,7 +1045,7 @@ describe("Concept.vue ___ moduleIri", () => {
     mockToast = {
       add: vi.fn()
     };
-    mockRef = { render: () => {}, methods: { toggle: vi.fn(), show: vi.fn(), hide: vi.fn() } };
+    mockRef = { render: () => { }, methods: { toggle: vi.fn(), show: vi.fn(), hide: vi.fn() } };
 
     windowSpy = vi.spyOn(window, "getComputedStyle");
     windowSpy.mockReturnValue({ getPropertyValue: vi.fn().mockReturnValue("16px") });
@@ -1064,7 +1062,6 @@ describe("Concept.vue ___ moduleIri", () => {
           Button,
           TabPanel,
           TabView,
-          SecondaryTree,
           UsedIn,
           Members,
           EntityChart,
