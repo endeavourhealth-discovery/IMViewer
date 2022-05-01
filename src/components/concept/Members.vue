@@ -48,11 +48,14 @@
             {{ subSet }}
           </span>
         </span>
-        <span v-if="slotProps.data.type === 'INCLUDED'" class="group-header">
-          Included Members
+        <span v-if="slotProps.data.type === 'INCLUDED_SELF'" class="group-header">
+          Included Members (self only)
+        </span>
+        <span v-if="slotProps.data.type === 'INCLUDED_DESC'" class="group-header">
+          Included Members (and their descendants)
         </span>
         <span v-if="slotProps.data.type === 'EXCLUDED'" class="group-header">
-          Excluded Members
+          Excluded Members (and their descendants)
         </span>
         <span v-if="slotProps.data.type === 'EXPANDED'" class="group-header">
           Expanded Members
@@ -108,13 +111,13 @@ export default defineComponent({
       expandedRowGroups: ["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"],
       downloadMenu: [
         { label: "Definition", command: () => this.download(false) },
-        { label: "Expanded (v2)", command: () => this.download(true) },
-        { label: "Expanded (v1)", command: () => this.download(true, true) }
+        { label: "Expanded Core", command: () => this.download(true,false) },
+        { label: "Expanded Legacy", command: () => this.download(true, true) }
       ],
       downloadMenu1: [
         { label: "Definition", command: () => this.download(false) },
-        { label: "Expanded (v2)", command: () => this.download(true) },
-        { label: "Expanded (v1)", command: () => this.download(true, true) },
+        { label: "Expanded Core", command: () => this.download(true,false) },
+        { label: "Expanded Legacy", command: () => this.download(true, true) },
         { label: "IMv1", command: () => this.downloadIMV1() }
       ],
       isPublishing: false
@@ -171,11 +174,11 @@ export default defineComponent({
       }
     },
 
-    async download(expanded: boolean, v1 = false): Promise<void> {
+    async download(expanded: boolean, v1: boolean): Promise<void> {
       this.downloading = true;
       try {
         this.$toast.add(LoggerService.success("Download will begin shortly"));
-        const result = expanded ? (await EntityService.getFullExportSet(this.conceptIri)).data : await SetService.download(this.conceptIri, expanded, v1);
+        const result = expanded ? (await EntityService.getFullExportSet(this.conceptIri, v1)).data : await SetService.download(this.conceptIri, expanded, v1);
         const label: string = (await EntityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
         this.downloadFile(result, this.getFileName(label));
       } catch (error) {
@@ -186,6 +189,9 @@ export default defineComponent({
     },
 
     getFileName(label: string) {
+      if(label.length > 100){
+        label = label.substring(0, 100);
+      }
       return (
         label +
         " - " +

@@ -3,9 +3,9 @@
     <TopBar>
       <template #content>
         <div class="topbar-content">
-          <span class="title"><strong>IMViewer:</strong></span>
+          <span class="title"><strong>IM Viewer:</strong></span>
           <span class="entity-name" v-tooltip="{ value: header, class: 'name-tooltip' }">{{ header }}</span>
-          <div v-if="isObjectHasKeysWrapper(concept, ['inferred'])">
+          <div v-if="isObjectHasKeysWrapper(concept, ['http://endhealth.info/im#definition'])">
             <Button
               icon="far fa-copy"
               class="p-button-rounded p-button-text p-button-secondary topbar-content-button"
@@ -24,11 +24,11 @@
           />
           <Menu id="overlay_menu" ref="downloadMenu" :model="items" :popup="true" />
           <Button
-              v-if="isFavourite(concept['@id'])"
-              style="color: #e39a36"
-              icon="pi pi-fw pi-star-fill"
-              class="p-button-rounded p-button-text "
-              @click="updateFavourites(concept)"
+            v-if="isFavourite(concept['@id'])"
+            style="color: #e39a36"
+            icon="pi pi-fw pi-star-fill"
+            class="p-button-rounded p-button-text "
+            @click="updateFavourites(concept)"
           />
 
           <Button v-else icon="pi pi-fw pi-star" class="p-button-rounded p-button-text p-button-plain" @click="updateFavourites(concept)" />
@@ -104,9 +104,9 @@
                   <TermCodeTable :terms="terms" />
                 </div>
               </TabPanel>
-              <TabPanel header="ECL" v-if="isSet && isObjectHasKeysWrapper(concept.inferred)">
+              <TabPanel header="ECL" v-if="isSet && isObjectHasKeysWrapper(concept['http://endhealth.info/im#definition'])">
                 <div class="concept-panel-content" id="ecl-container">
-                  <EclDefinition :definition="concept.inferred" />
+                  <EclDefinition :definition="concept['http://endhealth.info/im#definition']" />
                 </div>
               </TabPanel>
               <TabPanel header="Graph">
@@ -114,7 +114,12 @@
                   <Graph :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
-              -->
+              <TabPanel header="Query" v-if="isQuery">
+                <div class="concept-panel-content" id="query-container">
+                  <ProfileDisplay theme="light" :modelValue="profile" :activeProfile="activeProfile" />
+                  <QueryText class="queryText" :conceptIri="conceptIri" />
+                </div>
+              </TabPanel>
             </TabView>
           </div>
           <DownloadDialog v-if="showDownloadDialog" @closeDownloadDialog="closeDownloadDialog" :showDialog="showDownloadDialog" :conceptIri="conceptIri" />
@@ -128,6 +133,7 @@
 import { defineComponent } from "vue";
 import EntityChart from "../components/concept/EntityChart.vue";
 import Graph from "../components/concept/graph/Graph.vue";
+import QueryText from "../components/concept/query/QueryText.vue";
 import Definition from "../components/concept/Definition.vue";
 import UsedIn from "../components/concept/UsedIn.vue";
 import Members from "../components/concept/Members.vue";
@@ -138,9 +144,8 @@ import { mapState } from "vuex";
 import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
-import SecondaryTree from "../components/concept/SecondaryTree.vue";
 import Properties from "@/components/concept/Properties.vue";
-import { Helpers, Vocabulary, LoggerService } from "im-library";
+import { Helpers, Vocabulary, LoggerService, Models } from "im-library";
 import { DefinitionConfig, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
@@ -160,12 +165,21 @@ export default defineComponent({
     Members,
     Definition,
     DownloadDialog,
-    SecondaryTree,
     Mappings,
     Properties,
-    EclDefinition
+    EclDefinition,
+    QueryText
   },
   computed: {
+    activeProfile: {
+      get(): any {
+        return this.$store.state.activeProfile;
+      },
+      set(value: any): void {
+        this.$store.commit("updateActiveProfile", value);
+      }
+    },
+
     isSet(): boolean {
       return isValueSet(this.types);
     },
@@ -237,6 +251,7 @@ export default defineComponent({
       header: "",
       dialogHeader: "",
       active: 0,
+      profile: {} as Models.Query.Profile,
       copyMenuItems: [] as any,
       definitionConfig: [] as DefinitionConfig[],
       summaryConfig: [] as DefinitionConfig[],
@@ -296,34 +311,38 @@ export default defineComponent({
 
     async getConcept(iri: string): Promise<void> {
       const configs = this.definitionConfig.concat(this.summaryConfig);
+
       const predicates = configs
         .filter((c: DefinitionConfig) => c.type !== "Divider")
         .filter((c: DefinitionConfig) => c.predicate !== "subtypes")
-        .filter((c: DefinitionConfig) => c.predicate !== "inferred")
         .filter((c: DefinitionConfig) => c.predicate !== "termCodes")
         .filter((c: DefinitionConfig) => c.predicate !== "@id")
         .filter((c: DefinitionConfig) => c.predicate !== "None")
         .filter((c: DefinitionConfig) => c.predicate !== undefined)
         .map((c: DefinitionConfig) => c.predicate);
 
+      if (predicates.includes("inferred")) {
+        predicates.splice(predicates.indexOf("inferred"), 1, "http://endhealth.info/im#definition");
+      }
       this.concept = await EntityService.getPartialEntity(iri, predicates);
-
       this.concept["@id"] = iri;
       this.concept["subtypes"] = await EntityService.getEntityChildren(iri);
 
       this.concept["termCodes"] = await EntityService.getEntityTermCodes(iri);
+
+      this.profile = new Models.Query.Profile(this.concept);
     },
 
-    async getInferred(iri: string): Promise<void> {
+    async getDefinition(iri: string): Promise<void> {
       const result = await EntityService.getDefinitionBundle(iri);
       if (isObjectHasKeys(result, ["entity"]) && isObjectHasKeys(result.entity, [RDFS.SUBCLASS_OF, IM.ROLE_GROUP])) {
         const roleGroup = result.entity[IM.ROLE_GROUP];
         delete result.entity[IM.ROLE_GROUP];
-        const newRoleGroup : any = {};
+        const newRoleGroup: any = {};
         newRoleGroup[IM.ROLE_GROUP] = roleGroup;
         result.entity[RDFS.SUBCLASS_OF].push(newRoleGroup);
       }
-      this.concept["inferred"] = result;
+      this.concept[IM.DEFINITION] = result;
     },
 
     async getConfig(name: string): Promise<DefinitionConfig[]> {
@@ -335,7 +354,6 @@ export default defineComponent({
       } else {
         LoggerService.error(undefined, "Failed to sort config for definition component layout. One or more config items are missing 'order' property.");
       }
-
       return configs;
     },
 
@@ -344,7 +362,7 @@ export default defineComponent({
       this.definitionConfig = await this.getConfig("definition");
       this.summaryConfig = await this.getConfig("summary");
       await this.getConcept(this.conceptIri);
-      await this.getInferred(this.conceptIri);
+      await this.getDefinition(this.conceptIri);
       await this.getTerms(this.conceptIri);
       this.types = isObjectHasKeys(this.concept, [RDF.TYPE]) ? this.concept[RDF.TYPE] : ([] as TTIriRef[]);
       this.header = this.concept[RDFS.LABEL];
@@ -511,6 +529,7 @@ export default defineComponent({
 
 .title {
   font-size: 2rem;
+  white-space: nowrap;
 }
 
 #definition-container {
