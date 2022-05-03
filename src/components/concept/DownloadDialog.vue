@@ -86,7 +86,7 @@
 <script lang="ts">
 import EntityService from "@/services/EntityService";
 import { defineComponent } from "@vue/runtime-core";
-import { TTIriRef, EntityReferenceNode, PartialBundle, TermCode, ExportValueSet, DataModelProperty } from "im-library/dist/types/interfaces/Interfaces";
+import { TTIriRef, EntityReferenceNode, TermCode, ExportValueSet, DataModelProperty, TTBundle } from "im-library/dist/types/interfaces/Interfaces";
 import { Vocabulary, Helpers, LoggerService, Env } from "im-library";
 const { IM, RDFS } = Vocabulary;
 const {
@@ -114,7 +114,7 @@ export default defineComponent({
   data() {
     return {
       concept: {} as any,
-      definition: {} as PartialBundle,
+      definition: {} as TTBundle,
       hasSubTypes: [] as EntityReferenceNode[],
       isChildOf: [] as TTIriRef[],
       hasChildren: [] as any[],

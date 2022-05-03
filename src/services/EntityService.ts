@@ -9,7 +9,6 @@ import {
   TTBundle,
   TTIriRef,
   EntityDefinitionDto,
-  PartialBundle,
   EntityReferenceNode,
   GraphData
 } from "im-library/dist/types/interfaces/Interfaces";
@@ -29,7 +28,7 @@ export default class EntityService {
     }
   }
 
-  public static async getFullExportSet(iri: string, v1:boolean): Promise<any> {
+  public static async getFullExportSet(iri: string, v1: boolean): Promise<any> {
     const client = axios.create({
       baseURL: Env.api,
       timeout: 0
@@ -69,7 +68,7 @@ export default class EntityService {
     }
   }
 
-  public static async getPartialEntityBundle(iri: string, predicates: string[]): Promise<PartialBundle> {
+  public static async getPartialEntityBundle(iri: string, predicates: string[]): Promise<TTBundle> {
     try {
       return await axios.get(Env.api + "api/entity/public/partialBundle", {
         params: {
@@ -78,11 +77,11 @@ export default class EntityService {
         }
       });
     } catch (error) {
-      return {} as PartialBundle;
+      return {} as TTBundle;
     }
   }
 
-  public static async getDefinitionBundle(iri: string): Promise<PartialBundle> {
+  public static async getDefinitionBundle(iri: string): Promise<TTBundle> {
     try {
       return await axios.get(Env.api + "api/entity/public/inferredBundle", {
         params: {
@@ -90,7 +89,7 @@ export default class EntityService {
         }
       });
     } catch (error) {
-      return {} as PartialBundle;
+      return {} as TTBundle;
     }
   }
 
