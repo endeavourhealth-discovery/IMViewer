@@ -13,7 +13,7 @@ import { defineComponent } from "@vue/runtime-core";
 import EntityService from "@/services/EntityService";
 import GraphComponent from "./GraphComponent.vue";
 import ConfigService from "@/services/ConfigService";
-import { TTGraphData, PartialBundle } from "im-library/dist/types/interfaces/Interfaces";
+import { TTGraphData, TTBundle } from "im-library/dist/types/interfaces/Interfaces";
 import { Helpers } from "im-library";
 const {
   GraphTranslator: { translateFromEntityBundle }
@@ -39,7 +39,7 @@ export default defineComponent({
       selectedPredicates: [] as { iri: string; name: string }[],
       selectedIris: [] as string[],
       predicatesIris: [] as string[],
-      bundle: {} as PartialBundle,
+      bundle: {} as TTBundle,
       graphExcludePredicates: [] as string[],
       options: [] as { iri: string; name: string }[]
     };
