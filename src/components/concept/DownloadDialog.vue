@@ -88,7 +88,7 @@ import EntityService from "@/services/EntityService";
 import { defineComponent } from "@vue/runtime-core";
 import { TTIriRef, EntityReferenceNode, TermCode, ExportValueSet, DataModelProperty, TTBundle } from "im-library/dist/types/interfaces/Interfaces";
 import { Vocabulary, Helpers, LoggerService, Env } from "im-library";
-const { IM, Helpers, RDFS } = Vocabulary;
+const { IM, RDFS } = Vocabulary;
 const {
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys },
   Converters: { iriToUrl }
