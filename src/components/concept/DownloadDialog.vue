@@ -88,9 +88,10 @@ import EntityService from "@/services/EntityService";
 import { defineComponent } from "@vue/runtime-core";
 import { TTIriRef, EntityReferenceNode, TermCode, ExportValueSet, DataModelProperty, TTBundle } from "im-library/dist/types/interfaces/Interfaces";
 import { Vocabulary, Helpers, LoggerService, Env } from "im-library";
-const { IM, RDFS } = Vocabulary;
+const { IM, Helpers, RDFS } = Vocabulary;
 const {
-  DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }
+  DataTypeCheckers: { isArrayHasLength, isObjectHasKeys },
+  Converters: { iriToUrl }
 } = Helpers;
 
 export default defineComponent({
@@ -153,7 +154,7 @@ export default defineComponent({
     },
 
     downloadConcept(): void {
-      const modIri = this.conceptIri.replace(/\//gi, "%2F").replace(/#/gi, "%23");
+      const modIri = iriToUrl(this.conceptIri);
 
       const url =
         Env.api +
