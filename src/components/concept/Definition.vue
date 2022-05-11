@@ -6,9 +6,13 @@
           :is="config.type"
           :label="config.label"
           :data="concept[config.predicate]"
+          :predicate="config.predicate"
           :size="config.size"
           :id="config.type + index"
           :show="showItem(config, index)"
+          @loadMore="loadMore"
+          :totalCount="totalCount"
+          :visible="loadButton"
         />
       </template>
     </div>
@@ -20,6 +24,7 @@ import { defineComponent, PropType } from "vue";
 import TermsTable from "@/components/concept/definition/TermsTable.vue";
 import { DefinitionConfig } from "im-library/dist/types/interfaces/Interfaces";
 import { Helpers } from "im-library";
+import EntityService from "@/services/EntityService";
 const {
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys, isObject }
 } = Helpers;
@@ -31,8 +36,24 @@ export default defineComponent({
   },
   props: {
     concept: { type: Object, required: true },
-    configs: { type: Array as PropType<Array<DefinitionConfig>>, required: true }
+    configs: { type: Array as PropType<Array<DefinitionConfig>>, required: true },
+    totalCount: { type: Number as any }
   },
+
+  data() {
+    return {
+      pageIndex: 2,
+      loadButton: false,
+      children: {} as any
+    };
+  },
+
+  mounted(){
+    if(this.totalCount > 9){
+      this.loadButton = true;
+    }
+  },
+
   methods: {
     showItem(config: DefinitionConfig, index: number): boolean {
       let dataResults = [];
@@ -82,6 +103,24 @@ export default defineComponent({
         console.log(`Unexpected data type encountered for function hasData in definition. Data: ${JSON.stringify(data)}`);
         return false;
       }
+    },
+
+    async loadMore(predicate: string) {
+      if(this.loadButton){
+        if (this.pageIndex * 10 < this.totalCount) {
+          this.children = await EntityService.getChildren(this.concept["@id"], this.pageIndex, 10);
+          this.concept[predicate] =  this.concept[predicate].concat(this.children.result);
+          this.pageIndex = this.pageIndex + 1;
+          this.loadButton = true;
+        } else if (this.pageIndex * 10 > this.totalCount) {
+          this.children = await EntityService.getChildren(this.concept["@id"], this.pageIndex, this.totalCount - ((this.pageIndex - 1) * 10) + 1);
+          this.concept[predicate] =  this.concept[predicate].concat(this.children.result);
+          this.loadButton = false;
+        } else {
+          this.loadButton = false;
+        }
+      }
+      this.showItem(this.configs[1], 1);
     }
   }
 });
