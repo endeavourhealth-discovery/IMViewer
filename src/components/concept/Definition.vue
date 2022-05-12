@@ -42,14 +42,15 @@ export default defineComponent({
 
   data() {
     return {
-      pageIndex: 2,
+      nextPage: 2,
+      pageSize: 10,
       loadButton: false,
       children: {} as any
     };
   },
 
   mounted(){
-    if(this.totalCount > 9){
+    if(this.totalCount >= this.pageSize){
       this.loadButton = true;
     }
   },
@@ -107,13 +108,13 @@ export default defineComponent({
 
     async loadMore(predicate: string) {
       if(this.loadButton){
-        if (this.pageIndex * 10 < this.totalCount) {
-          this.children = await EntityService.getChildren(this.concept["@id"], this.pageIndex, 10);
+        if (this.nextPage * this.pageSize < this.totalCount) {
+          this.children = await EntityService.getChildrenAndTotalCount(this.concept["@id"], this.nextPage, this.pageSize);
           this.concept[predicate] =  this.concept[predicate].concat(this.children.result);
-          this.pageIndex = this.pageIndex + 1;
+          this.nextPage = this.nextPage + 1;
           this.loadButton = true;
-        } else if (this.pageIndex * 10 > this.totalCount) {
-          this.children = await EntityService.getChildren(this.concept["@id"], this.pageIndex, this.totalCount - ((this.pageIndex - 1) * 10) + 1);
+        } else if (this.nextPage * this.pageSize > this.totalCount) {
+          this.children = await EntityService.getChildrenAndTotalCount(this.concept["@id"], this.nextPage, this.totalCount - ((this.nextPage - 1) * this.pageSize) + 1);
           this.concept[predicate] =  this.concept[predicate].concat(this.children.result);
           this.loadButton = false;
         } else {
