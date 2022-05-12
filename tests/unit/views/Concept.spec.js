@@ -54,26 +54,23 @@ describe("Concept.vue ___ not moduleIri", () => {
     "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": TYPES,
     "http://www.w3.org/2000/01/rdf-schema#label": "Critical care encounter (record type)"
   };
-  const CHILDREN = [
+  const CHILDREN = {
+    totalCount: 3,
+    pageSize: 10,
+    result:[
     {
       name: "Adult critical care encounter",
-      hasChildren: false,
-      type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
       "@id": "http://endhealth.info/im#1641000252107"
     },
     {
       name: "Neonatal critical care encounter",
-      hasChildren: false,
-      type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
       "@id": "http://endhealth.info/im#831000252103"
     },
     {
       name: "Paediatric critical care encounter",
-      hasChildren: false,
-      type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
       "@id": "http://endhealth.info/im#2811000252102"
     }
-  ];
+  ]};
   const TERMS = [{ name: "Critical care encounter (record type)" }];
   const INFERRED = {
     entity: {
@@ -144,7 +141,7 @@ describe("Concept.vue ___ not moduleIri", () => {
     clipboardSpy = vi.spyOn(navigator.clipboard, "writeText");
     EntityService.getDefinitionBundle = vi.fn().mockResolvedValue(INFERRED);
     EntityService.getPartialEntity = vi.fn().mockResolvedValue(CONCEPT);
-    EntityService.getEntityChildren = vi.fn().mockResolvedValue(CHILDREN);
+    EntityService.getChildrenAndTotalCount = vi.fn().mockResolvedValue(CHILDREN);
     EntityService.getEntityTermCodes = vi.fn().mockResolvedValue(TERMS);
     ConfigService.getComponentLayout = vi.fn().mockResolvedValue(CONFIG);
     ConfigService.getDefaultPredicateNames = vi.fn().mockResolvedValue(DEFAULT_PREDICATE_NAMES);
@@ -223,7 +220,7 @@ describe("Concept.vue ___ not moduleIri", () => {
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": TYPES,
       "http://www.w3.org/2000/01/rdf-schema#label": "Critical care encounter (record type)",
       termCodes: TERMS,
-      subtypes: CHILDREN
+      subtypes: CHILDREN.result
     });
     expect(wrapper.vm.definitionText).toBe("");
     expect(wrapper.vm.display).toBeFalsy();
@@ -345,31 +342,28 @@ describe("Concept.vue ___ not moduleIri", () => {
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2002/07/owl#Class", name: "Class" }],
       "http://www.w3.org/2000/01/rdf-schema#label": "Scoliosis deformity of spine (disorder)"
     });
-    EntityService.getEntityChildren = vi.fn().mockResolvedValue([
+    EntityService.getChildrenAndTotalCount = vi.fn().mockResolvedValue({
+      totalCount: 3,
+      pageSize: 10,
+      result:[
       {
         name: "Acquired scoliosis (disorder)",
-        hasChildren: true,
-        type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
         "@id": "http://snomed.info/sct#111266001"
       },
       {
         name: "Acrodysplasia scoliosis (disorder)",
-        hasChildren: false,
-        type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
         "@id": "http://snomed.info/sct#773773006"
       },
       {
         name: "Congenital scoliosis due to bony malformation (disorder)",
-        hasChildren: false,
-        type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
         "@id": "http://snomed.info/sct#205045003"
       }
-    ]);
+    ]});
     wrapper.vm.getConcept("http://snomed.info/sct#298382003");
     await flushPromises();
     expect(EntityService.getPartialEntity).toHaveBeenCalledTimes(1);
-    expect(EntityService.getEntityChildren).toHaveBeenCalledTimes(1);
-    expect(EntityService.getEntityChildren).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
+    expect(EntityService.getChildrenAndTotalCount).toHaveBeenCalledTimes(1);
+    expect(EntityService.getChildrenAndTotalCount).toHaveBeenCalledWith("http://snomed.info/sct#298382003",1,10);
     expect(EntityService.getEntityTermCodes).toHaveBeenCalledTimes(1);
     expect(EntityService.getEntityTermCodes).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
     expect(wrapper.vm.concept).toStrictEqual({
@@ -380,20 +374,14 @@ describe("Concept.vue ___ not moduleIri", () => {
       subtypes: [
         {
           name: "Acquired scoliosis (disorder)",
-          hasChildren: true,
-          type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
           "@id": "http://snomed.info/sct#111266001"
         },
         {
           name: "Acrodysplasia scoliosis (disorder)",
-          hasChildren: false,
-          type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
           "@id": "http://snomed.info/sct#773773006"
         },
         {
           name: "Congenital scoliosis due to bony malformation (disorder)",
-          hasChildren: false,
-          type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
           "@id": "http://snomed.info/sct#205045003"
         }
       ],
@@ -408,31 +396,28 @@ describe("Concept.vue ___ not moduleIri", () => {
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2002/07/owl#Class", name: "Class" }],
       "http://www.w3.org/2000/01/rdf-schema#label": "Scoliosis deformity of spine (disorder)"
     });
-    EntityService.getEntityChildren = vi.fn().mockResolvedValue([
+    EntityService.getChildrenAndTotalCount = vi.fn().mockResolvedValue({
+      totalCount: 3,
+      pageSize: 10,
+      result:[
       {
         name: "Acquired scoliosis (disorder)",
-        hasChildren: true,
-        type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
         "@id": "http://snomed.info/sct#111266001"
       },
       {
         name: "Acrodysplasia scoliosis (disorder)",
-        hasChildren: false,
-        type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
         "@id": "http://snomed.info/sct#773773006"
       },
       {
         name: "Congenital scoliosis due to bony malformation (disorder)",
-        hasChildren: false,
-        type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
         "@id": "http://snomed.info/sct#205045003"
       }
-    ]);
+    ]});
     wrapper.vm.getConcept("http://snomed.info/sct#298382003");
     await flushPromises();
     expect(EntityService.getPartialEntity).toHaveBeenCalledTimes(1);
-    expect(EntityService.getEntityChildren).toHaveBeenCalledTimes(1);
-    expect(EntityService.getEntityChildren).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
+    expect(EntityService.getChildrenAndTotalCount).toHaveBeenCalledTimes(1);
+    expect(EntityService.getChildrenAndTotalCount).toHaveBeenCalledWith("http://snomed.info/sct#298382003",1,10);
     expect(EntityService.getEntityTermCodes).toHaveBeenCalledTimes(1);
     expect(EntityService.getEntityTermCodes).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
     expect(wrapper.vm.concept).toStrictEqual({
@@ -443,20 +428,14 @@ describe("Concept.vue ___ not moduleIri", () => {
       subtypes: [
         {
           name: "Acquired scoliosis (disorder)",
-          hasChildren: true,
-          type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
           "@id": "http://snomed.info/sct#111266001"
         },
         {
           name: "Acrodysplasia scoliosis (disorder)",
-          hasChildren: false,
-          type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
           "@id": "http://snomed.info/sct#773773006"
         },
         {
           name: "Congenital scoliosis due to bony malformation (disorder)",
-          hasChildren: false,
-          type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
           "@id": "http://snomed.info/sct#205045003"
         }
       ],
@@ -922,20 +901,14 @@ describe("Concept.vue ___ not moduleIri", () => {
       subtypes: [
         {
           name: "Administrative entry",
-          hasChildren: true,
-          type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
           "@id": "http://endhealth.info/im#1731000252106"
         },
         {
           name: "Consultation",
-          hasChildren: true,
-          type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
           "@id": "http://endhealth.info/im#31000252100"
         },
         {
           name: "Hospital encounter",
-          hasChildren: true,
-          type: [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }],
           "@id": "http://endhealth.info/im#1161000252102"
         }
       ]
@@ -1026,7 +999,7 @@ describe("Concept.vue ___ moduleIri", () => {
     clipboardSpy = vi.spyOn(navigator.clipboard, "writeText");
     EntityService.getDefinitionBundle = vi.fn().mockResolvedValue({});
     EntityService.getPartialEntity = vi.fn().mockResolvedValue(CONCEPT);
-    EntityService.getEntityChildren = vi.fn().mockResolvedValue([]);
+    EntityService.getChildrenAndTotalCount = vi.fn().mockResolvedValue([]);
     EntityService.getEntityTermCodes = vi.fn().mockResolvedValue([]);
     ConfigService.getComponentLayout = vi.fn().mockResolvedValue(CONFIG);
     mockStore = {
