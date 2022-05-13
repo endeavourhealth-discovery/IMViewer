@@ -3,7 +3,7 @@ import Home from "../views/Home.vue";
 import Concept from "../views/Concept.vue";
 import store from "@/store/index";
 import { nextTick } from "vue";
-import { AccessDenied, Enums, Env, SnomedLicense } from "im-library";
+import { AccessDenied, Enums, Env, PageNotFound, SnomedLicense } from "im-library";
 const { AppEnum } = Enums;
 
 const APP_TITLE = "IM Viewer";
@@ -36,6 +36,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/401",
     name: "AccessDenied",
     component: AccessDenied
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "PageNotFound",
+    component: PageNotFound
   }
 ];
 
