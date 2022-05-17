@@ -4,7 +4,6 @@ import Concept from "../views/Concept.vue";
 import store from "@/store/index";
 import { nextTick } from "vue";
 import { AccessDenied, Enums, Env, SnomedLicense } from "im-library";
-const { AppEnum } = Enums;
 
 const APP_TITLE = "IM Viewer";
 
@@ -55,7 +54,7 @@ router.beforeEach(async (to, from) => {
     return false;
   }
   if (iri) {
-    store.commit("updateRecentLocalActivity", { iri: iri, dateTime: new Date(), app: AppEnum.VIEWER });
+    store.commit("updateRecentLocalActivity", { iri: iri, dateTime: new Date(), app: Env.viewerUrl });
     store.commit("updateConceptIri", to.params.selectedIri as string);
   }
   if (to.matched.some((record: any) => record.meta.requiresAuth)) {
