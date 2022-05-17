@@ -3,6 +3,7 @@ import App from "@/App.vue";
 import Toast from "primevue/toast";
 import store from "@/store/index";
 import { flushPromises, shallowMount } from "@vue/test-utils";
+import EntityService from "@/services/EntityService";
 
 describe("router", () => {
   beforeEach(() => {
@@ -169,6 +170,7 @@ describe("router", () => {
       store.state.snomedLicenseAccepted = "true";
       store.commit = vi.fn();
       store.dispatch = vi.fn().mockResolvedValue({ authenticated: true });
+      EntityService.iriExists = vi.fn().mockResolvedValue(true);
       router.push("/");
       await router.isReady();
 

@@ -71,7 +71,7 @@
                   <ProgressSpinner />
                 </div>
                 <div v-else class="concept-panel-content" id="definition-container">
-                  <Definition :concept="concept" :configs="definitionConfig" />
+                  <Definition :concept="concept" :configs="definitionConfig" :totalCount="totalCount"/>
                 </div>
               </TabPanel>
               <TabPanel header="Maps" v-if="showMappings">
@@ -276,7 +276,9 @@ export default defineComponent({
         //   }
         // }
       ] as any,
-      selectedOption: {} as any
+      selectedOption: {} as any,
+      children: {} as any,
+      totalCount: 0
     };
   },
   methods: {
@@ -326,8 +328,9 @@ export default defineComponent({
       }
       this.concept = await EntityService.getPartialEntity(iri, predicates);
       this.concept["@id"] = iri;
-      this.concept["subtypes"] = await EntityService.getEntityChildren(iri);
-
+      this.children = await EntityService.getChildrenAndTotalCount(iri,1,10);
+      this.totalCount = this.children["totalCount"];
+      this.concept["subtypes"] = this.children.result;
       this.concept["termCodes"] = await EntityService.getEntityTermCodes(iri);
 
       this.profile = new Models.Query.Profile(this.concept);

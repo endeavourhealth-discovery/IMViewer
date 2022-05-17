@@ -3,7 +3,12 @@ import Home from "../views/Home.vue";
 import Concept from "../views/Concept.vue";
 import store from "@/store/index";
 import { nextTick } from "vue";
-import { AccessDenied, Enums, Env, SnomedLicense } from "im-library";
+import { AccessDenied, Env, PageNotFound, SnomedLicense, EntityNotFound, Helpers } from "im-library";
+import EntityService from "@/services/EntityService";
+const { AppEnum } = Enums;
+const {
+  DataTypeCheckers: { isObjectHasKeys }
+} = Helpers;
 
 const APP_TITLE = "IM Viewer";
 
@@ -35,6 +40,16 @@ const routes: Array<RouteRecordRaw> = [
     path: "/401",
     name: "AccessDenied",
     component: AccessDenied
+  },
+  {
+    path: "/404",
+    name: "EntityNotFound",
+    component: EntityNotFound
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "PageNotFound",
+    component: PageNotFound
   }
 ];
 
@@ -71,6 +86,17 @@ router.beforeEach(async (to, from) => {
       return {
         path: "/snomedLicense"
       };
+    }
+  }
+  if (to.name === "Concept" && isObjectHasKeys(to.params, ["selectedIri"])) {
+    const iri = to.params.selectedIri as string;
+    try {
+      new URL(iri);
+      if (!(await EntityService.iriExists(iri))) {
+        router.push({ name: "EntityNotFound" });
+      }
+    } catch (_error) {
+      router.push({ name: "EntityNotFound" });
     }
   }
 });
