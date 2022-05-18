@@ -32,21 +32,15 @@
           />
 
           <Button v-else icon="pi pi-fw pi-star" class="p-button-rounded p-button-text p-button-plain" @click="updateFavourites(concept)" />
+          <Button icon="fa-solid fa-pencil" class="p-panel-header-icon p-link p-mr-2" @click="directToEditRoute" v-tooltip.bottom="'Edit concept'" />
         </div>
-        <!--<button
+        <!-- <button
             class="p-panel-header-icon p-link p-mr-2"
             @click="directToCreateRoute"
             v-tooltip.bottom="'Create new concept'"
           >
             <i class="fa-solid fa-plus-circle" aria-hidden="true"></i>
-          </button>
-          <button
-            class="p-panel-header-icon p-link p-mr-2"
-            @click="directToEditRoute"
-            v-tooltip.bottom="'Edit concept'"
-          >
-            <i class="fa-solid fa-pencil-alt" aria-hidden="true"></i>
-          </button>-->
+          </button> -->
       </template>
     </TopBar>
   </div>
@@ -144,8 +138,9 @@ import { mapState } from "vuex";
 import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
+import DirectService from "@/services/DirectService";
 import Properties from "@/components/concept/Properties.vue";
-import { Helpers, Vocabulary, LoggerService, Models } from "im-library";
+import { Env, Helpers, Vocabulary, LoggerService, Models } from "im-library";
 import { DefinitionConfig, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
@@ -291,11 +286,8 @@ export default defineComponent({
       return this.favourites.includes(iri);
     },
 
-    directToEditRoute(): void {
-      this.$router.push({
-        name: "Edit",
-        params: { iri: this.concept["@id"] }
-      });
+    directToEditRoute() {
+      DirectService.directTo(Env.EDITOR_URL, this.conceptIri, this, "editor");
     },
 
     directToCreateRoute(): void {
