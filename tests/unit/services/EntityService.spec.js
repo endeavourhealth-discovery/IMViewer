@@ -5,7 +5,7 @@ const {
   Search: { SearchRequest }
 } = Models;
 
-const api = Env.api;
+const api = Env.API;
 const SEARCH_PAYLOAD = {
   size: 100,
   query: {

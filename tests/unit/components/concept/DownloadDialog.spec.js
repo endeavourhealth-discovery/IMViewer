@@ -148,7 +148,8 @@ describe("DownloadDialog.vue", () => {
     expect(wrapper.vm.closeDownloadDialog).toHaveBeenCalledTimes(1);
     expect(window.open).toHaveBeenCalledTimes(1);
     expect(window.open).toHaveBeenCalledWith(
-      Env.api + "api/entity/download?iri=http:%2F%2Fsnomed.info%2Fsct%23298382003&format=excel&hasSubTypes=true&dataModelProperties=true&members=true&expandMembers=false&inferred=true&terms=true&isChildOf=false&hasChildren=false&inactive=false"
+      Env.API +
+        "api/entity/download?iri=http:%2F%2Fsnomed.info%2Fsct%23298382003&format=excel&hasSubTypes=true&dataModelProperties=true&members=true&expandMembers=false&inferred=true&terms=true&isChildOf=false&hasChildren=false&inactive=false"
     );
     expect(mockToast.add).toHaveBeenCalledTimes(1);
     expect(mockToast.add).toHaveBeenCalledWith(LoggerService.success("Download will begin shortly"));
@@ -161,7 +162,8 @@ describe("DownloadDialog.vue", () => {
     expect(wrapper.vm.closeDownloadDialog).toHaveBeenCalledTimes(1);
     expect(window.open).toHaveBeenCalledTimes(1);
     expect(window.open).toHaveBeenCalledWith(
-      Env.api + "api/entity/download?iri=http:%2F%2Fsnomed.info%2Fsct%23298382003&format=excel&hasSubTypes=true&dataModelProperties=true&members=true&expandMembers=false&inferred=true&terms=true&isChildOf=false&hasChildren=false&inactive=false"
+      Env.API +
+        "api/entity/download?iri=http:%2F%2Fsnomed.info%2Fsct%23298382003&format=excel&hasSubTypes=true&dataModelProperties=true&members=true&expandMembers=false&inferred=true&terms=true&isChildOf=false&hasChildren=false&inactive=false"
     );
     expect(mockToast.add).toHaveBeenCalledTimes(1);
     expect(mockToast.add).toHaveBeenCalledWith(LoggerService.error("Download failed from server"));

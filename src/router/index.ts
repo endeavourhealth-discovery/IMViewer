@@ -3,8 +3,11 @@ import Home from "../views/Home.vue";
 import Concept from "../views/Concept.vue";
 import store from "@/store/index";
 import { nextTick } from "vue";
-import { AccessDenied, Enums, Env, SnomedLicense } from "im-library";
-const { AppEnum } = Enums;
+import { AccessDenied, Env, PageNotFound, SnomedLicense, EntityNotFound, Helpers } from "im-library";
+import EntityService from "@/services/EntityService";
+const {
+  DataTypeCheckers: { isObjectHasKeys }
+} = Helpers;
 
 const APP_TITLE = "IM Viewer";
 
@@ -36,6 +39,16 @@ const routes: Array<RouteRecordRaw> = [
     path: "/401",
     name: "AccessDenied",
     component: AccessDenied
+  },
+  {
+    path: "/404",
+    name: "EntityNotFound",
+    component: EntityNotFound
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "PageNotFound",
+    component: PageNotFound
   }
 ];
 
@@ -46,7 +59,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from) => {
   const iri = to.params.selectedIri as string;
-  const currentUrl = Env.viewerUrl + "#" + to.path;
+  const currentUrl = Env.VIEWER_URL + "#" + to.path;
   if (to.path !== "/snomedLicense") {
     store.commit("updateSnomedReturnUrl", currentUrl);
     store.commit("updateAuthReturnUrl", currentUrl);
@@ -55,7 +68,7 @@ router.beforeEach(async (to, from) => {
     return false;
   }
   if (iri) {
-    store.commit("updateRecentLocalActivity", { iri: iri, dateTime: new Date(), app: AppEnum.VIEWER });
+    store.commit("updateRecentLocalActivity", { iri: iri, dateTime: new Date(), app: Env.VIEWER_URL });
     store.commit("updateConceptIri", to.params.selectedIri as string);
   }
   if (to.matched.some((record: any) => record.meta.requiresAuth)) {
@@ -63,7 +76,7 @@ router.beforeEach(async (to, from) => {
     console.log("auth guard user authenticated: " + res.authenticated);
     if (!res.authenticated) {
       console.log("redirecting to login");
-      window.location.href = Env.authUrl + "login?returnUrl=" + currentUrl;
+      window.location.href = Env.AUTH_URL + "login?returnUrl=" + currentUrl;
     }
   }
   if (to.matched.some((record: any) => record.meta.requiresLicense)) {
@@ -72,6 +85,17 @@ router.beforeEach(async (to, from) => {
       return {
         path: "/snomedLicense"
       };
+    }
+  }
+  if (to.name === "Concept" && isObjectHasKeys(to.params, ["selectedIri"])) {
+    const iri = to.params.selectedIri as string;
+    try {
+      new URL(iri);
+      if (!(await EntityService.iriExists(iri))) {
+        router.push({ name: "EntityNotFound" });
+      }
+    } catch (_error) {
+      router.push({ name: "EntityNotFound" });
     }
   }
 });
