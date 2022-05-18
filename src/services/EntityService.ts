@@ -30,7 +30,7 @@ export default class EntityService {
 
   public static async iriExists(iri: String): Promise<boolean> {
     try {
-      return await axios.get(Env.api + "api/entity/public/iriExists", { params: { iri: iri } });
+      return await axios.get(Env.API + "api/entity/public/iriExists", { params: { iri: iri } });
     } catch (error) {
       return false;
     }
@@ -162,7 +162,7 @@ export default class EntityService {
     cancelToken?: CancelToken
   ): Promise<any> {
     try {
-      return await axios.get(Env.api + "api/entity/public/childrenAndTotalCount", {
+      return await axios.get(Env.API + "api/entity/public/childrenAndTotalCount", {
         params: { iri: iri, page: pageIndex, size: pageSize, schemeIris: filters?.schemes.join(",") },
         cancelToken: cancelToken
       });
