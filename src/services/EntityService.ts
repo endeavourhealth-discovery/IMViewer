@@ -28,6 +28,14 @@ export default class EntityService {
     }
   }
 
+  public static async iriExists(iri: String): Promise<boolean> {
+    try {
+      return await axios.get(Env.api + "api/entity/public/iriExists", { params: { iri: iri } });
+    } catch (error) {
+      return false;
+    }
+  }
+
   public static async getFullExportSet(iri: string, v1: boolean): Promise<any> {
     const client = axios.create({
       baseURL: Env.API,
@@ -143,6 +151,23 @@ export default class EntityService {
       });
     } catch (error) {
       return [] as EntityReferenceNode[];
+    }
+  }
+
+  public static async getChildrenAndTotalCount(
+    iri: string,
+    pageIndex: number,
+    pageSize: number,
+    filters?: FiltersAsIris,
+    cancelToken?: CancelToken
+  ): Promise<any> {
+    try {
+      return await axios.get(Env.api + "api/entity/public/childrenAndTotalCount", {
+        params: { iri: iri, page: pageIndex, size: pageSize, schemeIris: filters?.schemes.join(",") },
+        cancelToken: cancelToken
+      });
+    } catch (error) {
+      return {} as any;
     }
   }
 
