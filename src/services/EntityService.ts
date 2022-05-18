@@ -173,7 +173,7 @@ export default class EntityService {
 
   public static async getMembersAndTotalCount(iri: string,predicate:string, pageIndex: number, pageSize: number, filters?: FiltersAsIris, cancelToken?: CancelToken): Promise<any> {
     try {
-      return await axios.get(Env.api + "api/entity/public/membersAndTotalCount", {
+      return await axios.get(Env.API + "api/entity/public/membersAndTotalCount", {
         params: { iri: iri,predicate: predicate, page: pageIndex, size: pageSize, schemeIris: filters?.schemes.join(",") },
         cancelToken: cancelToken
       });
@@ -184,7 +184,7 @@ export default class EntityService {
 
   public static async getPartialAndTotalCount(iri: string,predicate:string, pageIndex: number, pageSize: number, filters?: FiltersAsIris, cancelToken?: CancelToken): Promise<any> {
     try {
-      return await axios.get(Env.api + "api/entity/public/partialAndTotalCount", {
+      return await axios.get(Env.API + "api/entity/public/partialAndTotalCount", {
         params: { iri: iri,predicate: predicate, page: pageIndex, size: pageSize, schemeIris: filters?.schemes.join(",") },
         cancelToken: cancelToken
       });
