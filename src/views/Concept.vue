@@ -7,7 +7,7 @@
           <span class="entity-name" v-tooltip="{ value: header, class: 'name-tooltip' }">{{ header }}</span>
           <div v-if="isObjectHasKeysWrapper(concept, ['http://endhealth.info/im#definition'])">
             <Button
-              icon="far fa-copy"
+              icon="fa-regular fa-copy"
               class="p-button-rounded p-button-text p-button-secondary topbar-content-button"
               @click="toggle($event, 'copyMenu')"
               v-tooltip="'Copy concept to clipboard'"
@@ -15,7 +15,7 @@
             <Menu id="copy-options" ref="copyMenu" :model="copyMenuItems" :popup="true" />
           </div>
           <Button
-            icon="fas fa-cloud-download-alt"
+            icon="fa-regular fa-cloud-arrow-down"
             class="p-button-rounded p-button-text p-button-secondary topbar-content-button"
             @click="toggle($event, 'downloadMenu')"
             v-tooltip.bottom="'Download concept'"
@@ -38,14 +38,14 @@
             @click="directToCreateRoute"
             v-tooltip.bottom="'Create new concept'"
           >
-            <i class="fas fa-plus-circle" aria-hidden="true"></i>
+            <i class="fa-solid fa-plus-circle" aria-hidden="true"></i>
           </button>
           <button
             class="p-panel-header-icon p-link p-mr-2"
             @click="directToEditRoute"
             v-tooltip.bottom="'Edit concept'"
           >
-            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+            <i class="fa-solid fa-pencil-alt" aria-hidden="true"></i>
           </button>-->
       </template>
     </TopBar>
@@ -71,7 +71,7 @@
                   <ProgressSpinner />
                 </div>
                 <div v-else class="concept-panel-content" id="definition-container">
-                  <Definition :concept="concept" :configs="definitionConfig" :totalCount="totalCount"/>
+                  <Definition :concept="concept" :configs="definitionConfig" :totalCount="totalCount" />
                 </div>
               </TabPanel>
               <TabPanel header="Maps" v-if="showMappings">
@@ -328,7 +328,7 @@ export default defineComponent({
       }
       this.concept = await EntityService.getPartialEntity(iri, predicates);
       this.concept["@id"] = iri;
-      this.children = await EntityService.getChildrenAndTotalCount(iri,1,10);
+      this.children = await EntityService.getChildrenAndTotalCount(iri, 1, 10);
       this.totalCount = this.children["totalCount"];
       this.concept["subtypes"] = this.children.result;
       this.concept["termCodes"] = await EntityService.getEntityTermCodes(iri);
