@@ -157,6 +157,28 @@ export default class EntityService {
     }
   }
 
+  public static async getMembersAndTotalCount(iri: string,predicate:string, pageIndex: number, pageSize: number, filters?: FiltersAsIris, cancelToken?: CancelToken): Promise<any> {
+    try {
+      return await axios.get(Env.api + "api/entity/public/membersAndTotalCount", {
+        params: { iri: iri,predicate: predicate, page: pageIndex, size: pageSize, schemeIris: filters?.schemes.join(",") },
+        cancelToken: cancelToken
+      });
+    } catch (error) {
+      return {} as any;
+    }
+  }
+
+  public static async getPartialAndTotalCount(iri: string,predicate:string, pageIndex: number, pageSize: number, filters?: FiltersAsIris, cancelToken?: CancelToken): Promise<any> {
+    try {
+      return await axios.get(Env.api + "api/entity/public/partialAndTotalCount", {
+        params: { iri: iri,predicate: predicate, page: pageIndex, size: pageSize, schemeIris: filters?.schemes.join(",") },
+        cancelToken: cancelToken
+      });
+    } catch (error) {
+      return {} as any;
+    }
+  }
+
   public static async getEntityUsages(iri: string, pageIndex: number, pageSize: number): Promise<TTIriRef[]> {
     try {
       return await axios.get(Env.api + "api/entity/public/usages", {

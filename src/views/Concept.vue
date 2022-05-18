@@ -57,7 +57,7 @@
           <ProgressSpinner />
         </div>
         <div v-else class="leftSplitterContent">
-          <Definition :concept="concept" :configs="summaryConfig" class="definition" />
+          <Definition :concept="concept" :configs="summaryConfig" class="definition" :totalCount="totalCount"/>
           <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
           <SecondaryTree :conceptIri="conceptIri" class="leftHierarchy" />
         </div>
@@ -278,7 +278,7 @@ export default defineComponent({
       ] as any,
       selectedOption: {} as any,
       children: {} as any,
-      totalCount: 0
+      totalCount: {} as any
     };
   },
   methods: {
@@ -329,7 +329,13 @@ export default defineComponent({
       this.concept = await EntityService.getPartialEntity(iri, predicates);
       this.concept["@id"] = iri;
       this.children = await EntityService.getChildrenAndTotalCount(iri,1,10);
-      this.totalCount = this.children["totalCount"];
+      configs.forEach((config) => {
+        if(config.predicate === "subtypes"){
+          this.totalCount[config.predicate] = this.children.totalCount;
+        }else{
+          this.totalCount[config.predicate] = null;
+        }
+      })
       this.concept["subtypes"] = this.children.result;
       this.concept["termCodes"] = await EntityService.getEntityTermCodes(iri);
 

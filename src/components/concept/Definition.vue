@@ -37,7 +37,7 @@ export default defineComponent({
   props: {
     concept: { type: Object, required: true },
     configs: { type: Array as PropType<Array<DefinitionConfig>>, required: true },
-    totalCount: { type: Number as any }
+    totalCount: { type: Object , required: true }
   },
 
   data() {
@@ -50,7 +50,7 @@ export default defineComponent({
   },
 
   mounted(){
-    if(this.totalCount >= this.pageSize){
+    if(isObjectHasKeys(this.totalCount,["subtypes"]) && this.totalCount.subtypes >= this.pageSize){
       this.loadButton = true;
     }
   },
@@ -108,13 +108,13 @@ export default defineComponent({
 
     async loadMore(predicate: string) {
       if(this.loadButton){
-        if (this.nextPage * this.pageSize < this.totalCount) {
+        if (this.nextPage * this.pageSize < this.totalCount["subtypes"]) {
           this.children = await EntityService.getChildrenAndTotalCount(this.concept["@id"], this.nextPage, this.pageSize);
           this.concept[predicate] =  this.concept[predicate].concat(this.children.result);
           this.nextPage = this.nextPage + 1;
           this.loadButton = true;
-        } else if (this.nextPage * this.pageSize > this.totalCount) {
-          this.children = await EntityService.getChildrenAndTotalCount(this.concept["@id"], this.nextPage, this.totalCount - ((this.nextPage - 1) * this.pageSize) + 1);
+        } else if (this.nextPage * this.pageSize > this.totalCount["subtypes"]) {
+          this.children = await EntityService.getChildrenAndTotalCount(this.concept["@id"], this.nextPage, this.pageSize);
           this.concept[predicate] =  this.concept[predicate].concat(this.children.result);
           this.loadButton = false;
         } else {
