@@ -5,7 +5,6 @@ import store from "@/store/index";
 import { nextTick } from "vue";
 import { AccessDenied, Env, PageNotFound, SnomedLicense, EntityNotFound, Helpers } from "im-library";
 import EntityService from "@/services/EntityService";
-const { AppEnum } = Enums;
 const {
   DataTypeCheckers: { isObjectHasKeys }
 } = Helpers;
