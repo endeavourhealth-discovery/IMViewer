@@ -3,9 +3,9 @@ import { Models, Env } from "im-library";
 
 export default class QueryService {
   public static async generateSQL(conceptIri: string) {
-    return axios.get(Env.api + "api/query/public/generateSQL", {
+    return axios.get(Env.API + "api/query/public/generateSQL", {
       params: {
-        iri: conceptIri,
+        iri: conceptIri
       },
       responseType: "text"
     });
