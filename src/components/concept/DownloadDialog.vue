@@ -157,7 +157,7 @@ export default defineComponent({
       const modIri = iriToUrl(this.conceptIri);
 
       const url =
-        Env.api +
+        Env.API +
         "api/entity/download?iri=" +
         modIri +
         "&format=" +

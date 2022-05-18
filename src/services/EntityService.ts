@@ -16,7 +16,7 @@ import {
 export default class EntityService {
   public static async downloadConcept(iri: string, format: string): Promise<any> {
     try {
-      return await axios.get(Env.api + "api/entity/public/exportConcept", {
+      return await axios.get(Env.API + "api/entity/public/exportConcept", {
         params: {
           iri: iri,
           format: format
@@ -30,7 +30,7 @@ export default class EntityService {
 
   public static async getFullExportSet(iri: string, v1: boolean): Promise<any> {
     const client = axios.create({
-      baseURL: Env.api,
+      baseURL: Env.API,
       timeout: 0
     });
 
@@ -45,7 +45,7 @@ export default class EntityService {
 
   public static async getSimpleMaps(iri: string): Promise<any[]> {
     try {
-      return await axios.get(Env.api + "api/entity/public/simpleMaps", {
+      return await axios.get(Env.API + "api/entity/public/simpleMaps", {
         params: {
           iri: iri
         }
@@ -57,7 +57,7 @@ export default class EntityService {
 
   public static async getPartialEntity(iri: string, predicates: string[]): Promise<any> {
     try {
-      return await axios.get(Env.api + "api/entity/public/partial", {
+      return await axios.get(Env.API + "api/entity/public/partial", {
         params: {
           iri: iri,
           predicate: predicates.join(",")
@@ -70,7 +70,7 @@ export default class EntityService {
 
   public static async getPartialEntityBundle(iri: string, predicates: string[]): Promise<TTBundle> {
     try {
-      return await axios.get(Env.api + "api/entity/public/partialBundle", {
+      return await axios.get(Env.API + "api/entity/public/partialBundle", {
         params: {
           iri: iri,
           predicate: predicates.join(",")
@@ -83,7 +83,7 @@ export default class EntityService {
 
   public static async getDefinitionBundle(iri: string): Promise<TTBundle> {
     try {
-      return await axios.get(Env.api + "api/entity/public/inferredBundle", {
+      return await axios.get(Env.API + "api/entity/public/inferredBundle", {
         params: {
           iri: iri
         }
@@ -95,7 +95,7 @@ export default class EntityService {
 
   public static async getInferredAsString(iri: string): Promise<string> {
     try {
-      return await axios.get(Env.api + "api/entity/public/inferredAsString", {
+      return await axios.get(Env.API + "api/entity/public/inferredAsString", {
         params: {
           iri: iri
         }
@@ -107,7 +107,7 @@ export default class EntityService {
 
   public static async advancedSearch(request: Models.Search.SearchRequest, cancelToken: CancelToken): Promise<Models.Search.ConceptSummary[]> {
     try {
-      return await axios.post(Env.api + "api/entity/public/search", request, {
+      return await axios.post(Env.API + "api/entity/public/search", request, {
         cancelToken: cancelToken
       });
     } catch (error) {
@@ -117,7 +117,7 @@ export default class EntityService {
 
   public static async getEntityDefinitionDto(iri: string): Promise<EntityDefinitionDto> {
     try {
-      return await axios.get(Env.api + "api/entity/public/definition", {
+      return await axios.get(Env.API + "api/entity/public/definition", {
         params: { iri: iri }
       });
     } catch (error) {
@@ -127,7 +127,7 @@ export default class EntityService {
 
   public static async getEntityParents(iri: string, filters?: FiltersAsIris): Promise<EntityReferenceNode[]> {
     try {
-      return await axios.get(Env.api + "api/entity/public/parents", {
+      return await axios.get(Env.API + "api/entity/public/parents", {
         params: { iri: iri, schemeIris: filters?.schemes.join(",") }
       });
     } catch (error) {
@@ -137,7 +137,7 @@ export default class EntityService {
 
   public static async getEntityChildren(iri: string, filters?: FiltersAsIris, cancelToken?: CancelToken): Promise<EntityReferenceNode[]> {
     try {
-      return await axios.get(Env.api + "api/entity/public/children", {
+      return await axios.get(Env.API + "api/entity/public/children", {
         params: { iri: iri, schemeIris: filters?.schemes.join(",") },
         cancelToken: cancelToken
       });
@@ -148,7 +148,7 @@ export default class EntityService {
 
   public static async getEntityUsages(iri: string, pageIndex: number, pageSize: number): Promise<TTIriRef[]> {
     try {
-      return await axios.get(Env.api + "api/entity/public/usages", {
+      return await axios.get(Env.API + "api/entity/public/usages", {
         params: {
           iri: iri,
           page: pageIndex,
@@ -162,7 +162,7 @@ export default class EntityService {
 
   public static async getUsagesTotalRecords(iri: string): Promise<number> {
     try {
-      return await axios.get(Env.api + "api/entity/public/usagesTotalRecords", {
+      return await axios.get(Env.API + "api/entity/public/usagesTotalRecords", {
         params: {
           iri: iri
         }
@@ -180,7 +180,7 @@ export default class EntityService {
     withHyperlinks?: boolean
   ): Promise<ExportValueSet> {
     try {
-      return await axios.get(Env.api + "api/entity/public/members", {
+      return await axios.get(Env.API + "api/entity/public/members", {
         params: {
           iri: iri,
           expandMembers: expandMembers,
@@ -196,7 +196,7 @@ export default class EntityService {
 
   public static async getEntityGraph(iri: string): Promise<GraphData> {
     try {
-      return await axios.get(Env.api + "api/entity/public/graph", { params: { iri: iri } });
+      return await axios.get(Env.API + "api/entity/public/graph", { params: { iri: iri } });
     } catch (error) {
       return {} as GraphData;
     }
@@ -204,7 +204,7 @@ export default class EntityService {
 
   public static async getEntityTermCodes(iri: string): Promise<TermCode[]> {
     try {
-      return await axios.get(Env.api + "api/entity/public/termCode", {
+      return await axios.get(Env.API + "api/entity/public/termCode", {
         params: { iri: iri }
       });
     } catch (error) {
@@ -214,7 +214,7 @@ export default class EntityService {
 
   public static async getDataModelProperties(iri: string): Promise<DataModelProperty[]> {
     try {
-      return await axios.get(Env.api + "api/entity/public/dataModelProperties", {
+      return await axios.get(Env.API + "api/entity/public/dataModelProperties", {
         params: { iri: iri }
       });
     } catch (error) {
@@ -224,7 +224,7 @@ export default class EntityService {
 
   public static async getEntitySummary(iri: string): Promise<Models.Search.ConceptSummary> {
     try {
-      return await axios.get(Env.api + "api/entity/public/summary", {
+      return await axios.get(Env.API + "api/entity/public/summary", {
         params: { iri: iri }
       });
     } catch (error) {
@@ -234,7 +234,7 @@ export default class EntityService {
 
   public static async getNamespaces(): Promise<Namespace[]> {
     try {
-      return await axios.get(Env.api + "api/entity/public/namespaces");
+      return await axios.get(Env.API + "api/entity/public/namespaces");
     } catch (error) {
       return [] as Namespace[];
     }
@@ -242,7 +242,7 @@ export default class EntityService {
 
   public static async getEcl(bundle: TTBundle): Promise<string> {
     try {
-      return await axios.post(Env.api + "api/entity/public/ecl", bundle);
+      return await axios.post(Env.API + "api/entity/public/ecl", bundle);
     } catch (error) {
       return "";
     }
