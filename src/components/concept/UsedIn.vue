@@ -28,7 +28,7 @@
       <Column field="name" filter-field="name" header="Name">
         <template #body="{data}">
           <span :style="'color:' + data.colour" class="p-mx-1 type-icon">
-            <font-awesome-icon :icon="data.icon" />
+            <i :class="data.icon" aria-hidden="true" />
           </span>
           <span class="text-name">{{ data.name }}</span>
         </template>

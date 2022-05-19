@@ -1,7 +1,7 @@
 <template>
   <div id="entity-panel-header-text" :key="icon">
     <span :style="color" class="p-mx-1">
-      <font-awesome-icon v-if="types.length" :icon="icon" />
+      <i v-if="types.length" :class="icon" aria-hidden="true" />
     </span>
     {{ header }}
   </div>
