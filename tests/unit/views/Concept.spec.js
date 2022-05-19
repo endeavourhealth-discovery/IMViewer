@@ -11,6 +11,7 @@ import SplitterPanel from "primevue/splitterpanel";
 import TopBar from "im-library";
 import TermCodeTable from "im-library";
 import TextSectionHeader from "im-library";
+import SecondaryTree from "im-library";
 import Definition from "@/components/concept/Definition.vue";
 import Mappings from "@/components/concept/Mappings.vue";
 import UsedIn from "@/components/concept/UsedIn.vue";
@@ -20,12 +21,13 @@ import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import Panel from "primevue/panel";
 import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
-import { LoggerService } from "im-library"
-import ProfileDisplay from 'im-library';
+import { LoggerService } from "im-library";
+import ProfileDisplay from "im-library";
+import DirectService from "@/services/DirectService";
 
 Object.assign(navigator, {
   clipboard: {
-    writeText: () => { }
+    writeText: () => {}
   }
 });
 
@@ -57,20 +59,21 @@ describe("Concept.vue ___ not moduleIri", () => {
   const CHILDREN = {
     totalCount: 3,
     pageSize: 10,
-    result:[
-    {
-      name: "Adult critical care encounter",
-      "@id": "http://endhealth.info/im#1641000252107"
-    },
-    {
-      name: "Neonatal critical care encounter",
-      "@id": "http://endhealth.info/im#831000252103"
-    },
-    {
-      name: "Paediatric critical care encounter",
-      "@id": "http://endhealth.info/im#2811000252102"
-    }
-  ]};
+    result: [
+      {
+        name: "Adult critical care encounter",
+        "@id": "http://endhealth.info/im#1641000252107"
+      },
+      {
+        name: "Neonatal critical care encounter",
+        "@id": "http://endhealth.info/im#831000252103"
+      },
+      {
+        name: "Paediatric critical care encounter",
+        "@id": "http://endhealth.info/im#2811000252102"
+      }
+    ]
+  };
   const TERMS = [{ name: "Critical care encounter (record type)" }];
   const INFERRED = {
     entity: {
@@ -125,7 +128,18 @@ describe("Concept.vue ___ not moduleIri", () => {
     }
   };
 
-  const DEFAULT_PREDICATE_NAMES = { "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Is subclass of", "http://endhealth.info/im#roleGroup": "Where", "http://www.w3.org/2002/07/owl#equivalentClass": "Is equivalent to", "http://www.w3.org/2002/07/owl#intersectionOf": "Combination of", "http://www.w3.org/2002/07/owl#someValuesFrom": "With a value", "http://www.w3.org/2002/07/owl#onProperty": "On property", "http://www.w3.org/ns/shacl#property": "Properties", "http://www.w3.org/ns/shacl#class": "Type", "http://www.w3.org/ns/shacl#path": "Property", "http://www.w3.org/ns/shacl#datatype": "Type" }
+  const DEFAULT_PREDICATE_NAMES = {
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Is subclass of",
+    "http://endhealth.info/im#roleGroup": "Where",
+    "http://www.w3.org/2002/07/owl#equivalentClass": "Is equivalent to",
+    "http://www.w3.org/2002/07/owl#intersectionOf": "Combination of",
+    "http://www.w3.org/2002/07/owl#someValuesFrom": "With a value",
+    "http://www.w3.org/2002/07/owl#onProperty": "On property",
+    "http://www.w3.org/ns/shacl#property": "Properties",
+    "http://www.w3.org/ns/shacl#class": "Type",
+    "http://www.w3.org/ns/shacl#path": "Property",
+    "http://www.w3.org/ns/shacl#datatype": "Type"
+  };
 
   let wrapper;
   let mockStore;
@@ -161,7 +175,7 @@ describe("Concept.vue ___ not moduleIri", () => {
     mockToast = {
       add: vi.fn()
     };
-    mockRef = { render: () => { }, methods: { toggle: vi.fn(), show: vi.fn(), hide: vi.fn() } };
+    mockRef = { render: () => {}, methods: { toggle: vi.fn(), show: vi.fn(), hide: vi.fn() } };
 
     windowSpy = vi.spyOn(window, "getComputedStyle");
     windowSpy.mockReturnValue({ getPropertyValue: vi.fn().mockReturnValue("16px") });
@@ -185,6 +199,7 @@ describe("Concept.vue ___ not moduleIri", () => {
           Panel,
           DownloadDialog,
           ProgressSpinner,
+          SecondaryTree,
           Splitter,
           SplitterPanel,
           TopBar,
@@ -321,12 +336,10 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("can routeToEdit", async () => {
+    DirectService.directTo = vi.fn().mockResolvedValue(true);
     wrapper.vm.directToEditRoute();
-    expect(mockRouter.push).toHaveBeenCalledTimes(1);
-    expect(mockRouter.push).toHaveBeenCalledWith({
-      name: "Edit",
-      params: { iri: "http://endhealth.info/im#CriticalCareEncounter" }
-    });
+    expect(DirectService.directTo).toHaveBeenCalledTimes(1);
+    expect(DirectService.directTo).toHaveBeenLastCalledWith("/editor/", "http://endhealth.info/im#CriticalCareEncounter", wrapper.vm, "editor");
   });
 
   it("can route to create", () => {
@@ -345,25 +358,26 @@ describe("Concept.vue ___ not moduleIri", () => {
     EntityService.getChildrenAndTotalCount = vi.fn().mockResolvedValue({
       totalCount: 3,
       pageSize: 10,
-      result:[
-      {
-        name: "Acquired scoliosis (disorder)",
-        "@id": "http://snomed.info/sct#111266001"
-      },
-      {
-        name: "Acrodysplasia scoliosis (disorder)",
-        "@id": "http://snomed.info/sct#773773006"
-      },
-      {
-        name: "Congenital scoliosis due to bony malformation (disorder)",
-        "@id": "http://snomed.info/sct#205045003"
-      }
-    ]});
+      result: [
+        {
+          name: "Acquired scoliosis (disorder)",
+          "@id": "http://snomed.info/sct#111266001"
+        },
+        {
+          name: "Acrodysplasia scoliosis (disorder)",
+          "@id": "http://snomed.info/sct#773773006"
+        },
+        {
+          name: "Congenital scoliosis due to bony malformation (disorder)",
+          "@id": "http://snomed.info/sct#205045003"
+        }
+      ]
+    });
     wrapper.vm.getConcept("http://snomed.info/sct#298382003");
     await flushPromises();
     expect(EntityService.getPartialEntity).toHaveBeenCalledTimes(1);
     expect(EntityService.getChildrenAndTotalCount).toHaveBeenCalledTimes(1);
-    expect(EntityService.getChildrenAndTotalCount).toHaveBeenCalledWith("http://snomed.info/sct#298382003",1,10);
+    expect(EntityService.getChildrenAndTotalCount).toHaveBeenCalledWith("http://snomed.info/sct#298382003", 1, 10);
     expect(EntityService.getEntityTermCodes).toHaveBeenCalledTimes(1);
     expect(EntityService.getEntityTermCodes).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
     expect(wrapper.vm.concept).toStrictEqual({
@@ -399,25 +413,26 @@ describe("Concept.vue ___ not moduleIri", () => {
     EntityService.getChildrenAndTotalCount = vi.fn().mockResolvedValue({
       totalCount: 3,
       pageSize: 10,
-      result:[
-      {
-        name: "Acquired scoliosis (disorder)",
-        "@id": "http://snomed.info/sct#111266001"
-      },
-      {
-        name: "Acrodysplasia scoliosis (disorder)",
-        "@id": "http://snomed.info/sct#773773006"
-      },
-      {
-        name: "Congenital scoliosis due to bony malformation (disorder)",
-        "@id": "http://snomed.info/sct#205045003"
-      }
-    ]});
+      result: [
+        {
+          name: "Acquired scoliosis (disorder)",
+          "@id": "http://snomed.info/sct#111266001"
+        },
+        {
+          name: "Acrodysplasia scoliosis (disorder)",
+          "@id": "http://snomed.info/sct#773773006"
+        },
+        {
+          name: "Congenital scoliosis due to bony malformation (disorder)",
+          "@id": "http://snomed.info/sct#205045003"
+        }
+      ]
+    });
     wrapper.vm.getConcept("http://snomed.info/sct#298382003");
     await flushPromises();
     expect(EntityService.getPartialEntity).toHaveBeenCalledTimes(1);
     expect(EntityService.getChildrenAndTotalCount).toHaveBeenCalledTimes(1);
-    expect(EntityService.getChildrenAndTotalCount).toHaveBeenCalledWith("http://snomed.info/sct#298382003",1,10);
+    expect(EntityService.getChildrenAndTotalCount).toHaveBeenCalledWith("http://snomed.info/sct#298382003", 1, 10);
     expect(EntityService.getEntityTermCodes).toHaveBeenCalledTimes(1);
     expect(EntityService.getEntityTermCodes).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
     expect(wrapper.vm.concept).toStrictEqual({
@@ -546,7 +561,6 @@ describe("Concept.vue ___ not moduleIri", () => {
     await flushPromises();
     expect(ConfigService.getComponentLayout).toHaveBeenCalledTimes(1);
     expect(ConfigService.getComponentLayout).toHaveBeenCalledWith("description");
-
   });
 
   it("can getConfig ___ missing order property", async () => {
@@ -623,7 +637,6 @@ describe("Concept.vue ___ not moduleIri", () => {
     expect(wrapper.vm.types).toStrictEqual([]);
     expect(wrapper.vm.header).toBe("Scoliosis caused by radiation (disorder)");
     expect(wrapper.vm.header).toBe("Scoliosis caused by radiation (disorder)");
-
   });
 
   it("can setStoreType ___ concept", async () => {
@@ -1018,7 +1031,7 @@ describe("Concept.vue ___ moduleIri", () => {
     mockToast = {
       add: vi.fn()
     };
-    mockRef = { render: () => { }, methods: { toggle: vi.fn(), show: vi.fn(), hide: vi.fn() } };
+    mockRef = { render: () => {}, methods: { toggle: vi.fn(), show: vi.fn(), hide: vi.fn() } };
 
     windowSpy = vi.spyOn(window, "getComputedStyle");
     windowSpy.mockReturnValue({ getPropertyValue: vi.fn().mockReturnValue("16px") });
@@ -1042,6 +1055,7 @@ describe("Concept.vue ___ moduleIri", () => {
           Panel,
           DownloadDialog,
           ProgressSpinner,
+          SecondaryTree,
           Splitter,
           SplitterPanel,
           TopBar,
