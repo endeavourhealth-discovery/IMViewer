@@ -15,7 +15,7 @@
             <Menu id="copy-options" ref="copyMenu" :model="copyMenuItems" :popup="true" />
           </div>
           <Button
-            icon="fa-regular fa-cloud-arrow-down"
+            icon="fa-solid fa-cloud-arrow-down"
             class="p-button-rounded p-button-text p-button-secondary topbar-content-button"
             @click="toggle($event, 'downloadMenu')"
             v-tooltip.bottom="'Download concept'"
