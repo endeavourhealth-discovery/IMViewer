@@ -27,12 +27,24 @@
             v-if="isFavourite(concept['@id'])"
             style="color: #e39a36"
             icon="pi pi-fw pi-star-fill"
-            class="p-button-rounded p-button-text "
+            class="p-button-rounded p-button-text topbar-content-button-fav"
+            v-tooltip.bottom="'Unfavourite'"
             @click="updateFavourites(concept)"
           />
 
-          <Button v-else icon="pi pi-fw pi-star" class="p-button-rounded p-button-text p-button-plain" @click="updateFavourites(concept)" />
-          <Button icon="fa-solid fa-pencil" class="p-panel-header-icon p-link p-mr-2" @click="directToEditRoute" v-tooltip.bottom="'Edit concept'" />
+          <Button
+            v-else
+            icon="pi pi-fw pi-star"
+            class="p-button-rounded p-button-text p-button-plain topbar-content-button"
+            v-tooltip.bottom="'Favourite'"
+            @click="updateFavourites(concept)"
+          />
+          <Button
+            icon="fa-solid fa-pencil"
+            class="p-button-rounded p-button-text p-button-plain topbar-content-button"
+            @click="directToEditRoute"
+            v-tooltip.bottom="'Edit concept'"
+          />
         </div>
         <!-- <button
             class="p-panel-header-icon p-link p-mr-2"
@@ -605,6 +617,16 @@ export default defineComponent({
 
 .topbar-content-button {
   flex: 0 0 auto;
+}
+
+.topbar-content-button:hover {
+  background-color: #6c757d !important;
+  color: #ffffff !important;
+}
+
+.topbar-content-button-fav:hover {
+  background-color: #e39a36 !important;
+  color: #ffffff !important;
 }
 
 .name-tooltip {
