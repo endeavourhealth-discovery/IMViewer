@@ -55,26 +55,26 @@ describe("UsedIn.vue", () => {
     {
       "@id": "http://endhealth.info/im#AccidentAndEmergencyEncounter",
       name: "Accident and emergency encounter (entry type)",
-      icon: ["fa-solid", "fa-diagram-project"],
+      icon: ["fas", "project-diagram"],
       colour: "#781c8188"
     },
     {
       "@id": "http://endhealth.info/im#AllergyIntoleranceAndAdverseReaction",
       name: "Allergy, intolerance and adverse reaction  (entry type)",
-      icon: ["fa-solid", "fa-diagram-project"],
+      icon: ["fas", "project-diagram"],
       colour: "#781c8188"
     },
-    { "@id": "http://endhealth.info/im#Appointment", name: "Appointment  (entry type)", icon: ["fa-solid", "fa-diagram-project"], colour: "#781c8188" },
+    { "@id": "http://endhealth.info/im#Appointment", name: "Appointment  (entry type)", icon: ["fas", "project-diagram"], colour: "#781c8188" },
     {
       "@id": "http://endhealth.info/im#AppointmentAttendanceHistory",
       name: "Appointment attendance history  (entry type)",
-      icon: ["fa-solid", "fa-diagram-project"],
+      icon: ["fas", "project-diagram"],
       colour: "#781c8188"
     },
     {
       "@id": "http://endhealth.info/im#AppointmentSession",
       name: "Appointment session  (entry type)",
-      icon: ["fa-solid", "fa-diagram-project"],
+      icon: ["fas", "project-diagram"],
       colour: "#781c8188"
     }
   ];

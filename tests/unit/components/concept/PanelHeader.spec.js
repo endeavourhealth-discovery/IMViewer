@@ -15,7 +15,7 @@ describe("PanelHeader.vue", () => {
     wrapper.vm.$options.watch.types.call(wrapper.vm, [{ name: "Class", "@id": "http://www.w3.org/2002/07/owl#Class" }]);
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.color).toBe("color: #c3ba4588");
-    expect(wrapper.vm.icon).toStrictEqual(["fa-solid", "fa-lightbulb"]);
+    expect(wrapper.vm.icon).toStrictEqual(["far", "lightbulb"]);
   });
 
   it("can watch types ___ 0 length", async () => {
