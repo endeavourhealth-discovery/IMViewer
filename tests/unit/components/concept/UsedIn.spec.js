@@ -64,7 +64,12 @@ describe("UsedIn.vue", () => {
       icon: ["fa-solid", "fa-diagram-project"],
       colour: "#781c8188"
     },
-    { "@id": "http://endhealth.info/im#Appointment", name: "Appointment  (entry type)", icon: ["fas", "project-diagram"], colour: "#781c8188" },
+    {
+      "@id": "http://endhealth.info/im#Appointment",
+      name: "Appointment  (entry type)",
+      icon: ["fa-solid", "fa-diagram-project"],
+      colour: "#781c8188"
+    },
     {
       "@id": "http://endhealth.info/im#AppointmentAttendanceHistory",
       name: "Appointment attendance history  (entry type)",
@@ -74,7 +79,7 @@ describe("UsedIn.vue", () => {
     {
       "@id": "http://endhealth.info/im#AppointmentSession",
       name: "Appointment session  (entry type)",
-      icon: ["fa-s", "fa-diagram-project"],
+      icon: ["fa-solid", "fa-diagram-project"],
       colour: "#781c8188"
     }
   ];
