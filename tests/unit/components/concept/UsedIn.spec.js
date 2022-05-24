@@ -10,19 +10,79 @@ describe("UsedIn.vue", () => {
   let mockToast;
   let docSpy;
   const USAGES = [
-    { "@id": "http://endhealth.info/im#AccidentAndEmergencyEncounter", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2000/01/rdf-schema#Class", "name": "Class" }, { "@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape" }], "http://www.w3.org/2000/01/rdf-schema#label": "Accident and emergency encounter (entry type)" },
-    { "@id": "http://endhealth.info/im#AllergyIntoleranceAndAdverseReaction", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2000/01/rdf-schema#Class", "name": "Class" }, { "@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape" }], "http://www.w3.org/2000/01/rdf-schema#label": "Allergy, intolerance and adverse reaction  (entry type)" },
-    { "@id": "http://endhealth.info/im#Appointment", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2000/01/rdf-schema#Class", "name": "Class" }, { "@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape" }], "http://www.w3.org/2000/01/rdf-schema#label": "Appointment  (entry type)" },
-    { "@id": "http://endhealth.info/im#AppointmentAttendanceHistory", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2000/01/rdf-schema#Class", "name": "Class" }, { "@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape" }], "http://www.w3.org/2000/01/rdf-schema#label": "Appointment attendance history  (entry type)" },
-    { "@id": "http://endhealth.info/im#AppointmentSession", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2000/01/rdf-schema#Class", "name": "Class" }, { "@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape" }], "http://www.w3.org/2000/01/rdf-schema#label": "Appointment session  (entry type)" },
-  ]
+    {
+      "@id": "http://endhealth.info/im#AccidentAndEmergencyEncounter",
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+        { "@id": "http://www.w3.org/2000/01/rdf-schema#Class", name: "Class" },
+        { "@id": "http://www.w3.org/ns/shacl#NodeShape", name: "Node shape" }
+      ],
+      "http://www.w3.org/2000/01/rdf-schema#label": "Accident and emergency encounter (entry type)"
+    },
+    {
+      "@id": "http://endhealth.info/im#AllergyIntoleranceAndAdverseReaction",
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+        { "@id": "http://www.w3.org/2000/01/rdf-schema#Class", name: "Class" },
+        { "@id": "http://www.w3.org/ns/shacl#NodeShape", name: "Node shape" }
+      ],
+      "http://www.w3.org/2000/01/rdf-schema#label": "Allergy, intolerance and adverse reaction  (entry type)"
+    },
+    {
+      "@id": "http://endhealth.info/im#Appointment",
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+        { "@id": "http://www.w3.org/2000/01/rdf-schema#Class", name: "Class" },
+        { "@id": "http://www.w3.org/ns/shacl#NodeShape", name: "Node shape" }
+      ],
+      "http://www.w3.org/2000/01/rdf-schema#label": "Appointment  (entry type)"
+    },
+    {
+      "@id": "http://endhealth.info/im#AppointmentAttendanceHistory",
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+        { "@id": "http://www.w3.org/2000/01/rdf-schema#Class", name: "Class" },
+        { "@id": "http://www.w3.org/ns/shacl#NodeShape", name: "Node shape" }
+      ],
+      "http://www.w3.org/2000/01/rdf-schema#label": "Appointment attendance history  (entry type)"
+    },
+    {
+      "@id": "http://endhealth.info/im#AppointmentSession",
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+        { "@id": "http://www.w3.org/2000/01/rdf-schema#Class", name: "Class" },
+        { "@id": "http://www.w3.org/ns/shacl#NodeShape", name: "Node shape" }
+      ],
+      "http://www.w3.org/2000/01/rdf-schema#label": "Appointment session  (entry type)"
+    }
+  ];
   const TRANSFORMED_USAGES = [
-    { "@id": "http://endhealth.info/im#AccidentAndEmergencyEncounter", "name": "Accident and emergency encounter (entry type)", "icon": ["fas", "project-diagram"], "colour": "#781c8188" },
-    { "@id": "http://endhealth.info/im#AllergyIntoleranceAndAdverseReaction", "name": "Allergy, intolerance and adverse reaction  (entry type)", "icon": ["fas", "project-diagram"], "colour": "#781c8188" },
-    { "@id": "http://endhealth.info/im#Appointment", "name": "Appointment  (entry type)", "icon": ["fas", "project-diagram"], "colour": "#781c8188" },
-    { "@id": "http://endhealth.info/im#AppointmentAttendanceHistory", "name": "Appointment attendance history  (entry type)", "icon": ["fas", "project-diagram"], "colour": "#781c8188" },
-    { "@id": "http://endhealth.info/im#AppointmentSession", "name": "Appointment session  (entry type)", "icon": ["fas", "project-diagram"], "colour": "#781c8188" }
-  ]
+    {
+      "@id": "http://endhealth.info/im#AccidentAndEmergencyEncounter",
+      name: "Accident and emergency encounter (entry type)",
+      icon: ["fa-solid", "fa-diagram-project"],
+      colour: "#781c8188"
+    },
+    {
+      "@id": "http://endhealth.info/im#AllergyIntoleranceAndAdverseReaction",
+      name: "Allergy, intolerance and adverse reaction  (entry type)",
+      icon: ["fa-solid", "fa-diagram-project"],
+      colour: "#781c8188"
+    },
+    {
+      "@id": "http://endhealth.info/im#Appointment",
+      name: "Appointment  (entry type)",
+      icon: ["fa-solid", "fa-diagram-project"],
+      colour: "#781c8188"
+    },
+    {
+      "@id": "http://endhealth.info/im#AppointmentAttendanceHistory",
+      name: "Appointment attendance history  (entry type)",
+      icon: ["fa-solid", "fa-diagram-project"],
+      colour: "#781c8188"
+    },
+    {
+      "@id": "http://endhealth.info/im#AppointmentSession",
+      name: "Appointment session  (entry type)",
+      icon: ["fa-solid", "fa-diagram-project"],
+      colour: "#781c8188"
+    }
+  ];
   beforeEach(async () => {
     vi.resetAllMocks();
     EntityService.getEntityUsages = vi.fn().mockResolvedValue(USAGES);

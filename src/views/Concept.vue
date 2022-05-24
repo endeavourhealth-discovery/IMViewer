@@ -7,7 +7,7 @@
           <span class="entity-name" v-tooltip="{ value: header, class: 'name-tooltip' }">{{ header }}</span>
           <div v-if="isObjectHasKeysWrapper(concept, ['http://endhealth.info/im#definition'])">
             <Button
-              icon="far fa-copy"
+              icon="fa-regular fa-copy"
               class="p-button-rounded p-button-text p-button-secondary topbar-content-button"
               @click="toggle($event, 'copyMenu')"
               v-tooltip="'Copy concept to clipboard'"
@@ -15,7 +15,7 @@
             <Menu id="copy-options" ref="copyMenu" :model="copyMenuItems" :popup="true" />
           </div>
           <Button
-            icon="fas fa-cloud-download-alt"
+            icon="fa-solid fa-cloud-arrow-down"
             class="p-button-rounded p-button-text p-button-secondary topbar-content-button"
             @click="toggle($event, 'downloadMenu')"
             v-tooltip.bottom="'Download concept'"
@@ -27,26 +27,32 @@
             v-if="isFavourite(concept['@id'])"
             style="color: #e39a36"
             icon="pi pi-fw pi-star-fill"
-            class="p-button-rounded p-button-text "
+            class="p-button-rounded p-button-text topbar-content-button-fav"
+            v-tooltip.bottom="'Unfavourite'"
             @click="updateFavourites(concept)"
           />
 
-          <Button v-else icon="pi pi-fw pi-star" class="p-button-rounded p-button-text p-button-plain" @click="updateFavourites(concept)" />
+          <Button
+            v-else
+            icon="pi pi-fw pi-star"
+            class="p-button-rounded p-button-text p-button-plain topbar-content-button"
+            v-tooltip.bottom="'Favourite'"
+            @click="updateFavourites(concept)"
+          />
+          <Button
+            icon="fa-solid fa-pencil"
+            class="p-button-rounded p-button-text p-button-plain topbar-content-button"
+            @click="directToEditRoute"
+            v-tooltip.bottom="'Edit concept'"
+          />
         </div>
-        <!--<button
+        <!-- <button
             class="p-panel-header-icon p-link p-mr-2"
             @click="directToCreateRoute"
             v-tooltip.bottom="'Create new concept'"
           >
-            <i class="fas fa-plus-circle" aria-hidden="true"></i>
-          </button>
-          <button
-            class="p-panel-header-icon p-link p-mr-2"
-            @click="directToEditRoute"
-            v-tooltip.bottom="'Edit concept'"
-          >
-            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
-          </button>-->
+            <i class="fa-solid fa-plus-circle" aria-hidden="true"></i>
+          </button> -->
       </template>
     </TopBar>
   </div>
@@ -71,7 +77,7 @@
                   <ProgressSpinner />
                 </div>
                 <div v-else class="concept-panel-content" id="definition-container">
-                  <Definition :concept="concept" :configs="definitionConfig" :totalCount="totalCount"/>
+                  <Definition :concept="concept" :configs="definitionConfig" :totalCount="totalCount" />
                 </div>
               </TabPanel>
               <TabPanel header="Maps" v-if="showMappings">
@@ -144,8 +150,9 @@ import { mapState } from "vuex";
 import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
+import DirectService from "@/services/DirectService";
 import Properties from "@/components/concept/Properties.vue";
-import { Helpers, Vocabulary, LoggerService, Models } from "im-library";
+import { Env, Helpers, Vocabulary, LoggerService, Models } from "im-library";
 import { DefinitionConfig, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
@@ -295,11 +302,8 @@ export default defineComponent({
       return this.favourites.includes(iri);
     },
 
-    directToEditRoute(): void {
-      this.$router.push({
-        name: "Edit",
-        params: { iri: this.concept["@id"] }
-      });
+    directToEditRoute() {
+      DirectService.directTo(Env.EDITOR_URL, this.conceptIri, this, "editor");
     },
 
     directToCreateRoute(): void {
@@ -332,7 +336,7 @@ export default defineComponent({
       }
       this.concept = await EntityService.getPartialEntity(iri, predicates);
       this.concept["@id"] = iri;
-      this.children = await EntityService.getChildrenAndTotalCount(iri,1,10);
+      this.children = await EntityService.getChildrenAndTotalCount(iri, 1, 10);
       configs.forEach((config) => {
         if(config.predicate === "subtypes"){
           this.totalCount[config.predicate] = this.children.totalCount;
@@ -632,6 +636,16 @@ export default defineComponent({
 
 .topbar-content-button {
   flex: 0 0 auto;
+}
+
+.topbar-content-button:hover {
+  background-color: #6c757d !important;
+  color: #ffffff !important;
+}
+
+.topbar-content-button-fav:hover {
+  background-color: #e39a36 !important;
+  color: #ffffff !important;
 }
 
 .name-tooltip {
