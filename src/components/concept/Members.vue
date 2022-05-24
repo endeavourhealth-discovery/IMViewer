@@ -81,7 +81,7 @@ import { Helpers, Vocabulary, LoggerService } from "im-library";
 const {
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }
 } = Helpers;
-const { RDFS } = Vocabulary;
+const { RDFS, IM } = Vocabulary;
 
 export default defineComponent({
   name: "Members",
@@ -282,12 +282,12 @@ export default defineComponent({
     async loadMore() {
       if(this.isIncludedSelf){
         if (this.nextPage * this.pageSize < this.totalCount) {
-          this.hasMembers = await EntityService.getMembersAndTotalCount(this.conceptIri, "http://endhealth.info/im#hasMember", this.nextPage, this.pageSize);
+          this.hasMembers = await EntityService.getHasMember(this.conceptIri, IM.HAS_MEMBER, this.nextPage, this.pageSize);
           this.combinedMembers[0].entity.name = this.combinedMembers[0].entity.name.concat(this.hasMembers.members[0].entity.name);
           this.nextPage = this.nextPage + 1;
           this.loadButton = true;
         } else if (this.nextPage * this.pageSize > this.totalCount) {
-          this.hasMembers = await EntityService.getMembersAndTotalCount(this.conceptIri, "http://endhealth.info/im#hasMember", this.nextPage, this.pageSize);
+          this.hasMembers = await EntityService.getHasMember(this.conceptIri, IM.HAS_MEMBER, this.nextPage, this.pageSize);
           this.combinedMembers[0].entity.name = this.combinedMembers[0].entity.name.concat(this.hasMembers.members[0].entity.name);
           this.loadButton = false;
         } else {
@@ -297,7 +297,7 @@ export default defineComponent({
     },
 
     async getTotalCount() {
-      this.totalCount = (await EntityService.getPartialAndTotalCount(this.conceptIri, "http://endhealth.info/im#hasMember", 1, 10)).totalCount;
+      this.totalCount = (await EntityService.getPartialAndTotalCount(this.conceptIri, IM.HAS_MEMBER, 1, 10)).totalCount;
     }
   }
 });

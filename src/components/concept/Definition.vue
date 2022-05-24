@@ -13,6 +13,7 @@
           @loadMore="loadMore"
           :totalCount="totalCount"
           :visible="loadButton"
+          :conceptIri="concept['@id']"
         />
       </template>
     </div>

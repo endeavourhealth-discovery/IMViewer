@@ -171,9 +171,9 @@ export default class EntityService {
     }
   }
 
-  public static async getMembersAndTotalCount(iri: string,predicate:string, pageIndex: number, pageSize: number, filters?: FiltersAsIris, cancelToken?: CancelToken): Promise<any> {
+  public static async getHasMember(iri: string,predicate:string, pageIndex: number, pageSize: number, filters?: FiltersAsIris, cancelToken?: CancelToken): Promise<any> {
     try {
-      return await axios.get(Env.API + "api/entity/public/membersAndTotalCount", {
+      return await axios.get(Env.API + "api/entity/public/hasMember", {
         params: { iri: iri,predicate: predicate, page: pageIndex, size: pageSize, schemeIris: filters?.schemes.join(",") },
         cancelToken: cancelToken
       });
@@ -294,4 +294,15 @@ export default class EntityService {
       return "";
     }
   }
+
+  public static async getEntityPredicatesIris(iri: string): Promise<any> {
+    try {
+      return await axios.get(Env.API + "api/entity/public/predicatesIris", {
+        params: { iri: iri }
+      });
+    } catch (error) {
+      return {} as any;
+    }
+  }
+
 }

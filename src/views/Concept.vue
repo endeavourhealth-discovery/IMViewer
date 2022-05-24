@@ -223,6 +223,10 @@ export default defineComponent({
       this.setActivePanel(newValue, oldValue);
     },
 
+    async conceptActivePanel() {
+      this.active = this.conceptActivePanel;
+    },
+
     active(newValue) {
       this.$store.commit("updateConceptActivePanel", newValue);
     },
@@ -344,6 +348,15 @@ export default defineComponent({
 
     async getDefinition(iri: string): Promise<void> {
       const result = await EntityService.getDefinitionBundle(iri);
+      const hasMember = await EntityService.getPartialAndTotalCount(iri, IM.HAS_MEMBER, 1, 10);
+      if(hasMember.totalCount !== 0){
+        result.entity[IM.HAS_MEMBER] = hasMember.result;
+        result.predicates[IM.HAS_MEMBER] = "has member";
+      }
+      if(hasMember.totalCount >= 10){
+        result.entity[IM.HAS_MEMBER] = result.entity[IM.HAS_MEMBER].concat({"@id":this.conceptIri, "name":"see more..."});
+      }
+
       if (isObjectHasKeys(result, ["entity"]) && isObjectHasKeys(result.entity, [RDFS.SUBCLASS_OF, IM.ROLE_GROUP])) {
         const roleGroup = result.entity[IM.ROLE_GROUP];
         delete result.entity[IM.ROLE_GROUP];

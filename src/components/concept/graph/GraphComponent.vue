@@ -237,11 +237,14 @@ export default defineComponent({
 
     navigate(iri: string) {
       const currentRoute = this.$route.name as RouteRecordName | undefined;
-      if (iri)
+      if(iri === "seeMore"){
+        this.$store.commit("updateConceptActivePanel",2);
+      } else if(iri) {
         this.$router.push({
           name: currentRoute,
-          params: { selectedIri: iri }
+          params: {selectedIri: iri}
         });
+      }
     },
 
     redrawGraph() {
