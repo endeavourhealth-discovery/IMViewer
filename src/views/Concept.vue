@@ -63,7 +63,7 @@
           <ProgressSpinner />
         </div>
         <div v-else class="leftSplitterContent">
-          <Definition :concept="concept" :configs="summaryConfig" class="definition" :totalCount="totalCount"/>
+          <Definition :concept="concept" :configs="summaryConfig" class="definition" />
           <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
           <SecondaryTree :conceptIri="conceptIri" class="leftHierarchy" />
         </div>
@@ -77,7 +77,7 @@
                   <ProgressSpinner />
                 </div>
                 <div v-else class="concept-panel-content" id="definition-container">
-                  <Definition :concept="concept" :configs="definitionConfig" :totalCount="totalCount" />
+                  <Definition :concept="concept" :configs="definitionConfig" />
                 </div>
               </TabPanel>
               <TabPanel header="Maps" v-if="showMappings">
@@ -287,9 +287,7 @@ export default defineComponent({
         //   }
         // }
       ] as any,
-      selectedOption: {} as any,
-      children: {} as any,
-      totalCount: {} as any
+      selectedOption: {} as any
     };
   },
   methods: {
@@ -336,15 +334,8 @@ export default defineComponent({
       }
       this.concept = await EntityService.getPartialEntity(iri, predicates);
       this.concept["@id"] = iri;
-      this.children = await EntityService.getChildrenAndTotalCount(iri, 1, 10);
-      configs.forEach((config) => {
-        if(config.predicate === "subtypes"){
-          this.totalCount[config.predicate] = this.children.totalCount;
-        }else{
-          this.totalCount[config.predicate] = null;
-        }
-      })
-      this.concept["subtypes"] = this.children.result;
+      const result = await EntityService.getChildrenAndTotalCount(iri, 1, 10);
+      this.concept["subtypes"] = { children: result.result, totalCount: result.totalCount, loadMore: this.loadMore };
       this.concept["termCodes"] = await EntityService.getEntityTermCodes(iri);
 
       this.profile = new Models.Query.Profile(this.concept);
@@ -353,12 +344,12 @@ export default defineComponent({
     async getDefinition(iri: string): Promise<void> {
       const result = await EntityService.getDefinitionBundle(iri);
       const hasMember = await EntityService.getPartialAndTotalCount(iri, IM.HAS_MEMBER, 1, 10);
-      if(hasMember.totalCount !== 0){
+      if (hasMember.totalCount !== 0) {
         result.entity[IM.HAS_MEMBER] = hasMember.result;
         result.predicates[IM.HAS_MEMBER] = "has member";
       }
-      if(hasMember.totalCount >= 10){
-        result.entity[IM.HAS_MEMBER] = result.entity[IM.HAS_MEMBER].concat({"@id":this.conceptIri, "name":"see more..."});
+      if (hasMember.totalCount >= 10) {
+        result.entity[IM.HAS_MEMBER] = result.entity[IM.HAS_MEMBER].concat({ "@id": this.conceptIri, name: "see more..." });
       }
 
       if (isObjectHasKeys(result, ["entity"]) && isObjectHasKeys(result.entity, [RDFS.SUBCLASS_OF, IM.ROLE_GROUP])) {
@@ -488,8 +479,9 @@ export default defineComponent({
       }
     },
 
-    isObjectHasKeysWrapper(object: any, keys: string[]) {
-      return isObjectHasKeys(object, keys);
+    isObjectHasKeysWrapper(object: any, keys?: string[]) {
+      if (keys) return isObjectHasKeys(object, keys);
+      else return isObjectHasKeys(object);
     },
 
     async exportConcept(format: any) {
@@ -514,6 +506,24 @@ export default defineComponent({
     toggle(event: any, refId: string) {
       const x = this.$refs[refId] as any;
       x.toggle(event);
+    },
+
+    async loadMore(children: any[], totalCount: number, nextPage: number, pageSize: number, loadButton: boolean, iri: string) {
+      if (loadButton) {
+        if (nextPage * pageSize < totalCount) {
+          const result = await EntityService.getChildrenAndTotalCount(iri, nextPage, pageSize);
+          children = children.concat(result.result);
+          nextPage = nextPage + 1;
+          loadButton = true;
+        } else if (nextPage * pageSize > totalCount) {
+          const result = await EntityService.getChildrenAndTotalCount(iri, nextPage, pageSize);
+          children = children.concat(result.result);
+          loadButton = false;
+        } else {
+          loadButton = false;
+        }
+      }
+      return { children: children, totalCount: totalCount, nextPage: nextPage, pageSize: pageSize, loadButton: loadButton, iri: iri };
     }
   }
 });

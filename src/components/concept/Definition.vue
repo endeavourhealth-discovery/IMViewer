@@ -6,14 +6,9 @@
           :is="config.type"
           :label="config.label"
           :data="concept[config.predicate]"
-          :predicate="config.predicate"
           :size="config.size"
           :id="config.type + index"
           :show="showItem(config, index)"
-          @loadMore="loadMore"
-          :totalCount="totalCount"
-          :visible="loadButton"
-          :conceptIri="concept['@id']"
         />
       </template>
     </div>
@@ -25,7 +20,6 @@ import { defineComponent, PropType } from "vue";
 import TermsTable from "@/components/concept/definition/TermsTable.vue";
 import { DefinitionConfig } from "im-library/dist/types/interfaces/Interfaces";
 import { Helpers } from "im-library";
-import EntityService from "@/services/EntityService";
 const {
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys, isObject }
 } = Helpers;
@@ -37,23 +31,7 @@ export default defineComponent({
   },
   props: {
     concept: { type: Object, required: true },
-    configs: { type: Array as PropType<Array<DefinitionConfig>>, required: true },
-    totalCount: { type: Object , required: true }
-  },
-
-  data() {
-    return {
-      nextPage: 2,
-      pageSize: 10,
-      loadButton: false,
-      children: {} as any
-    };
-  },
-
-  mounted(){
-    if(isObjectHasKeys(this.totalCount,["subtypes"]) && this.totalCount.subtypes >= this.pageSize){
-      this.loadButton = true;
-    }
+    configs: { type: Array as PropType<Array<DefinitionConfig>>, required: true }
   },
 
   methods: {
@@ -105,24 +83,6 @@ export default defineComponent({
         console.log(`Unexpected data type encountered for function hasData in definition. Data: ${JSON.stringify(data)}`);
         return false;
       }
-    },
-
-    async loadMore(predicate: string) {
-      if(this.loadButton){
-        if (this.nextPage * this.pageSize < this.totalCount["subtypes"]) {
-          this.children = await EntityService.getChildrenAndTotalCount(this.concept["@id"], this.nextPage, this.pageSize);
-          this.concept[predicate] =  this.concept[predicate].concat(this.children.result);
-          this.nextPage = this.nextPage + 1;
-          this.loadButton = true;
-        } else if (this.nextPage * this.pageSize > this.totalCount["subtypes"]) {
-          this.children = await EntityService.getChildrenAndTotalCount(this.concept["@id"], this.nextPage, this.pageSize);
-          this.concept[predicate] =  this.concept[predicate].concat(this.children.result);
-          this.loadButton = false;
-        } else {
-          this.loadButton = false;
-        }
-      }
-      this.showItem(this.configs[1], 1);
     }
   }
 });
