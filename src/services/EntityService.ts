@@ -295,13 +295,13 @@ export default class EntityService {
     }
   }
 
-  public static async getEntityPredicatesIris(iri: string): Promise<any> {
+  public static async getEntityByPredicateExclusions(iri: string, predicates: string[]): Promise<TTBundle> {
     try {
-      return await axios.get(Env.API + "api/entity/public/predicatesIris", {
-        params: { iri: iri }
+      return await axios.get(Env.API + "api/entity/public/entityByPredicatesExclusions", {
+        params: { iri: iri, predicates: predicates.join(",")}
       });
     } catch (error) {
-      return {} as any;
+      return {} as TTBundle;
     }
   }
 
