@@ -42,6 +42,9 @@
           <div v-html="slotProps.data.entity.name" class="name-container"></div>
         </template>
       </Column>
+      <template #footer v-if="isIncludedSelf && loadButton">
+        <Button  label="Load more..." class="p-button-text p-button-plain" @click="loadMore"/>
+      </template>
       <template #groupheader="slotProps">
         <span v-for="subSet of subsets" :key="subSet">
           <span v-if="slotProps.data.label === subSet" class="group-header">
@@ -78,7 +81,7 @@ import { Helpers, Vocabulary, LoggerService } from "im-library";
 const {
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }
 } = Helpers;
-const { RDFS } = Vocabulary;
+const { RDFS, IM } = Vocabulary;
 
 export default defineComponent({
   name: "Members",
@@ -95,6 +98,10 @@ export default defineComponent({
     await this.getMembers();
     this.onResize();
     this.getUserRoles();
+    await this.getTotalCount();
+    if(this.totalCount >= 10){
+      this.loadButton = true;
+    }
   },
   beforeUnmount() {
     window.removeEventListener("resize", this.onResize);
@@ -120,7 +127,13 @@ export default defineComponent({
         { label: "Expanded Legacy", command: () => this.download(true, true) },
         { label: "IMv1", command: () => this.downloadIMV1() }
       ],
-      isPublishing: false
+      isPublishing: false,
+      nextPage: 2,
+      pageSize: 10,
+      loadButton: false,
+      totalCount: 0,
+      hasMembers: {} as any,
+      isIncludedSelf: false
     };
   },
   methods: {
@@ -145,6 +158,9 @@ export default defineComponent({
       this.members = await EntityService.getEntityMembers(this.conceptIri, false, false, 2000, true);
       this.sortMembers();
       this.combinedMembers = this.members.members;
+      if(this.combinedMembers[0].type === 'INCLUDED_SELF'){
+        this.isIncludedSelf = true
+      }
       this.setSubsets();
       this.setTableWidth();
       this.loading = false;
@@ -261,6 +277,27 @@ export default defineComponent({
     checkAuthorization() {
       if (this.userRoles) return this.userRoles.includes("IM1_PUBLISH");
       else return false;
+    },
+
+    async loadMore() {
+      if(this.isIncludedSelf){
+        if (this.nextPage * this.pageSize < this.totalCount) {
+          this.hasMembers = await EntityService.getHasMember(this.conceptIri, IM.HAS_MEMBER, this.nextPage, this.pageSize);
+          this.combinedMembers[0].entity.name = this.combinedMembers[0].entity.name.concat(this.hasMembers.members[0].entity.name);
+          this.nextPage = this.nextPage + 1;
+          this.loadButton = true;
+        } else if (this.nextPage * this.pageSize > this.totalCount) {
+          this.hasMembers = await EntityService.getHasMember(this.conceptIri, IM.HAS_MEMBER, this.nextPage, this.pageSize);
+          this.combinedMembers[0].entity.name = this.combinedMembers[0].entity.name.concat(this.hasMembers.members[0].entity.name);
+          this.loadButton = false;
+        } else {
+          this.loadButton = false;
+        }
+      }
+    },
+
+    async getTotalCount() {
+      this.totalCount = (await EntityService.getPartialAndTotalCount(this.conceptIri, IM.HAS_MEMBER, 1, 10)).totalCount;
     }
   }
 });

@@ -29,6 +29,10 @@ describe("Graph.vue", () => {
       { name: "Scoliosis, unspecified", iri: "http://endhealth.info/icd10#M419", relToParent: "mapped to", children: [], _children: [] },
       { name: "Other forms of scoliosis", iri: "http://endhealth.info/icd10#M418", relToParent: "mapped to", children: [], _children: [] },
       { name: "Congenital deformity of spine", iri: "http://endhealth.info/icd10#Q675", relToParent: "mapped to", children: [], _children: [] },
+      { name: "Adult critical care encounter", iri: "http://endhealth.info/im#1641000252107", relToParent: "has member", children: [], _children: [] },
+      { name: "Neonatal critical care encounter", iri: "http://endhealth.info/im#831000252103", relToParent: "has member", children: [], _children: [] },
+      { name: "Paediatric critical care encounter", iri: "http://endhealth.info/im#2811000252102", relToParent: "has member", children: [], _children: [] },
+
     ],
     _children: []
   };
@@ -52,7 +56,7 @@ describe("Graph.vue", () => {
         "http://endhealth.info/im#isA"
       ]);
 
-    EntityService.getPartialEntityBundle = vi.fn().mockResolvedValue({
+    EntityService.getEntityByPredicateExclusions = vi.fn().mockResolvedValue({
       entity: {
         "@id": "http://snomed.info/sct#298382003",
         "http://endhealth.info/im#definitionalStatus": {
@@ -183,6 +187,25 @@ describe("Graph.vue", () => {
       }
     });
 
+    EntityService.getPartialAndTotalCount = vi.fn().mockResolvedValue({
+      totalCount: 3,
+      pageSize: 10,
+      result: [
+        {
+          name: "Adult critical care encounter",
+          "@id": "http://endhealth.info/im#1641000252107"
+        },
+        {
+          name: "Neonatal critical care encounter",
+          "@id": "http://endhealth.info/im#831000252103"
+        },
+        {
+          name: "Paediatric critical care encounter",
+          "@id": "http://endhealth.info/im#2811000252102"
+        }
+      ]
+    });
+
     translatorSpy = vi.spyOn(GraphTranslator, "translateFromEntityBundle").mockReturnValue(TRANSLATED);
 
     const warn = console.warn;
@@ -217,8 +240,9 @@ describe("Graph.vue", () => {
     vi.clearAllMocks();
     wrapper.vm.getEntityBundle("http://snomed.info/sct#203639008");
     expect(wrapper.vm.loading).toBe(true);
-    expect(EntityService.getPartialEntityBundle).toHaveBeenCalledTimes(1);
-    expect(EntityService.getPartialEntityBundle).toHaveBeenCalledWith("http://snomed.info/sct#203639008", []);
+    expect(EntityService.getEntityByPredicateExclusions).toHaveBeenCalledTimes(1);
+    expect(EntityService.getEntityByPredicateExclusions).toHaveBeenCalledWith("http://snomed.info/sct#203639008", ["http://endhealth.info/im#hasMember"]);
+
     await flushPromises();
     expect(wrapper.vm.data).toStrictEqual(TRANSLATED);
     expect(wrapper.vm.loading).toBe(false);

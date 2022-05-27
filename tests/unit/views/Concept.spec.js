@@ -74,6 +74,24 @@ describe("Concept.vue ___ not moduleIri", () => {
       }
     ]
   };
+  const MEMBERS = {
+    totalCount: 3,
+    pageSize: 10,
+    result: [
+      {
+        name: "Adult critical care encounter",
+        "@id": "http://endhealth.info/im#1641000252107"
+      },
+      {
+        name: "Neonatal critical care encounter",
+        "@id": "http://endhealth.info/im#831000252103"
+      },
+      {
+        name: "Paediatric critical care encounter",
+        "@id": "http://endhealth.info/im#2811000252102"
+      }
+    ]
+  };
   const TERMS = [{ name: "Critical care encounter (record type)" }];
   const INFERRED = {
     entity: {
@@ -114,9 +132,24 @@ describe("Concept.vue ___ not moduleIri", () => {
             }
           ]
         }
+      ],
+      "http://endhealth.info/im#hasMember": [
+        {
+          name: "Adult critical care encounter",
+          "@id": "http://endhealth.info/im#1641000252107"
+        },
+        {
+          name: "Neonatal critical care encounter",
+          "@id": "http://endhealth.info/im#831000252103"
+        },
+        {
+          name: "Paediatric critical care encounter",
+          "@id": "http://endhealth.info/im#2811000252102"
+        }
       ]
     },
     predicates: {
+      "http://endhealth.info/im#hasMember": "has member",
       "http://endhealth.info/im#roleGroup": "Where",
       "http://snomed.info/sct#116676008": "Associated morphology",
       "http://snomed.info/sct#363698007": "Finding site",
@@ -154,6 +187,7 @@ describe("Concept.vue ___ not moduleIri", () => {
     vi.resetAllMocks();
     clipboardSpy = vi.spyOn(navigator.clipboard, "writeText");
     EntityService.getDefinitionBundle = vi.fn().mockResolvedValue(INFERRED);
+    EntityService.getPartialAndTotalCount = vi.fn().mockResolvedValue(MEMBERS);
     EntityService.getPartialEntity = vi.fn().mockResolvedValue(CONCEPT);
     EntityService.getChildrenAndTotalCount = vi.fn().mockResolvedValue(CHILDREN);
     EntityService.getEntityTermCodes = vi.fn().mockResolvedValue(TERMS);
@@ -473,9 +507,24 @@ describe("Concept.vue ___ not moduleIri", () => {
               }
             ]
           }
+        ],
+        "http://endhealth.info/im#hasMember": [
+          {
+            name: "Adult critical care encounter",
+            "@id": "http://endhealth.info/im#1641000252107"
+          },
+          {
+            name: "Neonatal critical care encounter",
+            "@id": "http://endhealth.info/im#831000252103"
+          },
+          {
+            name: "Paediatric critical care encounter",
+            "@id": "http://endhealth.info/im#2811000252102"
+          }
         ]
       },
       predicates: {
+        "http://endhealth.info/im#hasMember": "has member",
         "http://endhealth.info/im#roleGroup": "Where",
         "http://snomed.info/sct#116676008": "Associated morphology",
         "http://snomed.info/sct#363698007": "Finding site",
@@ -505,9 +554,24 @@ describe("Concept.vue ___ not moduleIri", () => {
               }
             ]
           }
+        ],
+        "http://endhealth.info/im#hasMember": [
+          {
+            name: "Adult critical care encounter",
+            "@id": "http://endhealth.info/im#1641000252107"
+          },
+          {
+            name: "Neonatal critical care encounter",
+            "@id": "http://endhealth.info/im#831000252103"
+          },
+          {
+            name: "Paediatric critical care encounter",
+            "@id": "http://endhealth.info/im#2811000252102"
+          }
         ]
       },
       predicates: {
+        "http://endhealth.info/im#hasMember": "has member",
         "http://endhealth.info/im#roleGroup": "Where",
         "http://snomed.info/sct#116676008": "Associated morphology",
         "http://snomed.info/sct#363698007": "Finding site",
@@ -526,7 +590,47 @@ describe("Concept.vue ___ not moduleIri", () => {
     await flushPromises();
     expect(EntityService.getDefinitionBundle).toHaveBeenCalledTimes(1);
     expect(EntityService.getDefinitionBundle).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
-    expect(wrapper.vm.concept["http://endhealth.info/im#definition"]).toStrictEqual({ entity: {} });
+    expect(wrapper.vm.concept["http://endhealth.info/im#definition"]).toStrictEqual({ entity: {
+        "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+          { "@id": "http://snomed.info/sct#928000", name: "Disorder of musculoskeletal system" },
+          { "@id": "http://snomed.info/sct#699699005", name: "Disorder of vertebral column" },
+          { "@id": "http://snomed.info/sct#64217002", name: "Curvature of spine" },
+          {
+            "http://endhealth.info/im#roleGroup": [
+              {
+                "http://snomed.info/sct#116676008": { "@id": "http://snomed.info/sct#31739005", name: "Lateral abnormal curvature" },
+                "http://snomed.info/sct#363698007": { "@id": "http://snomed.info/sct#289959001", name: "Musculoskeletal structure of spine" }
+              }
+            ]
+          }
+        ],
+        "http://endhealth.info/im#hasMember": [
+          {
+            name: "Adult critical care encounter",
+            "@id": "http://endhealth.info/im#1641000252107"
+          },
+          {
+            name: "Neonatal critical care encounter",
+            "@id": "http://endhealth.info/im#831000252103"
+          },
+          {
+            name: "Paediatric critical care encounter",
+            "@id": "http://endhealth.info/im#2811000252102"
+          }
+        ]
+      },
+      predicates: {
+        "http://endhealth.info/im#hasMember": "has member",
+        "http://endhealth.info/im#roleGroup": "Where",
+        "http://snomed.info/sct#116676008": "Associated morphology",
+        "http://snomed.info/sct#363698007": "Finding site",
+        "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Subclass of",
+        "http://www.w3.org/2002/07/owl#onProperty": "On property",
+        "http://www.w3.org/2002/07/owl#intersectionOf": "Combination of",
+        "http://www.w3.org/2002/07/owl#someValuesFrom": "With a value",
+        "http://www.w3.org/2002/07/owl#equivalentClass": "Is equivalent to"
+      }
+    });
   });
 
   it("can getInferred ___ pass ___ not bundle", async () => {
@@ -535,7 +639,47 @@ describe("Concept.vue ___ not moduleIri", () => {
     await flushPromises();
     expect(EntityService.getDefinitionBundle).toHaveBeenCalledTimes(1);
     expect(EntityService.getDefinitionBundle).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
-    expect(wrapper.vm.concept["http://endhealth.info/im#definition"]).toStrictEqual({});
+    expect(wrapper.vm.concept["http://endhealth.info/im#definition"]).toStrictEqual({entity: {
+        "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+          { "@id": "http://snomed.info/sct#928000", name: "Disorder of musculoskeletal system" },
+          { "@id": "http://snomed.info/sct#699699005", name: "Disorder of vertebral column" },
+          { "@id": "http://snomed.info/sct#64217002", name: "Curvature of spine" },
+          {
+            "http://endhealth.info/im#roleGroup": [
+              {
+                "http://snomed.info/sct#116676008": { "@id": "http://snomed.info/sct#31739005", name: "Lateral abnormal curvature" },
+                "http://snomed.info/sct#363698007": { "@id": "http://snomed.info/sct#289959001", name: "Musculoskeletal structure of spine" }
+              }
+            ]
+          }
+        ],
+        "http://endhealth.info/im#hasMember": [
+          {
+            name: "Adult critical care encounter",
+            "@id": "http://endhealth.info/im#1641000252107"
+          },
+          {
+            name: "Neonatal critical care encounter",
+            "@id": "http://endhealth.info/im#831000252103"
+          },
+          {
+            name: "Paediatric critical care encounter",
+            "@id": "http://endhealth.info/im#2811000252102"
+          }
+        ]
+      },
+      predicates: {
+        "http://endhealth.info/im#hasMember": "has member",
+        "http://endhealth.info/im#roleGroup": "Where",
+        "http://snomed.info/sct#116676008": "Associated morphology",
+        "http://snomed.info/sct#363698007": "Finding site",
+        "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Subclass of",
+        "http://www.w3.org/2002/07/owl#onProperty": "On property",
+        "http://www.w3.org/2002/07/owl#intersectionOf": "Combination of",
+        "http://www.w3.org/2002/07/owl#someValuesFrom": "With a value",
+        "http://www.w3.org/2002/07/owl#equivalentClass": "Is equivalent to"
+      }
+    });
   });
 
   it("can getConfig ___ pass", async () => {

@@ -14,7 +14,8 @@ import EntityService from "@/services/EntityService";
 import GraphComponent from "./GraphComponent.vue";
 import ConfigService from "@/services/ConfigService";
 import { TTGraphData, TTBundle } from "im-library/dist/types/interfaces/Interfaces";
-import { Helpers } from "im-library";
+import {Helpers, Vocabulary} from "im-library";
+const { IM } = Vocabulary;
 const {
   GraphTranslator: { translateFromEntityBundle }
 } = Helpers;
@@ -41,7 +42,8 @@ export default defineComponent({
       predicatesIris: [] as string[],
       bundle: {} as TTBundle,
       graphExcludePredicates: [] as string[],
-      options: [] as { iri: string; name: string }[]
+      options: [] as { iri: string; name: string }[],
+      predicates: [] as any
     };
   },
   async mounted() {
@@ -61,7 +63,15 @@ export default defineComponent({
     },
     async getEntityBundle(iri: string) {
       this.loading = true;
-      this.bundle = await EntityService.getPartialEntityBundle(iri, []);
+      this.bundle = await EntityService.getEntityByPredicateExclusions(iri, [IM.HAS_MEMBER]);
+      const hasMember = await EntityService.getPartialAndTotalCount(iri,IM.HAS_MEMBER,1,10);
+      if(hasMember.totalCount !== 0){
+        this.bundle.entity[IM.HAS_MEMBER] = hasMember.result;
+        this.bundle.predicates[IM.HAS_MEMBER] = "has member";
+      }
+      if(hasMember.totalCount >= 10){
+        this.bundle.entity[IM.HAS_MEMBER] = this.bundle.entity[IM.HAS_MEMBER].concat({"@id":"seeMore","name":"see more..."})
+      }
       this.predicatesIris = Object.keys(this.bundle.entity).filter(value => value !== "@id");
       this.predicatesIris.forEach(i => {
         if (!this.graphExcludePredicates.includes(i)) this.options.push({ iri: i, name: this.bundle.predicates[i] });

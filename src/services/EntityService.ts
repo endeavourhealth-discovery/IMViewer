@@ -171,6 +171,28 @@ export default class EntityService {
     }
   }
 
+  public static async getHasMember(iri: string,predicate:string, pageIndex: number, pageSize: number, filters?: FiltersAsIris, cancelToken?: CancelToken): Promise<any> {
+    try {
+      return await axios.get(Env.API + "api/entity/public/hasMember", {
+        params: { iri: iri,predicate: predicate, page: pageIndex, size: pageSize, schemeIris: filters?.schemes.join(",") },
+        cancelToken: cancelToken
+      });
+    } catch (error) {
+      return {} as any;
+    }
+  }
+
+  public static async getPartialAndTotalCount(iri: string,predicate:string, pageIndex: number, pageSize: number, filters?: FiltersAsIris, cancelToken?: CancelToken): Promise<any> {
+    try {
+      return await axios.get(Env.API + "api/entity/public/partialAndTotalCount", {
+        params: { iri: iri,predicate: predicate, page: pageIndex, size: pageSize, schemeIris: filters?.schemes.join(",") },
+        cancelToken: cancelToken
+      });
+    } catch (error) {
+      return {} as any;
+    }
+  }
+
   public static async getEntityUsages(iri: string, pageIndex: number, pageSize: number): Promise<TTIriRef[]> {
     try {
       return await axios.get(Env.API + "api/entity/public/usages", {
@@ -272,4 +294,15 @@ export default class EntityService {
       return "";
     }
   }
+
+  public static async getEntityByPredicateExclusions(iri: string, predicates: string[]): Promise<TTBundle> {
+    try {
+      return await axios.get(Env.API + "api/entity/public/entityByPredicatesExclusions", {
+        params: { iri: iri, predicates: predicates.join(",")}
+      });
+    } catch (error) {
+      return {} as TTBundle;
+    }
+  }
+
 }
