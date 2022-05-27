@@ -2,7 +2,6 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 import Concept from "@/views/Concept.vue";
 import Menu from "primevue/menu";
 import Button from "primevue/button";
-import PanelHeader from "@/components/concept/PanelHeader.vue";
 import TabView from "primevue/tabview";
 import TabPanel from "primevue/tabpanel";
 import ProgressSpinner from "primevue/progressspinner";
@@ -12,12 +11,6 @@ import TopBar from "im-library";
 import TermCodeTable from "im-library";
 import TextSectionHeader from "im-library";
 import SecondaryTree from "im-library";
-import Definition from "@/components/concept/Definition.vue";
-import Mappings from "@/components/concept/Mappings.vue";
-import UsedIn from "@/components/concept/UsedIn.vue";
-import EntityChart from "@/components/concept/EntityChart.vue";
-import Members from "@/components/concept/Members.vue";
-import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import Panel from "primevue/panel";
 import EntityService from "@/services/EntityService";
 import ConfigService from "@/services/ConfigService";
@@ -220,18 +213,11 @@ describe("Concept.vue ___ not moduleIri", () => {
     wrapper = shallowMount(Concept, {
       global: {
         components: {
-          Definition,
-          Mappings,
           Menu,
           Button,
           TabPanel,
           TabView,
-          UsedIn,
-          Members,
-          EntityChart,
-          PanelHeader,
           Panel,
-          DownloadDialog,
           ProgressSpinner,
           SecondaryTree,
           Splitter,
@@ -269,7 +255,7 @@ describe("Concept.vue ___ not moduleIri", () => {
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": TYPES,
       "http://www.w3.org/2000/01/rdf-schema#label": "Critical care encounter (record type)",
       termCodes: TERMS,
-      subtypes: CHILDREN.result
+      subtypes: { children: CHILDREN.result, totalCount: 3, loadMore: wrapper.vm.loadMore }
     });
     expect(wrapper.vm.definitionText).toBe("");
     expect(wrapper.vm.display).toBeFalsy();
@@ -419,20 +405,24 @@ describe("Concept.vue ___ not moduleIri", () => {
       "http://endhealth.info/im#status": { "@id": "http://endhealth.info/im#Active", name: "Active" },
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2002/07/owl#Class", name: "Class" }],
       "http://www.w3.org/2000/01/rdf-schema#label": "Scoliosis deformity of spine (disorder)",
-      subtypes: [
-        {
-          name: "Acquired scoliosis (disorder)",
-          "@id": "http://snomed.info/sct#111266001"
-        },
-        {
-          name: "Acrodysplasia scoliosis (disorder)",
-          "@id": "http://snomed.info/sct#773773006"
-        },
-        {
-          name: "Congenital scoliosis due to bony malformation (disorder)",
-          "@id": "http://snomed.info/sct#205045003"
-        }
-      ],
+      subtypes: {
+        children: [
+          {
+            name: "Acquired scoliosis (disorder)",
+            "@id": "http://snomed.info/sct#111266001"
+          },
+          {
+            name: "Acrodysplasia scoliosis (disorder)",
+            "@id": "http://snomed.info/sct#773773006"
+          },
+          {
+            name: "Congenital scoliosis due to bony malformation (disorder)",
+            "@id": "http://snomed.info/sct#205045003"
+          }
+        ],
+        totalCount: 3,
+        loadMore: wrapper.vm.loadMore
+      },
       termCodes: [{ name: "Critical care encounter (record type)" }]
     });
   });
@@ -474,20 +464,24 @@ describe("Concept.vue ___ not moduleIri", () => {
       "http://endhealth.info/im#status": { "@id": "http://endhealth.info/im#Active", name: "Active" },
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2002/07/owl#Class", name: "Class" }],
       "http://www.w3.org/2000/01/rdf-schema#label": "Scoliosis deformity of spine (disorder)",
-      subtypes: [
-        {
-          name: "Acquired scoliosis (disorder)",
-          "@id": "http://snomed.info/sct#111266001"
-        },
-        {
-          name: "Acrodysplasia scoliosis (disorder)",
-          "@id": "http://snomed.info/sct#773773006"
-        },
-        {
-          name: "Congenital scoliosis due to bony malformation (disorder)",
-          "@id": "http://snomed.info/sct#205045003"
-        }
-      ],
+      subtypes: {
+        children: [
+          {
+            name: "Acquired scoliosis (disorder)",
+            "@id": "http://snomed.info/sct#111266001"
+          },
+          {
+            name: "Acrodysplasia scoliosis (disorder)",
+            "@id": "http://snomed.info/sct#773773006"
+          },
+          {
+            name: "Congenital scoliosis due to bony malformation (disorder)",
+            "@id": "http://snomed.info/sct#205045003"
+          }
+        ],
+        totalCount: 3,
+        loadMore: wrapper.vm.loadMore
+      },
       termCodes: [{ name: "Critical care encounter (record type)" }]
     });
   });
@@ -590,46 +584,8 @@ describe("Concept.vue ___ not moduleIri", () => {
     await flushPromises();
     expect(EntityService.getDefinitionBundle).toHaveBeenCalledTimes(1);
     expect(EntityService.getDefinitionBundle).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
-    expect(wrapper.vm.concept["http://endhealth.info/im#definition"]).toStrictEqual({ entity: {
-        "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-          { "@id": "http://snomed.info/sct#928000", name: "Disorder of musculoskeletal system" },
-          { "@id": "http://snomed.info/sct#699699005", name: "Disorder of vertebral column" },
-          { "@id": "http://snomed.info/sct#64217002", name: "Curvature of spine" },
-          {
-            "http://endhealth.info/im#roleGroup": [
-              {
-                "http://snomed.info/sct#116676008": { "@id": "http://snomed.info/sct#31739005", name: "Lateral abnormal curvature" },
-                "http://snomed.info/sct#363698007": { "@id": "http://snomed.info/sct#289959001", name: "Musculoskeletal structure of spine" }
-              }
-            ]
-          }
-        ],
-        "http://endhealth.info/im#hasMember": [
-          {
-            name: "Adult critical care encounter",
-            "@id": "http://endhealth.info/im#1641000252107"
-          },
-          {
-            name: "Neonatal critical care encounter",
-            "@id": "http://endhealth.info/im#831000252103"
-          },
-          {
-            name: "Paediatric critical care encounter",
-            "@id": "http://endhealth.info/im#2811000252102"
-          }
-        ]
-      },
-      predicates: {
-        "http://endhealth.info/im#hasMember": "has member",
-        "http://endhealth.info/im#roleGroup": "Where",
-        "http://snomed.info/sct#116676008": "Associated morphology",
-        "http://snomed.info/sct#363698007": "Finding site",
-        "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Subclass of",
-        "http://www.w3.org/2002/07/owl#onProperty": "On property",
-        "http://www.w3.org/2002/07/owl#intersectionOf": "Combination of",
-        "http://www.w3.org/2002/07/owl#someValuesFrom": "With a value",
-        "http://www.w3.org/2002/07/owl#equivalentClass": "Is equivalent to"
-      }
+    expect(wrapper.vm.concept["http://endhealth.info/im#definition"]).toStrictEqual({
+      entity: {}
     });
   });
 
@@ -639,47 +595,7 @@ describe("Concept.vue ___ not moduleIri", () => {
     await flushPromises();
     expect(EntityService.getDefinitionBundle).toHaveBeenCalledTimes(1);
     expect(EntityService.getDefinitionBundle).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
-    expect(wrapper.vm.concept["http://endhealth.info/im#definition"]).toStrictEqual({entity: {
-        "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-          { "@id": "http://snomed.info/sct#928000", name: "Disorder of musculoskeletal system" },
-          { "@id": "http://snomed.info/sct#699699005", name: "Disorder of vertebral column" },
-          { "@id": "http://snomed.info/sct#64217002", name: "Curvature of spine" },
-          {
-            "http://endhealth.info/im#roleGroup": [
-              {
-                "http://snomed.info/sct#116676008": { "@id": "http://snomed.info/sct#31739005", name: "Lateral abnormal curvature" },
-                "http://snomed.info/sct#363698007": { "@id": "http://snomed.info/sct#289959001", name: "Musculoskeletal structure of spine" }
-              }
-            ]
-          }
-        ],
-        "http://endhealth.info/im#hasMember": [
-          {
-            name: "Adult critical care encounter",
-            "@id": "http://endhealth.info/im#1641000252107"
-          },
-          {
-            name: "Neonatal critical care encounter",
-            "@id": "http://endhealth.info/im#831000252103"
-          },
-          {
-            name: "Paediatric critical care encounter",
-            "@id": "http://endhealth.info/im#2811000252102"
-          }
-        ]
-      },
-      predicates: {
-        "http://endhealth.info/im#hasMember": "has member",
-        "http://endhealth.info/im#roleGroup": "Where",
-        "http://snomed.info/sct#116676008": "Associated morphology",
-        "http://snomed.info/sct#363698007": "Finding site",
-        "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Subclass of",
-        "http://www.w3.org/2002/07/owl#onProperty": "On property",
-        "http://www.w3.org/2002/07/owl#intersectionOf": "Combination of",
-        "http://www.w3.org/2002/07/owl#someValuesFrom": "With a value",
-        "http://www.w3.org/2002/07/owl#equivalentClass": "Is equivalent to"
-      }
-    });
+    expect(wrapper.vm.concept["http://endhealth.info/im#definition"]).toStrictEqual({});
   });
 
   it("can getConfig ___ pass", async () => {
@@ -733,9 +649,20 @@ describe("Concept.vue ___ not moduleIri", () => {
 
   it("Inits ___ has types", async () => {
     wrapper.vm.getConcept = vi.fn();
-    wrapper.vm.getConfig = vi.fn();
+    wrapper.vm.getConfig = vi.fn().mockResolvedValue([
+      { label: "Divider", predicate: "None", type: "Divider", size: "100%" },
+      { label: "Name", predicate: "http://www.w3.org/2000/01/rdf-schema#label", type: "TextWithLabel", size: "50%", order: 0 },
+      { label: "Iri", predicate: "@id", type: "TextWithLabel", size: "50%", order: 1 },
+      { label: "Divider", predicate: "None", type: "Divider", size: "100%", order: 5 },
+      { label: "Status", predicate: "http://endhealth.info/im#status", type: "ObjectNameWithLabel", size: "50%", order: 2 },
+      { label: "Types", predicate: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", type: "ArrayObjectNamesToStringWithLabel", size: "50%", order: 3 },
+      { label: "Description", predicate: "http://www.w3.org/2000/01/rdf-schema#comment", type: "TextHTMLWithLabel", size: "100%", order: 4 },
+      { label: "Inferred", predicate: "inferred", type: "TextDefinition", size: "50%", order: 6 },
+      { label: "Has sub types", predicate: "subtypes", type: "ArrayObjectNameListboxWithLabel", size: "50%", order: 7 }
+    ]);
     wrapper.vm.getDefinition = vi.fn();
     wrapper.vm.setStoreType = vi.fn();
+    wrapper.vm.setCopyMenuItems = vi.fn();
     wrapper.vm.concept = {
       "@id": "http://snomed.info/sct#47518006",
       "http://endhealth.info/im#status": { "@id": "http://endhealth.info/im#Active", name: "Active" },
@@ -760,7 +687,17 @@ describe("Concept.vue ___ not moduleIri", () => {
 
   it("Inits ___ missing types", async () => {
     wrapper.vm.getConcept = vi.fn();
-    wrapper.vm.getConfig = vi.fn();
+    wrapper.vm.getConfig = vi.fn().mockResolvedValue([
+      { label: "Divider", predicate: "None", type: "Divider", size: "100%" },
+      { label: "Name", predicate: "http://www.w3.org/2000/01/rdf-schema#label", type: "TextWithLabel", size: "50%", order: 0 },
+      { label: "Iri", predicate: "@id", type: "TextWithLabel", size: "50%", order: 1 },
+      { label: "Divider", predicate: "None", type: "Divider", size: "100%", order: 5 },
+      { label: "Status", predicate: "http://endhealth.info/im#status", type: "ObjectNameWithLabel", size: "50%", order: 2 },
+      { label: "Types", predicate: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", type: "ArrayObjectNamesToStringWithLabel", size: "50%", order: 3 },
+      { label: "Description", predicate: "http://www.w3.org/2000/01/rdf-schema#comment", type: "TextHTMLWithLabel", size: "100%", order: 4 },
+      { label: "Inferred", predicate: "inferred", type: "TextDefinition", size: "50%", order: 6 },
+      { label: "Has sub types", predicate: "subtypes", type: "ArrayObjectNameListboxWithLabel", size: "50%", order: 7 }
+    ]);
     wrapper.vm.getDefinition = vi.fn();
     wrapper.vm.setStoreType = vi.fn();
     wrapper.vm.concept = {
@@ -1141,6 +1078,24 @@ describe("Concept.vue ___ moduleIri", () => {
     "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": TYPES,
     "http://www.w3.org/2000/01/rdf-schema#label": "Discovery Ontology"
   };
+  const MEMBERS = {
+    totalCount: 3,
+    pageSize: 10,
+    result: [
+      {
+        name: "Adult critical care encounter",
+        "@id": "http://endhealth.info/im#1641000252107"
+      },
+      {
+        name: "Neonatal critical care encounter",
+        "@id": "http://endhealth.info/im#831000252103"
+      },
+      {
+        name: "Paediatric critical care encounter",
+        "@id": "http://endhealth.info/im#2811000252102"
+      }
+    ]
+  };
 
   let wrapper;
   let mockStore;
@@ -1154,8 +1109,9 @@ describe("Concept.vue ___ moduleIri", () => {
   beforeEach(async () => {
     vi.resetAllMocks();
     clipboardSpy = vi.spyOn(navigator.clipboard, "writeText");
-    EntityService.getDefinitionBundle = vi.fn().mockResolvedValue({});
+    EntityService.getDefinitionBundle = vi.fn().mockResolvedValue({ entity: {}, predicates: [] });
     EntityService.getPartialEntity = vi.fn().mockResolvedValue(CONCEPT);
+    EntityService.getPartialAndTotalCount = vi.fn().mockResolvedValue(MEMBERS);
     EntityService.getChildrenAndTotalCount = vi.fn().mockResolvedValue([]);
     EntityService.getEntityTermCodes = vi.fn().mockResolvedValue([]);
     ConfigService.getComponentLayout = vi.fn().mockResolvedValue(CONFIG);
@@ -1186,18 +1142,11 @@ describe("Concept.vue ___ moduleIri", () => {
     wrapper = shallowMount(Concept, {
       global: {
         components: {
-          Definition,
-          Mappings,
           Menu,
           Button,
           TabPanel,
           TabView,
-          UsedIn,
-          Members,
-          EntityChart,
-          PanelHeader,
           Panel,
-          DownloadDialog,
           ProgressSpinner,
           SecondaryTree,
           Splitter,

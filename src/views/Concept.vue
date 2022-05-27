@@ -159,7 +159,8 @@ const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
   CopyConceptToClipboard: { copyConceptToClipboard, conceptObjectToCopyString },
   DataTypeCheckers: { isObjectHasKeys },
-  Sorters: { byOrder }
+  Sorters: { byOrder },
+  TypeGuards: { isTTBundle }
 } = Helpers;
 
 export default defineComponent({
@@ -344,11 +345,11 @@ export default defineComponent({
     async getDefinition(iri: string): Promise<void> {
       const result = await EntityService.getDefinitionBundle(iri);
       const hasMember = await EntityService.getPartialAndTotalCount(iri, IM.HAS_MEMBER, 1, 10);
-      if (hasMember.totalCount !== 0) {
+      if (hasMember.totalCount !== 0 && isTTBundle(result)) {
         result.entity[IM.HAS_MEMBER] = hasMember.result;
         result.predicates[IM.HAS_MEMBER] = "has member";
       }
-      if (hasMember.totalCount >= 10) {
+      if (hasMember.totalCount >= 10 && isTTBundle(result)) {
         result.entity[IM.HAS_MEMBER] = result.entity[IM.HAS_MEMBER].concat({ "@id": this.conceptIri, name: "see more..." });
       }
 
