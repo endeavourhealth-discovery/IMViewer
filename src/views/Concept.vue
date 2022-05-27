@@ -126,6 +126,11 @@
                   <QueryText class="queryText" :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
+              <TabPanel header="Query Definition" v-if="isQuery">
+                <div class="concept-panel-content" id="query-definition-container">
+                  <QueryDefinition :modelValue="dataSet" :edit="false"></QueryDefinition>
+                </div>
+              </TabPanel>
             </TabView>
           </div>
           <DownloadDialog v-if="showDownloadDialog" @closeDownloadDialog="closeDownloadDialog" :showDialog="showDownloadDialog" :conceptIri="conceptIri" />
@@ -154,6 +159,8 @@ import DirectService from "@/services/DirectService";
 import Properties from "@/components/concept/Properties.vue";
 import { Env, Helpers, Vocabulary, LoggerService, Models } from "im-library";
 import { DefinitionConfig, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
+import { QueryDefinition } from "im-library";
+import QueryService from "@/services/QueryService";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
@@ -175,7 +182,8 @@ export default defineComponent({
     Mappings,
     Properties,
     EclDefinition,
-    QueryText
+    QueryText,
+    QueryDefinition
   },
   computed: {
     activeProfile: {
@@ -249,6 +257,7 @@ export default defineComponent({
   },
   async mounted() {
     await this.init();
+    await this.getQueryDefinition();
   },
   data() {
     return {
@@ -289,7 +298,8 @@ export default defineComponent({
       ] as any,
       selectedOption: {} as any,
       children: {} as any,
-      totalCount: {} as any
+      totalCount: {} as any,
+      dataSet: {} as any
     };
   },
   methods: {
@@ -514,6 +524,10 @@ export default defineComponent({
     toggle(event: any, refId: string) {
       const x = this.$refs[refId] as any;
       x.toggle(event);
+    },
+
+    async getQueryDefinition() {
+      this.dataSet = await QueryService.querySummary(this.conceptIri);
     }
   }
 });

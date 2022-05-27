@@ -10,4 +10,17 @@ export default class QueryService {
       responseType: "text"
     });
   }
+
+  public static async querySummary(iri: string): Promise<any> {
+    try {
+      return await axios.get(Env.VITE_NODE_API + "node_api/query/public/querySummary", {
+        params: {
+          iri: iri
+        }
+      });
+    } catch (error) {
+      return {} as any;
+    }
+  }
+
 }
