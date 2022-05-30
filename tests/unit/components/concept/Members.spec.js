@@ -223,7 +223,7 @@ describe("Members.vue", () => {
     expect(wrapper.vm.selected).toStrictEqual({});
     expect(wrapper.vm.subsets).toStrictEqual([]);
     expect(EntityService.getEntityMembers).toHaveBeenCalledTimes(1);
-    expect(EntityService.getEntityMembers).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", false, false, 2000, true);
+    expect(EntityService.getEntityMembers).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", false, false, 20, true);
     await flushPromises();
     expect(wrapper.vm.members).toStrictEqual(testMembers);
     expect(wrapper.vm.loading).toBe(false);
