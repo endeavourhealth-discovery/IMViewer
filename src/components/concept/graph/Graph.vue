@@ -1,11 +1,11 @@
 <template>
-  <div class="p-fluid">
+  <div class="graph-predicates-container">
     <MultiSelect v-model="selectedPredicates" @change="updatePredicates" :options="options" option-label="name" placeholder="Select predicates" />
+    <div class="loading-container" v-if="loading">
+      <ProgressSpinner />
+    </div>
+    <GraphComponent v-else :data="data" />
   </div>
-  <div class="loading-container" v-if="loading">
-    <ProgressSpinner />
-  </div>
-  <GraphComponent v-else :data="data" />
 </template>
 
 <script lang="ts">
@@ -14,7 +14,7 @@ import EntityService from "@/services/EntityService";
 import GraphComponent from "./GraphComponent.vue";
 import ConfigService from "@/services/ConfigService";
 import { TTGraphData, TTBundle } from "im-library/dist/types/interfaces/Interfaces";
-import {Helpers, Vocabulary} from "im-library";
+import { Helpers, Vocabulary } from "im-library";
 const { IM } = Vocabulary;
 const {
   GraphTranslator: { translateFromEntityBundle }
@@ -64,13 +64,13 @@ export default defineComponent({
     async getEntityBundle(iri: string) {
       this.loading = true;
       this.bundle = await EntityService.getEntityByPredicateExclusions(iri, [IM.HAS_MEMBER]);
-      const hasMember = await EntityService.getPartialAndTotalCount(iri,IM.HAS_MEMBER,1,10);
-      if(hasMember.totalCount !== 0){
+      const hasMember = await EntityService.getPartialAndTotalCount(iri, IM.HAS_MEMBER, 1, 10);
+      if (hasMember.totalCount !== 0) {
         this.bundle.entity[IM.HAS_MEMBER] = hasMember.result;
         this.bundle.predicates[IM.HAS_MEMBER] = "has member";
       }
-      if(hasMember.totalCount >= 10){
-        this.bundle.entity[IM.HAS_MEMBER] = this.bundle.entity[IM.HAS_MEMBER].concat({"@id":"seeMore","name":"see more..."})
+      if (hasMember.totalCount >= 10) {
+        this.bundle.entity[IM.HAS_MEMBER] = this.bundle.entity[IM.HAS_MEMBER].concat({ "@id": "seeMore", name: "see more..." });
       }
       this.predicatesIris = Object.keys(this.bundle.entity).filter(value => value !== "@id");
       this.predicatesIris.forEach(i => {
@@ -95,5 +95,11 @@ export default defineComponent({
   align-items: center;
   width: 100%;
   height: 100%;
+}
+
+.graph-predicates-container {
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
 }
 </style>

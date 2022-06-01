@@ -237,12 +237,12 @@ export default defineComponent({
 
     navigate(iri: string) {
       const currentRoute = this.$route.name as RouteRecordName | undefined;
-      if(iri === "seeMore"){
-        this.$store.commit("updateConceptActivePanel",2);
-      } else if(iri) {
+      if (iri === "seeMore") {
+        this.$store.commit("updateConceptActivePanel", 2);
+      } else if (iri) {
         this.$router.push({
           name: currentRoute,
-          params: {selectedIri: iri}
+          params: { selectedIri: iri }
         });
       }
     },
@@ -311,24 +311,29 @@ export default defineComponent({
 });
 </script>
 
-<style>
-#force-layout-svg {
-  height: calc(100vh - 13em);
+<style scoped>
+#force-layout-graph {
+  flex: 1 1 auto;
   width: 100%;
 }
 
-circle:hover {
+#force-layout-svg {
+  height: 100%;
+  width: 100%;
+}
+
+#force-layout-graph:deep(circle):hover {
   stroke: steelblue;
   stroke-width: 3px;
   cursor: grab;
 }
 
-circle:active {
+#force-layout-graph:deep(circle):active {
   cursor: grabbing;
   cursor: -moz-grabbing;
   cursor: -webkit-grabbing;
 }
-foreignObject p {
+#force-layout-graph:deep(p) {
   text-align: center;
   position: relative;
   top: 50%;
@@ -337,12 +342,12 @@ foreignObject p {
   transform: translateY(-50%);
 }
 
-foreignObject:hover {
+#force-layout-graph:deep(foreignObject):hover {
   font-weight: 600;
   cursor: pointer;
 }
 
-div.tooltip {
+#force-layout-graph:deep(.tooltip) {
   position: absolute;
   text-align: center;
   width: 120px;

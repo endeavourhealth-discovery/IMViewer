@@ -43,7 +43,7 @@
         </template>
       </Column>
       <template #footer v-if="isIncludedSelf && loadButton">
-        <Button  label="Load more..." class="p-button-text p-button-plain" @click="loadMore"/>
+        <Button label="Load more..." class="p-button-text p-button-plain" @click="loadMore" />
       </template>
       <template #groupheader="slotProps">
         <span v-for="subSet of subsets" :key="subSet">
@@ -99,7 +99,7 @@ export default defineComponent({
     this.onResize();
     this.getUserRoles();
     await this.getTotalCount();
-    if(this.totalCount >= 10){
+    if (this.totalCount >= 10) {
       this.loadButton = true;
     }
   },
@@ -118,12 +118,12 @@ export default defineComponent({
       expandedRowGroups: ["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"],
       downloadMenu: [
         { label: "Definition", command: () => this.download(false) },
-        { label: "Expanded Core", command: () => this.download(true,false) },
+        { label: "Expanded Core", command: () => this.download(true, false) },
         { label: "Expanded Legacy", command: () => this.download(true, true) }
       ],
       downloadMenu1: [
         { label: "Definition", command: () => this.download(false) },
-        { label: "Expanded Core", command: () => this.download(true,false) },
+        { label: "Expanded Core", command: () => this.download(true, false) },
         { label: "Expanded Legacy", command: () => this.download(true, true) },
         { label: "IMv1", command: () => this.downloadIMV1() }
       ],
@@ -158,8 +158,8 @@ export default defineComponent({
       this.members = await EntityService.getEntityMembers(this.conceptIri, false, false, this.pageSize, true);
       this.sortMembers();
       this.combinedMembers = this.members.members;
-      if(this.combinedMembers[0].type === 'INCLUDED_SELF'){
-        this.isIncludedSelf = true
+      if (isArrayHasLength(this.combinedMembers) && this.combinedMembers[0].type === "INCLUDED_SELF") {
+        this.isIncludedSelf = true;
       }
       this.setSubsets();
       this.setTableWidth();
@@ -205,7 +205,7 @@ export default defineComponent({
     },
 
     getFileName(label: string) {
-      if(label.length > 100){
+      if (label.length > 100) {
         label = label.substring(0, 100);
       }
       return (
@@ -280,7 +280,7 @@ export default defineComponent({
     },
 
     async loadMore() {
-      if(this.isIncludedSelf){
+      if (this.isIncludedSelf) {
         if (this.nextPage * this.pageSize < this.totalCount) {
           this.hasMembers = await EntityService.getHasMember(this.conceptIri, IM.HAS_MEMBER, this.nextPage, this.pageSize);
           this.combinedMembers[0].entity.name = this.combinedMembers[0].entity.name.concat(this.hasMembers.members[0].entity.name);

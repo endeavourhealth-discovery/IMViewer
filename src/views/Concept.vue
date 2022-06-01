@@ -564,6 +564,7 @@ export default defineComponent({
 .concept-panel-content {
   overflow: auto;
   background-color: #ffffff;
+  height: 100%;
 }
 
 .loading-container {
