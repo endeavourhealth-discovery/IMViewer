@@ -26,11 +26,15 @@ const {
 export default defineComponent({
   name: "GraphComponent",
   props: {
-    data: { type: Object as PropType<TTGraphData>, required: true, default: {} as TTGraphData }
+    data: { type: Object as PropType<TTGraphData>, required: true, default: {} as TTGraphData },
+    splitterRightSize: { type: Number, required: true }
   },
   watch: {
     data(newValue) {
       this.root = d3.hierarchy(newValue);
+      this.drawGraph();
+    },
+    splitterRightSize() {
       this.drawGraph();
     }
   },

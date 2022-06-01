@@ -4,7 +4,7 @@
     <div class="loading-container" v-if="loading">
       <ProgressSpinner />
     </div>
-    <GraphComponent v-else :data="data" />
+    <GraphComponent v-else :data="data" :splitterRightSize="splitterRightSize" />
   </div>
 </template>
 
@@ -26,7 +26,8 @@ export default defineComponent({
     GraphComponent
   },
   props: {
-    conceptIri: { type: String, required: true }
+    conceptIri: { type: String, required: true },
+    splitterRightSize: { type: Number, required: true }
   },
   watch: {
     async conceptIri(newValue) {

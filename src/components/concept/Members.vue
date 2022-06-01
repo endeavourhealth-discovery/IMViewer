@@ -7,8 +7,6 @@
       groupRowsBy="label"
       :expandableRowGroups="true"
       v-model:expandedRowGroups="expandedRowGroups"
-      @rowgroupExpand="onRowGroupExpand"
-      @rowgroupCollapse="onRowGroupCollapse"
       :scrollable="true"
       sortMode="single"
       sortField="label"
@@ -94,17 +92,12 @@ export default defineComponent({
     }
   },
   async mounted() {
-    window.addEventListener("resize", this.onResize);
     await this.getMembers();
-    this.onResize();
     this.getUserRoles();
     await this.getTotalCount();
     if (this.totalCount >= 10) {
       this.loadButton = true;
     }
-  },
-  beforeUnmount() {
-    window.removeEventListener("resize", this.onResize);
   },
   data() {
     return {
@@ -142,14 +135,6 @@ export default defineComponent({
       x.toggle(event);
     },
 
-    onRowGroupExpand(): void {
-      this.setTableWidth();
-    },
-
-    onRowGroupCollapse(): void {
-      this.setTableWidth();
-    },
-
     async getMembers(): Promise<void> {
       this.loading = true;
       this.expandedRowGroups = ["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"];
@@ -162,7 +147,6 @@ export default defineComponent({
         this.isIncludedSelf = true;
       }
       this.setSubsets();
-      this.setTableWidth();
       this.loading = false;
     },
 
@@ -235,22 +219,6 @@ export default defineComponent({
       }
     },
 
-    onResize(): void {
-      this.setTableWidth();
-    },
-
-    setTableWidth(): void {
-      const container = document.getElementById("members-table-container") as HTMLElement;
-      if (!container) {
-        LoggerService.error(undefined, "Failed to set members table width. Required element(s) not found.");
-        return;
-      }
-      const table = container.getElementsByClassName("p-datatable-table")[0] as HTMLElement;
-      if (table) {
-        table.style.width = "100%";
-      }
-    },
-
     publish() {
       this.isPublishing = true;
       SetService.publish(this.conceptIri)
@@ -309,12 +277,17 @@ export default defineComponent({
   width: 100%;
 }
 
-#members-table-container ::v-deep(.p-datatable-wrapper) {
+#members-table-container:deep(.p-datatable-wrapper) {
   overflow-x: hidden;
 }
 
-#members-table-container ::v-deep(td) {
+#members-table-container:deep(td) {
   word-break: break-all;
+}
+
+#members-table-container:deep(.p-datatable) {
+  width: 100%;
+  height: 100%;
 }
 
 .group-header {
@@ -345,6 +318,7 @@ export default defineComponent({
   width: 100%;
   padding: 1rem;
   white-space: pre;
+  overflow: auto;
 }
 
 .html-container ::v-deep(p) {

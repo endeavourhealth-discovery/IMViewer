@@ -57,7 +57,7 @@
     </TopBar>
   </div>
   <div id="concept-main-container">
-    <Splitter stateKey="viewerConceptSplitterHorizontal" stateStorage="local" class="mainSplitter">
+    <Splitter stateKey="viewerConceptSplitterHorizontal" stateStorage="local" class="mainSplitter" @resizeend="updateSplitter">
       <SplitterPanel :size="20" :minSize="10" class="leftSplitterPanel">
         <div v-if="loading" class="loading-container">
           <ProgressSpinner />
@@ -117,12 +117,11 @@
               </TabPanel>
               <TabPanel header="Graph">
                 <div class="concept-panel-content" id="graph-container">
-                  <Graph :conceptIri="conceptIri" />
+                  <Graph :conceptIri="conceptIri" :splitterRightSize="splitterRightSize" />
                 </div>
               </TabPanel>
               <TabPanel header="Query" v-if="isQuery">
                 <div class="concept-panel-content" id="query-container">
-                  <ProfileDisplay theme="light" :modelValue="profile" :activeProfile="activeProfile" />
                   <QueryText class="queryText" :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
@@ -288,7 +287,8 @@ export default defineComponent({
         //   }
         // }
       ] as any,
-      selectedOption: {} as any
+      selectedOption: {} as any,
+      splitterRightSize: 0
     };
   },
   methods: {
@@ -536,6 +536,10 @@ export default defineComponent({
         }
       }
       return { children: children, totalCount: totalCount, nextPage: nextPage, pageSize: pageSize, loadButton: loadButton, iri: iri };
+    },
+
+    updateSplitter(event: any) {
+      this.splitterRightSize = event.sizes[1];
     }
   }
 });
