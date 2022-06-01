@@ -1,12 +1,19 @@
 <template>
-  <div id="force-layout-graph">
-    <svg id="force-layout-svg">
-      <defs id="defs">
-        <marker id="arrow" markerUnits="strokeWidth" markerWidth="12" markerHeight="12" viewBox="0 0 12 12" refX="25" refY="6" orient="auto-start-reverse">
-          <path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill: #781c81;"></path>
-        </marker>
-      </defs>
-    </svg>
+  <div class="graph-controls-container">
+    <div id="force-layout-graph">
+      <svg id="force-layout-svg">
+        <defs id="defs">
+          <marker id="arrow" markerUnits="strokeWidth" markerWidth="12" markerHeight="12" viewBox="0 0 12 12" refX="25" refY="6" orient="auto-start-reverse">
+            <path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill: #781c81;"></path>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+    <div class="custom-control-buttons">
+      <Button class="svg-pan-zoom-control p-button-secondary" icon="pi pi-plus" @click="zoomIn" />
+      <Button class="svg-pan-zoom-control p-button-secondary" label="RESET" @click="resetZoom" />
+      <Button class="svg-pan-zoom-control p-button-secondary" icon="pi pi-minus" @click="zoomOut" />
+    </div>
   </div>
 </template>
 
@@ -221,7 +228,7 @@ export default defineComponent({
 
       this.svgPan = svgPanZoom("#force-layout-svg", {
         zoomEnabled: true,
-        controlIconsEnabled: true,
+        controlIconsEnabled: false,
         fit: false,
         center: true,
         dblClickZoomEnabled: false
@@ -310,15 +317,55 @@ export default defineComponent({
       if (isObjectHasKeys(this.simulation, ["stop"])) {
         this.simulation.stop();
       }
+    },
+
+    zoomIn() {
+      this.svgPan.zoomIn();
+    },
+
+    resetZoom() {
+      this.svgPan.resetZoom();
+    },
+
+    zoomOut() {
+      this.svgPan.zoomOut();
     }
   }
 });
 </script>
 
 <style scoped>
-#force-layout-graph {
+.graph-controls-container {
   flex: 1 1 auto;
   width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+#force-layout-graph {
+  height: 100%;
+  width: 100%;
+}
+
+.custom-control-buttons {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.svg-pan-zoom-control {
+  opacity: 33%;
+  padding: 0.25rem !important;
+  width: auto !important;
+  background-color: black !important;
+}
+
+.svg-pan-zoom-control:hover {
+  opacity: 100%;
 }
 
 #force-layout-svg {

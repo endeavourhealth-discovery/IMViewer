@@ -277,10 +277,6 @@ export default defineComponent({
   width: 100%;
 }
 
-#members-table-container:deep(.p-datatable-wrapper) {
-  overflow-x: hidden;
-}
-
 #members-table-container:deep(td) {
   word-break: break-all;
 }
@@ -288,6 +284,15 @@ export default defineComponent({
 #members-table-container:deep(.p-datatable) {
   width: 100%;
   height: 100%;
+}
+
+#members-table-container:deep(.p-datatable-table) {
+  width: 100%;
+}
+
+#members-table-container:deep(td) {
+  width: 100%;
+  overflow: auto;
 }
 
 .group-header {
