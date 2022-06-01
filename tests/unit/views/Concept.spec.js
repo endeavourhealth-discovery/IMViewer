@@ -359,7 +359,7 @@ describe("Concept.vue ___ not moduleIri", () => {
     DirectService.directTo = vi.fn().mockResolvedValue(true);
     wrapper.vm.directToEditRoute();
     expect(DirectService.directTo).toHaveBeenCalledTimes(1);
-    expect(DirectService.directTo).toHaveBeenLastCalledWith("/editor/", "http://endhealth.info/im#CriticalCareEncounter", wrapper.vm, "editor");
+    expect(DirectService.directTo).toHaveBeenLastCalledWith("/editor/#/", "http://endhealth.info/im#CriticalCareEncounter", wrapper.vm, "editor");
   });
 
   it("can route to create", () => {

@@ -336,10 +336,12 @@ export default defineComponent({
       this.concept = await EntityService.getPartialEntity(iri, predicates);
       this.concept["@id"] = iri;
       const result = await EntityService.getPagedChildren(iri, 1, 10);
-      const resultChildren = result.result.map((child: EntityReferenceNode) => {
-        return { "@id": child["@id"], name: child.name };
-      });
-      this.concept["subtypes"] = { children: resultChildren, totalCount: result.totalCount, loadMore: this.loadMore };
+      if (result && isObjectHasKeys(result, ["result", "totalCount"])) {
+        const resultChildren = result.result.map((child: EntityReferenceNode) => {
+          return { "@id": child["@id"], name: child.name };
+        });
+        this.concept["subtypes"] = { children: resultChildren, totalCount: result.totalCount, loadMore: this.loadMore };
+      }
       this.concept["termCodes"] = await EntityService.getEntityTermCodes(iri);
 
       this.profile = new Models.Query.Profile(this.concept);
