@@ -185,8 +185,8 @@ export default defineComponent({
             .style("opacity", 0.9);
           div
             .html(d.path[0]["__data__"]["data"]["name"] + "<div/> Press ctr+click to navigate")
-            .style("left", d.x + "px")
-            .style("top", d.y + 10 + "px");
+            .style("left", d.layerX + "px")
+            .style("top", d.layerY + 10 + "px");
         })
         .on("mouseout", (_d: any) => {
           div
