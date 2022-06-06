@@ -290,6 +290,11 @@ export default defineComponent({
   width: 100%;
 }
 
+#members-table-container:deep(.p-datatable-wrapper) {
+  height: auto;
+  flex: 0 1 auto;
+}
+
 #members-table-container:deep(td) {
   width: 100%;
   overflow: auto;
