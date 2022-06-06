@@ -278,6 +278,8 @@ export default defineComponent({
 }
 
 #members-table-container:deep(td) {
+  width: 100%;
+  overflow: auto;
   word-break: break-all;
 }
 
@@ -290,9 +292,9 @@ export default defineComponent({
   width: 100%;
 }
 
-#members-table-container:deep(td) {
-  width: 100%;
-  overflow: auto;
+#members-table-container:deep(.p-datatable-wrapper) {
+  height: auto;
+  flex: 0 1 auto;
 }
 
 .group-header {

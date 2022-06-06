@@ -88,7 +88,6 @@ router.beforeEach(async (to, from) => {
     }
   }
   if (to.name === "Concept" && isObjectHasKeys(to.params, ["selectedIri"])) {
-    const iri = to.params.selectedIri as string;
     try {
       new URL(iri);
       if (!(await EntityService.iriExists(iri))) {
