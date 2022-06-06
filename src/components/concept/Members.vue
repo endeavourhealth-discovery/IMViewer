@@ -129,7 +129,7 @@ export default defineComponent({
       ],
       isPublishing: false,
       nextPage: 2,
-      pageSize: 10,
+      pageSize: 20,
       loadButton: false,
       totalCount: 0,
       hasMembers: {} as any,
@@ -155,7 +155,7 @@ export default defineComponent({
       this.expandedRowGroups = ["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"];
       this.selected = {} as ValueSetMember;
       this.subsets = [];
-      this.members = await EntityService.getEntityMembers(this.conceptIri, false, false, 2000, true);
+      this.members = await EntityService.getEntityMembers(this.conceptIri, false, false, this.pageSize, true);
       this.sortMembers();
       this.combinedMembers = this.members.members;
       if(this.combinedMembers[0].type === 'INCLUDED_SELF'){

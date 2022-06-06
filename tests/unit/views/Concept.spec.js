@@ -182,7 +182,7 @@ describe("Concept.vue ___ not moduleIri", () => {
     EntityService.getDefinitionBundle = vi.fn().mockResolvedValue(INFERRED);
     EntityService.getPartialAndTotalCount = vi.fn().mockResolvedValue(MEMBERS);
     EntityService.getPartialEntity = vi.fn().mockResolvedValue(CONCEPT);
-    EntityService.getChildrenAndTotalCount = vi.fn().mockResolvedValue(CHILDREN);
+    EntityService.getPagedChildren = vi.fn().mockResolvedValue(CHILDREN);
     EntityService.getEntityTermCodes = vi.fn().mockResolvedValue(TERMS);
     ConfigService.getComponentLayout = vi.fn().mockResolvedValue(CONFIG);
     ConfigService.getDefaultPredicateNames = vi.fn().mockResolvedValue(DEFAULT_PREDICATE_NAMES);
@@ -359,7 +359,7 @@ describe("Concept.vue ___ not moduleIri", () => {
     DirectService.directTo = vi.fn().mockResolvedValue(true);
     wrapper.vm.directToEditRoute();
     expect(DirectService.directTo).toHaveBeenCalledTimes(1);
-    expect(DirectService.directTo).toHaveBeenLastCalledWith("/editor/", "http://endhealth.info/im#CriticalCareEncounter", wrapper.vm, "editor");
+    expect(DirectService.directTo).toHaveBeenLastCalledWith("/editor/#/", "http://endhealth.info/im#CriticalCareEncounter", wrapper.vm, "editor");
   });
 
   it("can route to create", () => {
@@ -375,7 +375,7 @@ describe("Concept.vue ___ not moduleIri", () => {
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2002/07/owl#Class", name: "Class" }],
       "http://www.w3.org/2000/01/rdf-schema#label": "Scoliosis deformity of spine (disorder)"
     });
-    EntityService.getChildrenAndTotalCount = vi.fn().mockResolvedValue({
+    EntityService.getPagedChildren = vi.fn().mockResolvedValue({
       totalCount: 3,
       pageSize: 10,
       result: [
@@ -396,8 +396,8 @@ describe("Concept.vue ___ not moduleIri", () => {
     wrapper.vm.getConcept("http://snomed.info/sct#298382003");
     await flushPromises();
     expect(EntityService.getPartialEntity).toHaveBeenCalledTimes(1);
-    expect(EntityService.getChildrenAndTotalCount).toHaveBeenCalledTimes(1);
-    expect(EntityService.getChildrenAndTotalCount).toHaveBeenCalledWith("http://snomed.info/sct#298382003", 1, 10);
+    expect(EntityService.getPagedChildren).toHaveBeenCalledTimes(1);
+    expect(EntityService.getPagedChildren).toHaveBeenCalledWith("http://snomed.info/sct#298382003", 1, 10);
     expect(EntityService.getEntityTermCodes).toHaveBeenCalledTimes(1);
     expect(EntityService.getEntityTermCodes).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
     expect(wrapper.vm.concept).toStrictEqual({
@@ -434,7 +434,7 @@ describe("Concept.vue ___ not moduleIri", () => {
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2002/07/owl#Class", name: "Class" }],
       "http://www.w3.org/2000/01/rdf-schema#label": "Scoliosis deformity of spine (disorder)"
     });
-    EntityService.getChildrenAndTotalCount = vi.fn().mockResolvedValue({
+    EntityService.getPagedChildren = vi.fn().mockResolvedValue({
       totalCount: 3,
       pageSize: 10,
       result: [
@@ -455,8 +455,8 @@ describe("Concept.vue ___ not moduleIri", () => {
     wrapper.vm.getConcept("http://snomed.info/sct#298382003");
     await flushPromises();
     expect(EntityService.getPartialEntity).toHaveBeenCalledTimes(1);
-    expect(EntityService.getChildrenAndTotalCount).toHaveBeenCalledTimes(1);
-    expect(EntityService.getChildrenAndTotalCount).toHaveBeenCalledWith("http://snomed.info/sct#298382003", 1, 10);
+    expect(EntityService.getPagedChildren).toHaveBeenCalledTimes(1);
+    expect(EntityService.getPagedChildren).toHaveBeenCalledWith("http://snomed.info/sct#298382003", 1, 10);
     expect(EntityService.getEntityTermCodes).toHaveBeenCalledTimes(1);
     expect(EntityService.getEntityTermCodes).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
     expect(wrapper.vm.concept).toStrictEqual({
@@ -1112,7 +1112,7 @@ describe("Concept.vue ___ moduleIri", () => {
     EntityService.getDefinitionBundle = vi.fn().mockResolvedValue({ entity: {}, predicates: [] });
     EntityService.getPartialEntity = vi.fn().mockResolvedValue(CONCEPT);
     EntityService.getPartialAndTotalCount = vi.fn().mockResolvedValue(MEMBERS);
-    EntityService.getChildrenAndTotalCount = vi.fn().mockResolvedValue([]);
+    EntityService.getPagedChildren = vi.fn().mockResolvedValue([]);
     EntityService.getEntityTermCodes = vi.fn().mockResolvedValue([]);
     ConfigService.getComponentLayout = vi.fn().mockResolvedValue(CONFIG);
     mockStore = {
