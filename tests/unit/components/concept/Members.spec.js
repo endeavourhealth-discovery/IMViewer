@@ -169,47 +169,10 @@ describe("Members.vue", () => {
     expect(wrapper.vm.download).toHaveBeenLastCalledWith(true, true);
   });
 
-  it("adds event listener to setTableWidth on resize", async () => {
-    console.error = vi.fn();
-    await flushPromises();
-    const spy = vi.spyOn(wrapper.vm, "setTableWidth");
-    window.dispatchEvent(new Event("resize"));
-    await wrapper.vm.$nextTick();
-    expect(spy).toHaveBeenCalledTimes(1);
-    spy.mockReset();
-  });
-
-  it("can remove eventListener", () => {
-    console.error = vi.fn();
-    const spy = vi.spyOn(window, "removeEventListener");
-    wrapper.unmount();
-    expect(spy).toHaveBeenCalled();
-    spy.mockReset();
-  });
-
-  it("can resize", () => {
-    console.error = vi.fn();
-    wrapper.vm.setTableWidth = vi.fn();
-    wrapper.vm.onResize();
-    expect(wrapper.vm.setTableWidth).toHaveBeenCalledTimes(1);
-  });
-
   it("can watch conceptIri", async () => {
     wrapper.vm.getMembers = vi.fn();
     wrapper.vm.$options.watch.conceptIri.call(wrapper.vm, "http://snomed.info/sct#92491000000104");
     expect(wrapper.vm.getMembers).toHaveBeenCalledTimes(1);
-  });
-
-  it("can set width onRowGroupExpand", () => {
-    wrapper.vm.setTableWidth = vi.fn();
-    wrapper.vm.onRowGroupExpand();
-    expect(wrapper.vm.setTableWidth).toHaveBeenCalledTimes(1);
-  });
-
-  it("can set width onRowGroupExpand", () => {
-    wrapper.vm.setTableWidth = vi.fn();
-    wrapper.vm.onRowGroupCollapse();
-    expect(wrapper.vm.setTableWidth).toHaveBeenCalledTimes(1);
   });
 
   it("can getMembers ___ success", async () => {
@@ -227,7 +190,6 @@ describe("Members.vue", () => {
     await flushPromises();
     expect(wrapper.vm.members).toStrictEqual(testMembers);
     expect(wrapper.vm.loading).toBe(false);
-    expect(wrapper.vm.setTableWidth).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.sortMembers).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.setSubsets).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.combinedMembers).toStrictEqual(testCombinedMembers);
@@ -364,41 +326,6 @@ describe("Members.vue", () => {
     wrapper.vm.members.members = [];
     wrapper.vm.sortMembers();
     expect(wrapper.vm.members.members).toStrictEqual([]);
-  });
-
-  it("resizes", async () => {
-    wrapper.vm.setTableWidth = vi.fn();
-    wrapper.vm.onResize();
-    await flushPromises();
-    expect(wrapper.vm.setTableWidth).toHaveBeenCalledTimes(1);
-  });
-
-  it("can setTableWidth", () => {
-    const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ width: 100 });
-    mockElement.getElementsByClassName = vi.fn().mockReturnValue([mockElement]);
-    mockElement.style.width = "10px";
-    docSpy.mockReturnValue(mockElement);
-    wrapper.vm.setTableWidth();
-    expect(mockElement.style.width).not.toBe("10px");
-  });
-
-  it("can setTableWidth ___ container fail", () => {
-    LoggerService.error = vi.fn();
-    docSpy.mockReturnValue(undefined);
-    wrapper.vm.setTableWidth();
-    expect(LoggerService.error).toHaveBeenCalledTimes(1);
-    expect(LoggerService.error).toHaveBeenCalledWith(undefined, "Failed to set members table width. Required element(s) not found.");
-  });
-
-  it("can setTableWidth ___ table fail", () => {
-    const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ width: 100 });
-    mockElement.getElementsByClassName = vi.fn().mockReturnValue([]);
-    mockElement.style.width = "10px";
-    docSpy.mockReturnValue(mockElement);
-    wrapper.vm.setTableWidth();
-    expect(mockElement.style.width).toBe("10px");
   });
 
   it("can toggle", () => {
