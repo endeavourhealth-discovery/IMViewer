@@ -7,8 +7,6 @@
       groupRowsBy="label"
       :expandableRowGroups="true"
       v-model:expandedRowGroups="expandedRowGroups"
-      @rowgroupExpand="onRowGroupExpand"
-      @rowgroupCollapse="onRowGroupCollapse"
       :scrollable="true"
       sortMode="single"
       sortField="label"
@@ -43,7 +41,7 @@
         </template>
       </Column>
       <template #footer v-if="isIncludedSelf && loadButton">
-        <Button  label="Load more..." class="p-button-text p-button-plain" @click="loadMore"/>
+        <Button label="Load more..." class="p-button-text p-button-plain" @click="loadMore" />
       </template>
       <template #groupheader="slotProps">
         <span v-for="subSet of subsets" :key="subSet">
@@ -94,17 +92,12 @@ export default defineComponent({
     }
   },
   async mounted() {
-    window.addEventListener("resize", this.onResize);
     await this.getMembers();
-    this.onResize();
     this.getUserRoles();
     await this.getTotalCount();
-    if(this.totalCount >= 10){
+    if (this.totalCount >= 10) {
       this.loadButton = true;
     }
-  },
-  beforeUnmount() {
-    window.removeEventListener("resize", this.onResize);
   },
   data() {
     return {
@@ -118,12 +111,12 @@ export default defineComponent({
       expandedRowGroups: ["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"],
       downloadMenu: [
         { label: "Definition", command: () => this.download(false) },
-        { label: "Expanded Core", command: () => this.download(true,false) },
+        { label: "Expanded Core", command: () => this.download(true, false) },
         { label: "Expanded Legacy", command: () => this.download(true, true) }
       ],
       downloadMenu1: [
         { label: "Definition", command: () => this.download(false) },
-        { label: "Expanded Core", command: () => this.download(true,false) },
+        { label: "Expanded Core", command: () => this.download(true, false) },
         { label: "Expanded Legacy", command: () => this.download(true, true) },
         { label: "IMv1", command: () => this.downloadIMV1() }
       ],
@@ -142,14 +135,6 @@ export default defineComponent({
       x.toggle(event);
     },
 
-    onRowGroupExpand(): void {
-      this.setTableWidth();
-    },
-
-    onRowGroupCollapse(): void {
-      this.setTableWidth();
-    },
-
     async getMembers(): Promise<void> {
       this.loading = true;
       this.expandedRowGroups = ["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"];
@@ -158,11 +143,10 @@ export default defineComponent({
       this.members = await EntityService.getEntityMembers(this.conceptIri, false, false, this.pageSize, true);
       this.sortMembers();
       this.combinedMembers = this.members.members;
-      if(this.combinedMembers[0].type === 'INCLUDED_SELF'){
-        this.isIncludedSelf = true
+      if (isArrayHasLength(this.combinedMembers) && this.combinedMembers[0].type === "INCLUDED_SELF") {
+        this.isIncludedSelf = true;
       }
       this.setSubsets();
-      this.setTableWidth();
       this.loading = false;
     },
 
@@ -205,7 +189,7 @@ export default defineComponent({
     },
 
     getFileName(label: string) {
-      if(label.length > 100){
+      if (label.length > 100) {
         label = label.substring(0, 100);
       }
       return (
@@ -232,22 +216,6 @@ export default defineComponent({
         this.members.members.sort((a: ValueSetMember, b: ValueSetMember) =>
           a.label.localeCompare(b.label) == 0 ? a.entity.name.localeCompare(b.entity.name) : a.label.localeCompare(b.label)
         );
-      }
-    },
-
-    onResize(): void {
-      this.setTableWidth();
-    },
-
-    setTableWidth(): void {
-      const container = document.getElementById("members-table-container") as HTMLElement;
-      if (!container) {
-        LoggerService.error(undefined, "Failed to set members table width. Required element(s) not found.");
-        return;
-      }
-      const table = container.getElementsByClassName("p-datatable-table")[0] as HTMLElement;
-      if (table) {
-        table.style.width = "100%";
       }
     },
 
@@ -280,7 +248,7 @@ export default defineComponent({
     },
 
     async loadMore() {
-      if(this.isIncludedSelf){
+      if (this.isIncludedSelf) {
         if (this.nextPage * this.pageSize < this.totalCount) {
           this.hasMembers = await EntityService.getHasMember(this.conceptIri, IM.HAS_MEMBER, this.nextPage, this.pageSize);
           this.combinedMembers[0].entity.name = this.combinedMembers[0].entity.name.concat(this.hasMembers.members[0].entity.name);
@@ -309,12 +277,24 @@ export default defineComponent({
   width: 100%;
 }
 
-#members-table-container ::v-deep(.p-datatable-wrapper) {
-  overflow-x: hidden;
+#members-table-container:deep(td) {
+  width: 100%;
+  overflow: auto;
+  word-break: break-all;
 }
 
-#members-table-container ::v-deep(td) {
-  word-break: break-all;
+#members-table-container:deep(.p-datatable) {
+  width: 100%;
+  height: 100%;
+}
+
+#members-table-container:deep(.p-datatable-table) {
+  width: 100%;
+}
+
+#members-table-container:deep(.p-datatable-wrapper) {
+  height: auto;
+  flex: 0 1 auto;
 }
 
 .group-header {
@@ -345,6 +325,7 @@ export default defineComponent({
   width: 100%;
   padding: 1rem;
   white-space: pre;
+  overflow: auto;
 }
 
 .html-container ::v-deep(p) {

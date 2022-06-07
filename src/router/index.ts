@@ -59,7 +59,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from) => {
   const iri = to.params.selectedIri as string;
-  const currentUrl = Env.VIEWER_URL + "#" + to.path;
+  const currentUrl = Env.VIEWER_URL + to.path.slice(1);
   if (to.path !== "/snomedLicense") {
     store.commit("updateSnomedReturnUrl", currentUrl);
     store.commit("updateAuthReturnUrl", currentUrl);
@@ -76,7 +76,7 @@ router.beforeEach(async (to, from) => {
     console.log("auth guard user authenticated: " + res.authenticated);
     if (!res.authenticated) {
       console.log("redirecting to login");
-      window.location.href = Env.AUTH_URL + "#/login?returnUrl=" + currentUrl;
+      window.location.href = Env.AUTH_URL + "login?returnUrl=" + currentUrl;
     }
   }
   if (to.matched.some((record: any) => record.meta.requiresLicense)) {
@@ -88,7 +88,6 @@ router.beforeEach(async (to, from) => {
     }
   }
   if (to.name === "Concept" && isObjectHasKeys(to.params, ["selectedIri"])) {
-    const iri = to.params.selectedIri as string;
     try {
       new URL(iri);
       if (!(await EntityService.iriExists(iri))) {

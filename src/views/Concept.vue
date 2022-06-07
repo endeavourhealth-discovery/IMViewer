@@ -57,21 +57,21 @@
     </TopBar>
   </div>
   <div id="concept-main-container">
-    <Splitter stateKey="viewerConceptSplitterHorizontal" stateStorage="local" class="mainSplitter">
-      <SplitterPanel :size="20" :minSize="10" class="leftSplitterPanel">
+    <Splitter stateKey="viewerConceptSplitterHorizontal" stateStorage="local" class="main-splitter" @resizeend="updateSplitter">
+      <SplitterPanel :size="20" :minSize="10" class="left-splitter-panel">
         <div v-if="loading" class="loading-container">
           <ProgressSpinner />
         </div>
-        <div v-else class="leftSplitterContent">
+        <div v-else class="left-splitter-content">
           <Definition :concept="concept" :configs="summaryConfig" class="definition" />
           <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
-          <SecondaryTree :conceptIri="conceptIri" class="leftHierarchy" />
+          <SecondaryTree :conceptIri="conceptIri" class="left-hierarchy" />
         </div>
       </SplitterPanel>
-      <SplitterPanel :size="80" :minSize="20" class="rightSplitterPanel">
+      <SplitterPanel :size="80" :minSize="20" class="right-splitter-panel">
         <div id="concept-content-dialogs-container">
           <div id="concept-panel-container">
-            <TabView v-model:activeIndex="active" :lazy="true" class="tabView">
+            <TabView v-model:activeIndex="active" :lazy="true" class="tab-view">
               <TabPanel header="Details">
                 <div v-if="loading" class="loading-container">
                   <ProgressSpinner />
@@ -117,18 +117,14 @@
               </TabPanel>
               <TabPanel header="Graph">
                 <div class="concept-panel-content" id="graph-container">
-                  <Graph :conceptIri="conceptIri" />
+                  <Graph :conceptIri="conceptIri" :splitterRightSize="splitterRightSize" />
                 </div>
               </TabPanel>
               <TabPanel header="Query" v-if="isQuery">
                 <div class="concept-panel-content" id="query-container">
-                  <ProfileDisplay theme="light" :modelValue="profile" :activeProfile="activeProfile" />
-                  <QueryText class="queryText" :conceptIri="conceptIri" />
-                </div>
-              </TabPanel>
-              <TabPanel header="Query Definition" v-if="isQuery">
-                <div class="concept-panel-content" id="query-definition-container">
+                  <h4>Query Definition</h4>
                   <QueryDefinition :modelValue="dataSet" :edit="false"></QueryDefinition>
+                  <QueryText class="queryText" :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
             </TabView>
@@ -298,6 +294,7 @@ export default defineComponent({
         // }
       ] as any,
       selectedOption: {} as any,
+      splitterRightSize: 0,
       dataSet: {} as any
     };
   },
@@ -346,10 +343,12 @@ export default defineComponent({
       this.concept = await EntityService.getPartialEntity(iri, predicates);
       this.concept["@id"] = iri;
       const result = await EntityService.getPagedChildren(iri, 1, 10);
-      const resultChildren = result.result.map((child: EntityReferenceNode) => {
-        return { "@id": child["@id"], name: child.name };
-      });
-      this.concept["subtypes"] = { children: resultChildren, totalCount: result.totalCount, loadMore: this.loadMore };
+      if (result && isObjectHasKeys(result, ["result", "totalCount"])) {
+        const resultChildren = result.result.map((child: EntityReferenceNode) => {
+          return { "@id": child["@id"], name: child.name };
+        });
+        this.concept["subtypes"] = { children: resultChildren, totalCount: result.totalCount, loadMore: this.loadMore };
+      }
       this.concept["termCodes"] = await EntityService.getEntityTermCodes(iri);
 
       this.profile = new Models.Query.Profile(this.concept);
@@ -546,6 +545,10 @@ export default defineComponent({
       return { children: children, totalCount: totalCount, nextPage: nextPage, pageSize: pageSize, loadButton: loadButton, iri: iri };
     },
 
+    updateSplitter(event: any) {
+      this.splitterRightSize = event.sizes[1];
+    },
+
     async getQueryDefinition() {
       this.dataSet = await QueryService.querySummary(this.conceptIri);
     }
@@ -560,7 +563,7 @@ export default defineComponent({
   background-color: #ffffff;
 }
 
-.mainSplitter {
+.main-splitter {
   height: 100%;
 }
 
@@ -576,6 +579,7 @@ export default defineComponent({
 .concept-panel-content {
   overflow: auto;
   background-color: #ffffff;
+  height: 100%;
 }
 
 .loading-container {
@@ -601,11 +605,15 @@ export default defineComponent({
   border-top: solid lightgrey 1px;
 }
 
-.leftSplitterPanel {
+.left-splitter-panel {
   display: flex;
 }
 
-.leftSplitterContent {
+.right-splitter-panel {
+  overflow: auto;
+}
+
+.left-splitter-content {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -616,13 +624,13 @@ export default defineComponent({
   flex: 0;
 }
 
-.leftHierarchy {
+.left-hierarchy {
   overflow: auto;
   flex: 0 1 auto;
   border: none !important;
 }
 
-.tabView {
+.tab-view {
   display: flex;
   flex-direction: column;
   height: 100%;
