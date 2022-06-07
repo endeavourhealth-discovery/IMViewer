@@ -122,6 +122,8 @@
               </TabPanel>
               <TabPanel header="Query" v-if="isQuery">
                 <div class="concept-panel-content" id="query-container">
+                  <h4>Query Definition</h4>
+                  <QueryDefinition :modelValue="dataSet" :edit="false"></QueryDefinition>
                   <QueryText class="queryText" :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
@@ -153,6 +155,8 @@ import DirectService from "@/services/DirectService";
 import Properties from "@/components/concept/Properties.vue";
 import { Env, Helpers, Vocabulary, LoggerService, Models } from "im-library";
 import { DefinitionConfig, EntityReferenceNode, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
+import { QueryDefinition } from "im-library";
+import QueryService from "@/services/QueryService";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
@@ -175,7 +179,8 @@ export default defineComponent({
     Mappings,
     Properties,
     EclDefinition,
-    QueryText
+    QueryText,
+    QueryDefinition
   },
   computed: {
     activeProfile: {
@@ -249,6 +254,7 @@ export default defineComponent({
   },
   async mounted() {
     await this.init();
+    await this.getQueryDefinition();
   },
   data() {
     return {
@@ -288,7 +294,8 @@ export default defineComponent({
         // }
       ] as any,
       selectedOption: {} as any,
-      splitterRightSize: 0
+      splitterRightSize: 0,
+      dataSet: {} as any
     };
   },
   methods: {
@@ -540,6 +547,10 @@ export default defineComponent({
 
     updateSplitter(event: any) {
       this.splitterRightSize = event.sizes[1];
+    },
+
+    async getQueryDefinition() {
+      this.dataSet = await QueryService.querySummary(this.conceptIri);
     }
   }
 });
