@@ -122,13 +122,10 @@
               </TabPanel>
               <TabPanel header="Query" v-if="isQuery">
                 <div class="concept-panel-content" id="query-container">
+                  <h4>Query Definition</h4>
+                  <QueryDefinition :modelValue="dataSet" :edit="false"></QueryDefinition>
                   <ProfileDisplay theme="light" :modelValue="profile" :activeProfile="activeProfile" />
                   <QueryText class="queryText" :conceptIri="conceptIri" />
-                </div>
-              </TabPanel>
-              <TabPanel header="Query Definition" v-if="isQuery">
-                <div class="concept-panel-content" id="query-definition-container">
-                  <QueryDefinition :modelValue="dataSet" :edit="false"></QueryDefinition>
                 </div>
               </TabPanel>
             </TabView>
