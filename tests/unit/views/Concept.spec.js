@@ -13,8 +13,7 @@ import TextSectionHeader from "im-library";
 import SecondaryTree from "im-library";
 import Panel from "primevue/panel";
 import EntityService from "@/services/EntityService";
-import ConfigService from "@/services/ConfigService";
-import { LoggerService } from "im-library";
+import { LoggerService, ConfigService } from "im-library";
 import ProfileDisplay from "im-library";
 import DirectService from "@/services/DirectService";
 

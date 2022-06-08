@@ -12,9 +12,8 @@
 import { defineComponent } from "@vue/runtime-core";
 import EntityService from "@/services/EntityService";
 import GraphComponent from "./GraphComponent.vue";
-import ConfigService from "@/services/ConfigService";
 import { TTGraphData, TTBundle } from "im-library/dist/types/interfaces/Interfaces";
-import { Helpers, Vocabulary } from "im-library";
+import { Helpers, Vocabulary, ConfigService } from "im-library";
 const { IM } = Vocabulary;
 const {
   GraphTranslator: { translateFromEntityBundle }

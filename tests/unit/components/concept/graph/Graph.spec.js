@@ -3,9 +3,8 @@ import EntityService from "@/services/EntityService";
 import { flushPromises, shallowMount } from "@vue/test-utils";
 import ProgressSpinner from "primevue/progressspinner";
 import MultiSelect from "primevue/multiselect";
-import { Helpers } from "im-library";
+import { Helpers, ConfigService } from "im-library";
 const { GraphTranslator } = Helpers;
-import ConfigService from "@/services/ConfigService";
 
 describe("Graph.vue", () => {
   let wrapper;
@@ -31,8 +30,7 @@ describe("Graph.vue", () => {
       { name: "Congenital deformity of spine", iri: "http://endhealth.info/icd10#Q675", relToParent: "mapped to", children: [], _children: [] },
       { name: "Adult critical care encounter", iri: "http://endhealth.info/im#1641000252107", relToParent: "has member", children: [], _children: [] },
       { name: "Neonatal critical care encounter", iri: "http://endhealth.info/im#831000252103", relToParent: "has member", children: [], _children: [] },
-      { name: "Paediatric critical care encounter", iri: "http://endhealth.info/im#2811000252102", relToParent: "has member", children: [], _children: [] },
-
+      { name: "Paediatric critical care encounter", iri: "http://endhealth.info/im#2811000252102", relToParent: "has member", children: [], _children: [] }
     ],
     _children: []
   };
@@ -123,10 +121,12 @@ describe("Graph.vue", () => {
               {
                 "http://endhealth.info/im#mapAdvice": "ALWAYS M41.9 | FIFTH CHARACTER POSSIBLE",
                 "http://endhealth.info/im#mapPriority": 3,
-                "http://endhealth.info/im#mappedTo": [{
-                  "@id": "http://endhealth.info/icd10#M419",
-                  name: "Scoliosis, unspecified"
-                }],
+                "http://endhealth.info/im#mappedTo": [
+                  {
+                    "@id": "http://endhealth.info/icd10#M419",
+                    name: "Scoliosis, unspecified"
+                  }
+                ],
                 "http://endhealth.info/im#assuranceLevel": {
                   "@id": "http://endhealth.info/im#NationallyAssuredUK",
                   name: "Nationally assured UK level"
@@ -135,10 +135,12 @@ describe("Graph.vue", () => {
               {
                 "http://endhealth.info/im#mapAdvice": "ALWAYS M41.8 | FIFTH CHARACTER POSSIBLE",
                 "http://endhealth.info/im#mapPriority": 2,
-                "http://endhealth.info/im#mappedTo": [{
-                  "@id": "http://endhealth.info/icd10#M418",
-                  name: "Other forms of scoliosis"
-                }],
+                "http://endhealth.info/im#mappedTo": [
+                  {
+                    "@id": "http://endhealth.info/icd10#M418",
+                    name: "Other forms of scoliosis"
+                  }
+                ],
                 "http://endhealth.info/im#assuranceLevel": {
                   "@id": "http://endhealth.info/im#NationallyAssuredUK",
                   name: "Nationally assured UK level"
@@ -147,10 +149,12 @@ describe("Graph.vue", () => {
               {
                 "http://endhealth.info/im#mapAdvice": "ALWAYS Q67.5",
                 "http://endhealth.info/im#mapPriority": 1,
-                "http://endhealth.info/im#mappedTo": [{
-                  "@id": "http://endhealth.info/icd10#Q675",
-                  name: "Congenital deformity of spine"
-                }],
+                "http://endhealth.info/im#mappedTo": [
+                  {
+                    "@id": "http://endhealth.info/icd10#Q675",
+                    name: "Congenital deformity of spine"
+                  }
+                ],
                 "http://endhealth.info/im#assuranceLevel": {
                   "@id": "http://endhealth.info/im#NationallyAssuredUK",
                   name: "Nationally assured UK level"

@@ -1,6 +1,5 @@
-import ConfigService from "@/services/ConfigService";
 import axios from "axios";
-import { Env } from "im-library";
+import { Env, ConfigService } from "im-library";
 
 describe("ConfigService.ts ___ axios success", () => {
   beforeEach(() => {

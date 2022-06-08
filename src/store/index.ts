@@ -1,7 +1,6 @@
 import { createStore } from "vuex";
 import AuthService from "@/services/AuthService";
-import ConfigService from "@/services/ConfigService";
-import { Models, Vocabulary, Constants, LoggerService } from "im-library";
+import { Models, Vocabulary, Constants, LoggerService, ConfigService } from "im-library";
 import { RecentActivityItem } from "im-library/dist/types/interfaces/Interfaces";
 const { User, CustomAlert } = Models;
 const { IM } = Vocabulary;
@@ -29,7 +28,7 @@ export default createStore({
       { "@id": IM.INACTIVE, severity: "danger" }
     ],
     textDefinitionStartExpanded: ["Definition"],
-    activeProfile: { uuid: "", activeClausePath: "" },
+    activeProfile: { uuid: "", activeClausePath: "" }
   },
   mutations: {
     updateActiveProfile(state, value) {
