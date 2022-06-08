@@ -693,4 +693,9 @@ export default defineComponent({
 .name-tooltip {
   width: 80vw;
 }
+
+.query-definition pre {
+  margin-top: 0;
+  margin-bottom: 0;
+}
 </style>
