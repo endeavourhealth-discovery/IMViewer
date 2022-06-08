@@ -254,7 +254,6 @@ export default defineComponent({
   },
   async mounted() {
     await this.init();
-    await this.getQueryDefinition();
   },
   data() {
     return {
@@ -394,6 +393,7 @@ export default defineComponent({
       await this.getConcept(this.conceptIri);
       await this.getDefinition(this.conceptIri);
       await this.getTerms(this.conceptIri);
+      await this.getQueryDefinition(this.conceptIri);
       this.types = isObjectHasKeys(this.concept, [RDF.TYPE]) ? this.concept[RDF.TYPE] : ([] as TTIriRef[]);
       this.header = this.concept[RDFS.LABEL];
       await this.setCopyMenuItems();
@@ -431,6 +431,8 @@ export default defineComponent({
           this.active = 2;
         } else if (this.isRecordModel) {
           this.active = 3;
+        } else if (this.isQuery) {
+          this.active = 4;
         } else {
           this.active = 0;
         }
@@ -549,8 +551,8 @@ export default defineComponent({
       this.splitterRightSize = event.sizes[1];
     },
 
-    async getQueryDefinition() {
-      this.dataSet = await QueryService.querySummary(this.conceptIri);
+    async getQueryDefinition(iri: string) {
+      this.dataSet = await QueryService.querySummary(iri);
     }
   }
 });
