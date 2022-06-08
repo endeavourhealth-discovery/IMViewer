@@ -3,7 +3,7 @@ import { Models, Env } from "im-library";
 
 export default class QueryService {
   public static async generateSQL(conceptIri: string) {
-    return axios.get(Env.API + "api/query/public/generateSQL", {
+    return axios.get(Env.VITE_NODE_API + "node_api/query/public/getSQL", {
       params: {
         iri: conceptIri
       },
