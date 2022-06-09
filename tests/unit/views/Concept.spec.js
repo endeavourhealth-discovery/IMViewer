@@ -17,6 +17,7 @@ import ConfigService from "@/services/ConfigService";
 import { LoggerService } from "im-library";
 import ProfileDisplay from "im-library";
 import DirectService from "@/services/DirectService";
+import QueryService from "@/services/QueryService";
 
 Object.assign(navigator, {
   clipboard: {
@@ -186,6 +187,8 @@ describe("Concept.vue ___ not moduleIri", () => {
     EntityService.getEntityTermCodes = vi.fn().mockResolvedValue(TERMS);
     ConfigService.getComponentLayout = vi.fn().mockResolvedValue(CONFIG);
     ConfigService.getDefaultPredicateNames = vi.fn().mockResolvedValue(DEFAULT_PREDICATE_NAMES);
+    QueryService.querySummary = vi.fn().mockResolvedValue("{}");
+    QueryService.generateSQL = vi.fn().mockResolvedValue("");
     mockStore = {
       state: {
         conceptIri: "http://endhealth.info/im#CriticalCareEncounter",
