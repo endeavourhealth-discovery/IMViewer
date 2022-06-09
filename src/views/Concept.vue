@@ -393,9 +393,9 @@ export default defineComponent({
       await this.getConcept(this.conceptIri);
       await this.getDefinition(this.conceptIri);
       await this.getTerms(this.conceptIri);
+      this.types = isObjectHasKeys(this.concept, [RDF.TYPE]) ? this.concept[RDF.TYPE] : ([] as TTIriRef[]);
       if (this.isQuery)
         await this.getQueryDefinition(this.conceptIri);
-      this.types = isObjectHasKeys(this.concept, [RDF.TYPE]) ? this.concept[RDF.TYPE] : ([] as TTIriRef[]);
       this.header = this.concept[RDFS.LABEL];
       await this.setCopyMenuItems();
       this.setStoreType();
