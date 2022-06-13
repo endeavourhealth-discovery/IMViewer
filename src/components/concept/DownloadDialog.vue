@@ -84,7 +84,6 @@
 </template>
 
 <script lang="ts">
-import EntityService from "@/services/EntityService";
 import { defineComponent } from "@vue/runtime-core";
 import { TTIriRef, EntityReferenceNode, TermCode, ExportValueSet, DataModelProperty, TTBundle } from "im-library/dist/types/interfaces/Interfaces";
 import { Vocabulary, Helpers, LoggerService, Env } from "im-library";
@@ -191,7 +190,7 @@ export default defineComponent({
 
     async init(iri: string): Promise<void> {
       this.loading = true;
-      this.concept = await EntityService.getPartialEntity(iri, [RDFS.LABEL, IM.IS_CHILD_OF, IM.HAS_CHILDREN]);
+      this.concept = await this.$entityService.getPartialEntity(iri, [RDFS.LABEL, IM.IS_CHILD_OF, IM.HAS_CHILDREN]);
       if (isObjectHasKeys(this.concept, [IM.IS_CHILD_OF]) && isArrayHasLength(this.concept[IM.IS_CHILD_OF])) {
         this.isChildOf = this.concept[IM.IS_CHILD_OF];
       }
@@ -199,15 +198,15 @@ export default defineComponent({
         this.hasChildren = this.concept[IM.HAS_CHILDREN];
       }
 
-      this.definition = await EntityService.getDefinitionBundle(iri);
+      this.definition = await this.$entityService.getDefinitionBundle(iri);
 
-      this.hasSubTypes = await EntityService.getEntityChildren(iri);
+      this.hasSubTypes = await this.$entityService.getEntityChildren(iri);
 
-      this.terms = await EntityService.getEntityTermCodes(iri);
+      this.terms = await this.$entityService.getEntityTermCodes(iri);
 
-      this.dataModelProperties = await EntityService.getDataModelProperties(iri);
+      this.dataModelProperties = await this.$entityService.getDataModelProperties(iri);
 
-      this.members = await EntityService.getEntityMembers(iri, this.expandMembers, false);
+      this.members = await this.$entityService.getEntityMembers(iri, this.expandMembers, false);
 
       this.setIncludeBooleans();
       this.loading = false;

@@ -72,8 +72,6 @@
 <script lang="ts">
 import { Auth } from "aws-amplify";
 import { defineComponent } from "@vue/runtime-core";
-import EntityService from "@/services/EntityService";
-import SetService from "@/services/SetService";
 import { ValueSetMember, ExportValueSet } from "im-library/dist/types/interfaces/Interfaces";
 import { Helpers, Vocabulary, LoggerService } from "im-library";
 const {
@@ -140,7 +138,7 @@ export default defineComponent({
       this.expandedRowGroups = ["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"];
       this.selected = {} as ValueSetMember;
       this.subsets = [];
-      this.members = await EntityService.getEntityMembers(this.conceptIri, false, false, this.pageSize, true);
+      this.members = await this.$entityService.getEntityMembers(this.conceptIri, false, false, this.pageSize, true);
       this.sortMembers();
       this.combinedMembers = this.members.members;
       if (isArrayHasLength(this.combinedMembers) && this.combinedMembers[0].type === "INCLUDED_SELF") {
@@ -164,8 +162,8 @@ export default defineComponent({
       this.downloading = true;
       try {
         this.$toast.add(LoggerService.success("Download will begin shortly"));
-        const result = await SetService.IMV1(this.conceptIri);
-        const label: string = (await EntityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
+        const result = await this.$setService.IMV1(this.conceptIri);
+        const label: string = (await this.$entityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
         this.downloadFile(result, label + ".txt");
       } catch (error) {
         this.$toast.add(LoggerService.error("Download failed from server"));
@@ -178,8 +176,10 @@ export default defineComponent({
       this.downloading = true;
       try {
         this.$toast.add(LoggerService.success("Download will begin shortly"));
-        const result = expanded ? (await EntityService.getFullExportSet(this.conceptIri, v1)).data : await SetService.download(this.conceptIri, expanded, v1);
-        const label: string = (await EntityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
+        const result = expanded
+          ? (await this.$entityService.getFullExportSet(this.conceptIri, v1)).data
+          : await this.$setService.download(this.conceptIri, expanded, v1);
+        const label: string = (await this.$entityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
         this.downloadFile(result, this.getFileName(label));
       } catch (error) {
         this.$toast.add(LoggerService.error("Download failed from server"));
@@ -221,7 +221,8 @@ export default defineComponent({
 
     publish() {
       this.isPublishing = true;
-      SetService.publish(this.conceptIri)
+      this.$setService
+        .publish(this.conceptIri)
         .then(() => {
           this.isPublishing = false;
           this.$toast.add(LoggerService.success("Value set published", "Published to IM1 :" + this.conceptIri));
@@ -250,12 +251,12 @@ export default defineComponent({
     async loadMore() {
       if (this.isIncludedSelf) {
         if (this.nextPage * this.pageSize < this.totalCount) {
-          this.hasMembers = await EntityService.getHasMember(this.conceptIri, IM.HAS_MEMBER, this.nextPage, this.pageSize);
+          this.hasMembers = await this.$entityService.getHasMember(this.conceptIri, IM.HAS_MEMBER, this.nextPage, this.pageSize);
           this.combinedMembers[0].entity.name = this.combinedMembers[0].entity.name.concat(this.hasMembers.members[0].entity.name);
           this.nextPage = this.nextPage + 1;
           this.loadButton = true;
         } else if (this.nextPage * this.pageSize > this.totalCount) {
-          this.hasMembers = await EntityService.getHasMember(this.conceptIri, IM.HAS_MEMBER, this.nextPage, this.pageSize);
+          this.hasMembers = await this.$entityService.getHasMember(this.conceptIri, IM.HAS_MEMBER, this.nextPage, this.pageSize);
           this.combinedMembers[0].entity.name = this.combinedMembers[0].entity.name.concat(this.hasMembers.members[0].entity.name);
           this.loadButton = false;
         } else {
@@ -265,7 +266,7 @@ export default defineComponent({
     },
 
     async getTotalCount() {
-      this.totalCount = (await EntityService.getPartialAndTotalCount(this.conceptIri, IM.HAS_MEMBER, 1, 10)).totalCount;
+      this.totalCount = (await this.$entityService.getPartialAndTotalCount(this.conceptIri, IM.HAS_MEMBER, 1, 10)).totalCount;
     }
   }
 });

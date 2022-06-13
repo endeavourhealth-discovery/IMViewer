@@ -43,7 +43,6 @@
   </div>
 </template>
 <script lang="ts">
-import EntityService from "@/services/EntityService";
 import { defineComponent } from "@vue/runtime-core";
 import { RouteRecordName } from "vue-router";
 import { DataModelProperty, ProcessedDataModelProperty } from "im-library/dist/types/interfaces/Interfaces";
@@ -85,7 +84,7 @@ export default defineComponent({
 
     async getDataModelProps(iri: string): Promise<void> {
       this.loading = true;
-      const result = await EntityService.getDataModelProperties(iri);
+      const result = await this.$entityService.getDataModelProperties(iri);
       this.dataModelPropsData = result.map((prop: DataModelProperty) => {
         return {
           propertyId: prop.property["@id"],

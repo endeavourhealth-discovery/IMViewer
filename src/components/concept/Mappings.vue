@@ -71,7 +71,6 @@
 </template>
 
 <script lang="ts">
-import EntityService from "@/services/EntityService";
 import { defineComponent } from "vue";
 import SimpleMaps from "@/components/concept/mapping/SimpleMaps.vue";
 import { Namespace, SimpleMap, SimpleMapIri, MapItem, ChartTableNode, ChartMapNode } from "im-library/dist/types/interfaces/Interfaces";
@@ -113,11 +112,11 @@ export default defineComponent({
       this.loading = false;
     },
     async getMappings(): Promise<void> {
-      this.mappings = (await EntityService.getPartialEntity(this.conceptIri, [IM.HAS_MAP]))[IM.HAS_MAP] || [];
+      this.mappings = (await this.$entityService.getPartialEntity(this.conceptIri, [IM.HAS_MAP]))[IM.HAS_MAP] || [];
       this.data = {};
 
-      this.namespaces = await EntityService.getNamespaces();
-      this.simpleMaps = await EntityService.getSimpleMaps(this.conceptIri);
+      this.namespaces = await this.$entityService.getNamespaces();
+      this.simpleMaps = await this.$entityService.getSimpleMaps(this.conceptIri);
     },
 
     createChartTableNode(

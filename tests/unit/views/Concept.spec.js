@@ -12,10 +12,9 @@ import TermCodeTable from "im-library";
 import TextSectionHeader from "im-library";
 import SecondaryTree from "im-library";
 import Panel from "primevue/panel";
-import EntityService from "@/services/EntityService";
-import { LoggerService, ConfigService } from "im-library";
+import { LoggerService } from "im-library";
 import ProfileDisplay from "im-library";
-import DirectService from "@/services/DirectService";
+import { vi } from "vitest";
 
 Object.assign(navigator, {
   clipboard: {
@@ -174,17 +173,27 @@ describe("Concept.vue ___ not moduleIri", () => {
   let clipboardSpy;
   let docSpy;
   let windowSpy;
+  let mockEntityService;
+  let mockConfigService;
+  let mockDirectService;
 
   beforeEach(async () => {
     vi.resetAllMocks();
     clipboardSpy = vi.spyOn(navigator.clipboard, "writeText");
-    EntityService.getDefinitionBundle = vi.fn().mockResolvedValue(INFERRED);
-    EntityService.getPartialAndTotalCount = vi.fn().mockResolvedValue(MEMBERS);
-    EntityService.getPartialEntity = vi.fn().mockResolvedValue(CONCEPT);
-    EntityService.getPagedChildren = vi.fn().mockResolvedValue(CHILDREN);
-    EntityService.getEntityTermCodes = vi.fn().mockResolvedValue(TERMS);
-    ConfigService.getComponentLayout = vi.fn().mockResolvedValue(CONFIG);
-    ConfigService.getDefaultPredicateNames = vi.fn().mockResolvedValue(DEFAULT_PREDICATE_NAMES);
+    mockEntityService = {
+      getDefinitionBundle: vi.fn().mockResolvedValue(INFERRED),
+      getPartialAndTotalCount: vi.fn().mockResolvedValue(MEMBERS),
+      getPartialEntity: vi.fn().mockResolvedValue(CONCEPT),
+      getPagedChildren: vi.fn().mockResolvedValue(CHILDREN),
+      getEntityTermCodes: vi.fn().mockResolvedValue(TERMS)
+    };
+    mockConfigService = {
+      getComponentLayout: vi.fn().mockResolvedValue(CONFIG),
+      getDefaultPredicateNames: vi.fn().mockResolvedValue(DEFAULT_PREDICATE_NAMES)
+    };
+    mockDirectService = {
+      directTo: vi.fn()
+    };
     mockStore = {
       state: {
         conceptIri: "http://endhealth.info/im#CriticalCareEncounter",
@@ -226,7 +235,14 @@ describe("Concept.vue ___ not moduleIri", () => {
           TextSectionHeader,
           ProfileDisplay
         },
-        mocks: { $store: mockStore, $router: mockRouter, $toast: mockToast },
+        mocks: {
+          $store: mockStore,
+          $router: mockRouter,
+          $toast: mockToast,
+          $configService: mockConfigService,
+          $directService: mockDirectService,
+          $entityService: mockEntityService
+        },
         directives: { tooltip: vi.fn() },
         stubs: { Panel: Panel, Menu: mockRef, FontAwesomeIcon: true }
       }
@@ -355,10 +371,10 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("can routeToEdit", async () => {
-    DirectService.directTo = vi.fn().mockResolvedValue(true);
+    mockDirectService.directTo = vi.fn().mockResolvedValue(true);
     wrapper.vm.directToEditRoute();
-    expect(DirectService.directTo).toHaveBeenCalledTimes(1);
-    expect(DirectService.directTo).toHaveBeenLastCalledWith("/editor/#/", "http://endhealth.info/im#CriticalCareEncounter", wrapper.vm, "editor");
+    expect(mockDirectService.directTo).toHaveBeenCalledTimes(1);
+    expect(mockDirectService.directTo).toHaveBeenLastCalledWith("/editor/#/", "http://endhealth.info/im#CriticalCareEncounter", wrapper.vm, "editor");
   });
 
   it("can route to create", () => {
@@ -368,13 +384,13 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("can getConcept ___ pass", async () => {
-    EntityService.getPartialEntity = vi.fn().mockResolvedValue({
+    mockEntityService.getPartialEntity = vi.fn().mockResolvedValue({
       "@id": "http://snomed.info/sct#298382003",
       "http://endhealth.info/im#status": { "@id": "http://endhealth.info/im#Active", name: "Active" },
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2002/07/owl#Class", name: "Class" }],
       "http://www.w3.org/2000/01/rdf-schema#label": "Scoliosis deformity of spine (disorder)"
     });
-    EntityService.getPagedChildren = vi.fn().mockResolvedValue({
+    mockEntityService.getPagedChildren = vi.fn().mockResolvedValue({
       totalCount: 3,
       pageSize: 10,
       result: [
@@ -394,11 +410,11 @@ describe("Concept.vue ___ not moduleIri", () => {
     });
     wrapper.vm.getConcept("http://snomed.info/sct#298382003");
     await flushPromises();
-    expect(EntityService.getPartialEntity).toHaveBeenCalledTimes(1);
-    expect(EntityService.getPagedChildren).toHaveBeenCalledTimes(1);
-    expect(EntityService.getPagedChildren).toHaveBeenCalledWith("http://snomed.info/sct#298382003", 1, 10);
-    expect(EntityService.getEntityTermCodes).toHaveBeenCalledTimes(1);
-    expect(EntityService.getEntityTermCodes).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
+    expect(mockEntityService.getPartialEntity).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getPagedChildren).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getPagedChildren).toHaveBeenCalledWith("http://snomed.info/sct#298382003", 1, 10);
+    expect(mockEntityService.getEntityTermCodes).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getEntityTermCodes).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
     expect(wrapper.vm.concept).toStrictEqual({
       "@id": "http://snomed.info/sct#298382003",
       "http://endhealth.info/im#status": { "@id": "http://endhealth.info/im#Active", name: "Active" },
@@ -427,13 +443,13 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("can getConcept ___ no subclass", async () => {
-    EntityService.getPartialEntity = vi.fn().mockResolvedValue({
+    mockEntityService.getPartialEntity = vi.fn().mockResolvedValue({
       "@id": "http://snomed.info/sct#298382003",
       "http://endhealth.info/im#status": { "@id": "http://endhealth.info/im#Active", name: "Active" },
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2002/07/owl#Class", name: "Class" }],
       "http://www.w3.org/2000/01/rdf-schema#label": "Scoliosis deformity of spine (disorder)"
     });
-    EntityService.getPagedChildren = vi.fn().mockResolvedValue({
+    mockEntityService.getPagedChildren = vi.fn().mockResolvedValue({
       totalCount: 3,
       pageSize: 10,
       result: [
@@ -453,11 +469,11 @@ describe("Concept.vue ___ not moduleIri", () => {
     });
     wrapper.vm.getConcept("http://snomed.info/sct#298382003");
     await flushPromises();
-    expect(EntityService.getPartialEntity).toHaveBeenCalledTimes(1);
-    expect(EntityService.getPagedChildren).toHaveBeenCalledTimes(1);
-    expect(EntityService.getPagedChildren).toHaveBeenCalledWith("http://snomed.info/sct#298382003", 1, 10);
-    expect(EntityService.getEntityTermCodes).toHaveBeenCalledTimes(1);
-    expect(EntityService.getEntityTermCodes).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
+    expect(mockEntityService.getPartialEntity).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getPagedChildren).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getPagedChildren).toHaveBeenCalledWith("http://snomed.info/sct#298382003", 1, 10);
+    expect(mockEntityService.getEntityTermCodes).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getEntityTermCodes).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
     expect(wrapper.vm.concept).toStrictEqual({
       "@id": "http://snomed.info/sct#298382003",
       "http://endhealth.info/im#status": { "@id": "http://endhealth.info/im#Active", name: "Active" },
@@ -486,7 +502,7 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("can getInferred ___ pass", async () => {
-    EntityService.getDefinitionBundle.mockResolvedValue({
+    mockEntityService.getDefinitionBundle.mockResolvedValue({
       entity: {
         "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
           { "@id": "http://snomed.info/sct#928000", name: "Disorder of musculoskeletal system" },
@@ -531,8 +547,8 @@ describe("Concept.vue ___ not moduleIri", () => {
     wrapper.vm.getDefinition("http://snomed.info/sct#298382003");
     await flushPromises();
     await wrapper.vm.$nextTick();
-    expect(EntityService.getDefinitionBundle).toHaveBeenCalledTimes(1);
-    expect(EntityService.getDefinitionBundle).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
+    expect(mockEntityService.getDefinitionBundle).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getDefinitionBundle).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
     expect(wrapper.vm.concept["http://endhealth.info/im#definition"]).toStrictEqual({
       entity: {
         "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
@@ -578,34 +594,34 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("can getInferred ___ pass ___ empty bundle", async () => {
-    EntityService.getDefinitionBundle.mockResolvedValue({ entity: {} });
+    mockEntityService.getDefinitionBundle.mockResolvedValue({ entity: {} });
     wrapper.vm.getDefinition("http://snomed.info/sct#298382003");
     await flushPromises();
-    expect(EntityService.getDefinitionBundle).toHaveBeenCalledTimes(1);
-    expect(EntityService.getDefinitionBundle).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
+    expect(mockEntityService.getDefinitionBundle).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getDefinitionBundle).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
     expect(wrapper.vm.concept["http://endhealth.info/im#definition"]).toStrictEqual({
       entity: {}
     });
   });
 
   it("can getInferred ___ pass ___ not bundle", async () => {
-    EntityService.getDefinitionBundle.mockResolvedValue({});
+    mockEntityService.getDefinitionBundle.mockResolvedValue({});
     wrapper.vm.getDefinition("http://snomed.info/sct#298382003");
     await flushPromises();
-    expect(EntityService.getDefinitionBundle).toHaveBeenCalledTimes(1);
-    expect(EntityService.getDefinitionBundle).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
+    expect(mockEntityService.getDefinitionBundle).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getDefinitionBundle).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
     expect(wrapper.vm.concept["http://endhealth.info/im#definition"]).toStrictEqual({});
   });
 
   it("can getConfig ___ pass", async () => {
     wrapper.vm.getConfig("description");
     await flushPromises();
-    expect(ConfigService.getComponentLayout).toHaveBeenCalledTimes(1);
-    expect(ConfigService.getComponentLayout).toHaveBeenCalledWith("description");
+    expect(mockConfigService.getComponentLayout).toHaveBeenCalledTimes(1);
+    expect(mockConfigService.getComponentLayout).toHaveBeenCalledWith("description");
   });
 
   it("can getConfig ___ unordered", async () => {
-    ConfigService.getComponentLayout.mockResolvedValue([
+    mockConfigService.getComponentLayout.mockResolvedValue([
       { label: "Divider", predicate: "None", type: "Divider", size: "100%", order: 8 },
       { label: "Name", predicate: "http://www.w3.org/2000/01/rdf-schema#label", type: "TextWithLabel", size: "50%", order: 0 },
       { label: "Iri", predicate: "@id", type: "TextWithLabel", size: "50%", order: 1 },
@@ -618,13 +634,13 @@ describe("Concept.vue ___ not moduleIri", () => {
     ]);
     wrapper.vm.getConfig("description");
     await flushPromises();
-    expect(ConfigService.getComponentLayout).toHaveBeenCalledTimes(1);
-    expect(ConfigService.getComponentLayout).toHaveBeenCalledWith("description");
+    expect(mockConfigService.getComponentLayout).toHaveBeenCalledTimes(1);
+    expect(mockConfigService.getComponentLayout).toHaveBeenCalledWith("description");
   });
 
   it("can getConfig ___ missing order property", async () => {
     LoggerService.error = vi.fn();
-    ConfigService.getComponentLayout.mockResolvedValue([
+    mockConfigService.getComponentLayout.mockResolvedValue([
       { label: "Divider", predicate: "None", type: "Divider", size: "100%" },
       { label: "Name", predicate: "http://www.w3.org/2000/01/rdf-schema#label", type: "TextWithLabel", size: "50%", order: 0 },
       { label: "Iri", predicate: "@id", type: "TextWithLabel", size: "50%", order: 1 },
@@ -637,8 +653,8 @@ describe("Concept.vue ___ not moduleIri", () => {
     ]);
     wrapper.vm.getConfig("description");
     await flushPromises();
-    expect(ConfigService.getComponentLayout).toHaveBeenCalledTimes(1);
-    expect(ConfigService.getComponentLayout).toHaveBeenCalledWith("description");
+    expect(mockConfigService.getComponentLayout).toHaveBeenCalledTimes(1);
+    expect(mockConfigService.getComponentLayout).toHaveBeenCalledWith("description");
     expect(LoggerService.error).toHaveBeenCalledTimes(1);
     expect(LoggerService.error).toHaveBeenCalledWith(
       undefined,
@@ -1104,16 +1120,22 @@ describe("Concept.vue ___ moduleIri", () => {
   let clipboardSpy;
   let docSpy;
   let windowSpy;
+  let mockConfigService;
+  let mockDirectService;
+  let mockEntityService;
 
   beforeEach(async () => {
     vi.resetAllMocks();
     clipboardSpy = vi.spyOn(navigator.clipboard, "writeText");
-    EntityService.getDefinitionBundle = vi.fn().mockResolvedValue({ entity: {}, predicates: [] });
-    EntityService.getPartialEntity = vi.fn().mockResolvedValue(CONCEPT);
-    EntityService.getPartialAndTotalCount = vi.fn().mockResolvedValue(MEMBERS);
-    EntityService.getPagedChildren = vi.fn().mockResolvedValue([]);
-    EntityService.getEntityTermCodes = vi.fn().mockResolvedValue([]);
-    ConfigService.getComponentLayout = vi.fn().mockResolvedValue(CONFIG);
+    mockEntityService = {
+      getDefinitionBundle: vi.fn().mockResolvedValue({ entity: {}, predicates: [] }),
+      getPartialEntity: vi.fn().mockResolvedValue(CONCEPT),
+      getPartialAndTotalCount: vi.fn().mockResolvedValue(MEMBERS),
+      getPagedChildren: vi.fn().mockResolvedValue([]),
+      getEntityTermCodes: vi.fn().mockResolvedValue([])
+    };
+    mockConfigService = { getComponentLayout: vi.fn().mockResolvedValue(CONFIG) };
+    mockDirectService = { directTo: vi.fn() };
     mockStore = {
       state: {
         conceptIri: "http://endhealth.info/im#DiscoveryOntology",
@@ -1155,7 +1177,14 @@ describe("Concept.vue ___ moduleIri", () => {
           TextSectionHeader,
           ProfileDisplay
         },
-        mocks: { $store: mockStore, $router: mockRouter, $toast: mockToast },
+        mocks: {
+          $store: mockStore,
+          $router: mockRouter,
+          $toast: mockToast,
+          $configService: mockConfigService,
+          $directService: mockDirectService,
+          $entityService: mockEntityService
+        },
         directives: { tooltip: vi.fn() },
         stubs: { Panel: Panel, Menu: mockRef }
       }

@@ -2,13 +2,14 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 import EntityChart from "@/components/concept/EntityChart.vue";
 import ProgressSpinner from "primevue/progressspinner";
 import OrganizationChart from "primevue/organizationchart";
-import EntityService from "@/services/EntityService";
 
 describe("Graph.vue", () => {
   let wrapper;
   let mockRoute;
   let mockRouter;
   let mockToast;
+  let mockEntityService;
+
   const GRAPH = {
     key: "0",
     name: "Accident and emergency encounter (record type)",
@@ -229,7 +230,7 @@ describe("Graph.vue", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
-    EntityService.getEntityGraph = vi.fn().mockResolvedValue(GRAPH);
+    mockEntityService = { getEntityGraph: vi.fn().mockResolvedValue(GRAPH) };
     mockRoute = {
       name: "Concept"
     };
@@ -243,7 +244,7 @@ describe("Graph.vue", () => {
     wrapper = shallowMount(EntityChart, {
       global: {
         components: { ProgressSpinner, OrganizationChart },
-        mocks: { $route: mockRoute, $router: mockRouter, $toast: mockToast }
+        mocks: { $route: mockRoute, $router: mockRouter, $toast: mockToast, $entityService: mockEntityService }
       },
       props: { conceptIri: "http://endhealth.info/im#AccidentAndEmergencyEncounter" }
     });
@@ -263,8 +264,8 @@ describe("Graph.vue", () => {
   });
 
   it("calls getGraph on mounted", () => {
-    expect(EntityService.getEntityGraph).toHaveBeenCalledTimes(1);
-    expect(EntityService.getEntityGraph).toHaveBeenCalledWith("http://endhealth.info/im#AccidentAndEmergencyEncounter");
+    expect(mockEntityService.getEntityGraph).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getEntityGraph).toHaveBeenCalledWith("http://endhealth.info/im#AccidentAndEmergencyEncounter");
   });
 
   it("can getTypeFromIri ___ no #", () => {
@@ -284,8 +285,8 @@ describe("Graph.vue", () => {
     await wrapper.vm.$nextTick();
     wrapper.vm.getGraph("http://snomed.info/sct#298382003");
     expect(wrapper.vm.loading).toBe(true);
-    expect(EntityService.getEntityGraph).toHaveBeenCalledTimes(2);
-    expect(EntityService.getEntityGraph).toHaveBeenLastCalledWith("http://snomed.info/sct#298382003");
+    expect(mockEntityService.getEntityGraph).toHaveBeenCalledTimes(2);
+    expect(mockEntityService.getEntityGraph).toHaveBeenLastCalledWith("http://snomed.info/sct#298382003");
     await flushPromises();
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.loading).toBe(false);

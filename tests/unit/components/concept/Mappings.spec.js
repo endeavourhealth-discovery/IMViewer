@@ -4,7 +4,6 @@ import SimpleMaps from "@/components/concept/mapping/SimpleMaps.vue";
 import ProgressSpinner from "primevue/progressspinner";
 import OrganizationChart from "primevue/organizationchart";
 import OverlayPanel from "primevue/overlaypanel";
-import EntityService from "@/services/EntityService";
 import { Vocabulary } from "im-library";
 const { IM } = Vocabulary;
 
@@ -13,6 +12,7 @@ describe("Mappings.vue", () => {
   let mockStore;
   let mockToast;
   let mockRef;
+  let mockEntityService;
 
   const HAS_MAPS = {
     "http://endhealth.info/im#hasMap": [
@@ -82,16 +82,16 @@ describe("Mappings.vue", () => {
 
     mockRef = { render: () => {}, methods: { toggle: vi.fn() } };
 
-    EntityService.getPartialEntity = vi.fn().mockResolvedValue(HAS_MAPS);
-
-    EntityService.getNamespaces = vi.fn().mockResolvedValue(NAMESPACES);
-
-    EntityService.getSimpleMaps = vi.fn().mockResolvedValue(SIMPLE_MAPS);
+    mockEntityService = {
+      getPartialEntity: vi.fn().mockResolvedValue(HAS_MAPS),
+      getNamespaces: vi.fn().mockResolvedValue(NAMESPACES),
+      getSimpleMaps: vi.fn().mockResolvedValue(SIMPLE_MAPS)
+    };
 
     wrapper = shallowMount(Mappings, {
       global: {
         components: { ProgressSpinner, OrganizationChart, OverlayPanel, SimpleMaps },
-        mocks: { $store: mockStore, $toast: mockToast },
+        mocks: { $store: mockStore, $toast: mockToast, $entityService: mockEntityService },
         stubs: { OverlayPanel: mockRef }
       },
       props: { conceptIri: "http://snomed.info/sct#723312009" }
@@ -113,18 +113,18 @@ describe("Mappings.vue", () => {
   it("can get mappings ___ success", async () => {
     wrapper.vm.getMappings();
     await flushPromises();
-    expect(EntityService.getPartialEntity).toHaveBeenCalledTimes(1);
-    expect(EntityService.getPartialEntity).toHaveBeenCalledWith("http://snomed.info/sct#723312009", ["http://endhealth.info/im#hasMap"]);
-    expect(EntityService.getSimpleMaps).toHaveBeenCalledTimes(1);
-    expect(EntityService.getSimpleMaps).toHaveBeenCalledWith("http://snomed.info/sct#723312009");
-    expect(EntityService.getNamespaces).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getPartialEntity).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getPartialEntity).toHaveBeenCalledWith("http://snomed.info/sct#723312009", ["http://endhealth.info/im#hasMap"]);
+    expect(mockEntityService.getSimpleMaps).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getSimpleMaps).toHaveBeenCalledWith("http://snomed.info/sct#723312009");
+    expect(mockEntityService.getNamespaces).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.mappings).toStrictEqual(HAS_MAPS[IM.HAS_MAP]);
     expect(wrapper.vm.namespaces).toStrictEqual(NAMESPACES);
     expect(wrapper.vm.simpleMaps).toStrictEqual(SIMPLE_MAPS);
   });
 
   it("can get mappings ___ fail no hasMap", async () => {
-    EntityService.getPartialEntity = vi.fn().mockResolvedValue({ comboOf: [1, 2] });
+    mockEntityService.getPartialEntity = vi.fn().mockResolvedValue({ comboOf: [1, 2] });
     wrapper.vm.getMappings();
     await flushPromises();
     expect(wrapper.vm.mappings).toStrictEqual([]);
@@ -132,11 +132,11 @@ describe("Mappings.vue", () => {
   });
 
   it("can get mappings ___ no simpleMaps", async () => {
-    EntityService.getPartialEntity = vi.fn().mockResolvedValue({});
+    mockEntityService.getPartialEntity = vi.fn().mockResolvedValue({});
     wrapper.vm.getMappings();
     await flushPromises();
     expect(wrapper.vm.simpleMaps).toStrictEqual(SIMPLE_MAPS);
-    expect(EntityService.getSimpleMaps).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getSimpleMaps).toHaveBeenCalledTimes(1);
   });
 
   it("can create chartTableNode", () => {

@@ -2,13 +2,14 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 import UsedIn from "@/components/concept/UsedIn.vue";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
-import EntityService from "@/services/EntityService";
 
 describe("UsedIn.vue", () => {
   let wrapper;
   let mockRouter;
   let mockToast;
   let docSpy;
+  let mockEntityService;
+
   const USAGES = [
     {
       "@id": "http://endhealth.info/im#AccidentAndEmergencyEncounter",
@@ -85,8 +86,10 @@ describe("UsedIn.vue", () => {
   ];
   beforeEach(async () => {
     vi.resetAllMocks();
-    EntityService.getEntityUsages = vi.fn().mockResolvedValue(USAGES);
-    EntityService.getUsagesTotalRecords = vi.fn().mockResolvedValue(50);
+    mockEntityService = {
+      getEntityUsages: vi.fn().mockResolvedValue(USAGES),
+      getUsagesTotalRecords: vi.fn().mockResolvedValue(50)
+    };
     mockRouter = {
       push: vi.fn()
     };
@@ -105,7 +108,7 @@ describe("UsedIn.vue", () => {
     wrapper = shallowMount(UsedIn, {
       global: {
         components: { DataTable, Column },
-        mocks: { $router: mockRouter, $toast: mockToast }
+        mocks: { $router: mockRouter, $toast: mockToast, $entityService: mockEntityService }
       },
       props: { conceptIri: "http://snomed.info/sct#298382003" }
     });
@@ -164,8 +167,8 @@ describe("UsedIn.vue", () => {
   it("gets usages", async () => {
     wrapper.vm.getUsages("http://snomed.info/sct#298382003", 0, 25);
     await flushPromises();
-    expect(EntityService.getEntityUsages).toHaveBeenCalledTimes(1);
-    expect(EntityService.getEntityUsages).toHaveBeenCalledWith("http://snomed.info/sct#298382003", 0, 25);
+    expect(mockEntityService.getEntityUsages).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getEntityUsages).toHaveBeenCalledWith("http://snomed.info/sct#298382003", 0, 25);
     expect(wrapper.vm.usages).toStrictEqual(TRANSFORMED_USAGES);
   });
 
@@ -173,8 +176,8 @@ describe("UsedIn.vue", () => {
     wrapper.vm.records = 0;
     wrapper.vm.getRecordsSize("http://snomed.info/sct#298382003");
     await flushPromises();
-    expect(EntityService.getUsagesTotalRecords).toHaveBeenCalledTimes(1);
-    expect(EntityService.getUsagesTotalRecords).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
+    expect(mockEntityService.getUsagesTotalRecords).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getUsagesTotalRecords).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
     expect(wrapper.vm.recordsTotal).toBe(50);
   });
 

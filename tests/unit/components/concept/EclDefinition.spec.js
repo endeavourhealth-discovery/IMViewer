@@ -1,18 +1,20 @@
 import EclDefinition from "@/components/concept/EclDefinition.vue";
 import { flushPromises, shallowMount } from "@vue/test-utils";
-import EntityService from "@/services/EntityService";
 
 describe("EclDefinition.vue", () => {
   let wrapper;
+  let mockEntityService;
 
   beforeEach(async () => {
     vi.resetAllMocks();
 
-    EntityService.getEcl = vi
-      .fn()
-      .mockResolvedValue(
-        "<<108337002 | Islam AND/OR derivative |  OR \n<<1226001 | United Church of Canada |  OR \n<<160234004 | Salvation Army member (person) |"
-      );
+    mockEntityService = {
+      getEcl: vi
+        .fn()
+        .mockResolvedValue(
+          "<<108337002 | Islam AND/OR derivative |  OR \n<<1226001 | United Church of Canada |  OR \n<<160234004 | Salvation Army member (person) |"
+        )
+    };
 
     wrapper = shallowMount(EclDefinition, {
       props: {
@@ -30,7 +32,8 @@ describe("EclDefinition.vue", () => {
           },
           predicates: { "http://www.w3.org/ns/shacl#or": "or" }
         }
-      }
+      },
+      global: { mocks: { $entityService: mockEntityService } }
     });
     await flushPromises();
     await wrapper.vm.$nextTick();
@@ -60,17 +63,17 @@ describe("EclDefinition.vue", () => {
   it("inits ___ success", async () => {
     wrapper.vm.init();
     await flushPromises();
-    expect(EntityService.getEcl).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getEcl).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.eclString).toBe(
       "<<108337002 | Islam AND/OR derivative |  OR \n<<1226001 | United Church of Canada |  OR \n<<160234004 | Salvation Army member (person) |"
     );
   });
 
   it("inits ___ fail", async () => {
-    EntityService.getEcl = vi.fn().mockResolvedValue(false);
+    mockEntityService.getEcl = vi.fn().mockResolvedValue(false);
     wrapper.vm.init();
     await flushPromises();
-    expect(EntityService.getEcl).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getEcl).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.eclString).toBe("Error");
   });
 });

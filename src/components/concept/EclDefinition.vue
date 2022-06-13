@@ -6,7 +6,6 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "@vue/runtime-core";
-import EntityService from "@/services/EntityService";
 import { TTBundle } from "im-library/dist/types/interfaces/Interfaces";
 
 export default defineComponent({
@@ -24,7 +23,7 @@ export default defineComponent({
   },
   methods: {
     async init() {
-      const result = await EntityService.getEcl(this.definition);
+      const result = await this.$entityService.getEcl(this.definition);
       if (!result) this.eclString = "Error";
       else this.eclString = result;
     }
