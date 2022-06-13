@@ -176,6 +176,7 @@ describe("Concept.vue ___ not moduleIri", () => {
   let mockEntityService;
   let mockConfigService;
   let mockDirectService;
+  let mockQueryService;
 
   beforeEach(async () => {
     vi.resetAllMocks();
@@ -194,6 +195,7 @@ describe("Concept.vue ___ not moduleIri", () => {
     mockDirectService = {
       directTo: vi.fn()
     };
+    mockQueryService = { querySummary: vi.fn() };
     mockStore = {
       state: {
         conceptIri: "http://endhealth.info/im#CriticalCareEncounter",
@@ -241,7 +243,8 @@ describe("Concept.vue ___ not moduleIri", () => {
           $toast: mockToast,
           $configService: mockConfigService,
           $directService: mockDirectService,
-          $entityService: mockEntityService
+          $entityService: mockEntityService,
+          $queryService: mockQueryService
         },
         directives: { tooltip: vi.fn() },
         stubs: { Panel: Panel, Menu: mockRef, FontAwesomeIcon: true }
@@ -374,7 +377,7 @@ describe("Concept.vue ___ not moduleIri", () => {
     mockDirectService.directTo = vi.fn().mockResolvedValue(true);
     wrapper.vm.directToEditRoute();
     expect(mockDirectService.directTo).toHaveBeenCalledTimes(1);
-    expect(mockDirectService.directTo).toHaveBeenLastCalledWith("/editor/#/", "http://endhealth.info/im#CriticalCareEncounter", wrapper.vm, "editor");
+    expect(mockDirectService.directTo).toHaveBeenLastCalledWith("/editor/#/", "http://endhealth.info/im#CriticalCareEncounter", "editor");
   });
 
   it("can route to create", () => {
@@ -1112,6 +1115,19 @@ describe("Concept.vue ___ moduleIri", () => {
     ]
   };
 
+  const DEFAULT_PREDICATE_NAMES = {
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Is subclass of",
+    "http://endhealth.info/im#roleGroup": "Where",
+    "http://www.w3.org/2002/07/owl#equivalentClass": "Is equivalent to",
+    "http://www.w3.org/2002/07/owl#intersectionOf": "Combination of",
+    "http://www.w3.org/2002/07/owl#someValuesFrom": "With a value",
+    "http://www.w3.org/2002/07/owl#onProperty": "On property",
+    "http://www.w3.org/ns/shacl#property": "Properties",
+    "http://www.w3.org/ns/shacl#class": "Type",
+    "http://www.w3.org/ns/shacl#path": "Property",
+    "http://www.w3.org/ns/shacl#datatype": "Type"
+  };
+
   let wrapper;
   let mockStore;
   let mockRouter;
@@ -1123,6 +1139,7 @@ describe("Concept.vue ___ moduleIri", () => {
   let mockConfigService;
   let mockDirectService;
   let mockEntityService;
+  let mockQueryService;
 
   beforeEach(async () => {
     vi.resetAllMocks();
@@ -1134,8 +1151,9 @@ describe("Concept.vue ___ moduleIri", () => {
       getPagedChildren: vi.fn().mockResolvedValue([]),
       getEntityTermCodes: vi.fn().mockResolvedValue([])
     };
-    mockConfigService = { getComponentLayout: vi.fn().mockResolvedValue(CONFIG) };
+    mockConfigService = { getComponentLayout: vi.fn().mockResolvedValue(CONFIG), getDefaultPredicateNames: vi.fn().mockResolvedValue(DEFAULT_PREDICATE_NAMES) };
     mockDirectService = { directTo: vi.fn() };
+    mockQueryService = { querySummary: vi.fn() };
     mockStore = {
       state: {
         conceptIri: "http://endhealth.info/im#DiscoveryOntology",
@@ -1183,7 +1201,8 @@ describe("Concept.vue ___ moduleIri", () => {
           $toast: mockToast,
           $configService: mockConfigService,
           $directService: mockDirectService,
-          $entityService: mockEntityService
+          $entityService: mockEntityService,
+          $queryService: mockQueryService
         },
         directives: { tooltip: vi.fn() },
         stubs: { Panel: Panel, Menu: mockRef }

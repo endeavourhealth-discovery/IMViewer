@@ -80,7 +80,7 @@ import awsconfig from "./aws-exports";
 import axios from "axios";
 
 // IMLibrary imports
-import IMLibrary, { ConfigService, DirectService, EntityService, SetService } from "im-library";
+import IMLibrary, { ConfigService, DirectService, EntityService, QueryService, SetService } from "im-library";
 import "im-library/dist/style.css";
 import { Helpers, Env } from "im-library";
 import Profile from "@/components/query/Profile.vue";
@@ -91,6 +91,7 @@ const {
 const configService = new ConfigService(axios);
 const directService = new DirectService(store);
 const entityService = new EntityService(axios);
+const queryService = new QueryService(axios);
 const setService = new SetService(axios);
 
 Amplify.configure(awsconfig);
@@ -159,6 +160,7 @@ const app = createApp(App)
 app.config.globalProperties.$configService = configService;
 app.config.globalProperties.$directService = directService;
 app.config.globalProperties.$entityService = entityService;
+app.config.globalProperties.$queryService = queryService;
 app.config.globalProperties.$setService = setService;
 
 const vm = app.mount("#app");

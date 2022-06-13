@@ -1,4 +1,4 @@
-import { ConfigService, DirectService, EntityService, SetService } from "im-library";
+import { ConfigService, DirectService, EntityService, QueryService, SetService } from "im-library";
 import { ComponentCustomProperties } from "vue";
 import VueSweetalert2 from "vue-sweetalert2";
 import { Store } from "@/vuex";
@@ -10,6 +10,7 @@ declare module "@vue/runtime-core" {
     $entityService: EntityService;
     $configService: ConfigService;
     $directService: DirectService;
+    $queryService: QueryService;
     $setService: SetService;
     $swal: VueSweetalert2;
     $store: Store<State>;

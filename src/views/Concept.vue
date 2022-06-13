@@ -153,7 +153,6 @@ import Properties from "@/components/concept/Properties.vue";
 import { Env, Helpers, Vocabulary, LoggerService, Models } from "im-library";
 import { DefinitionConfig, EntityReferenceNode, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
 import { QueryDefinition } from "im-library";
-import QueryService from "@/services/QueryService";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
@@ -306,7 +305,7 @@ export default defineComponent({
     },
 
     directToEditRoute() {
-      this.$directService.directTo(Env.EDITOR_URL, this.conceptIri, this, "editor");
+      this.$directService.directTo(Env.EDITOR_URL, this.conceptIri, "editor");
     },
 
     directToCreateRoute(): void {
@@ -547,7 +546,7 @@ export default defineComponent({
     },
 
     async getQueryDefinition() {
-      this.dataSet = await QueryService.querySummary(this.conceptIri);
+      this.dataSet = await this.$queryService.querySummary(this.conceptIri);
     }
   }
 });
