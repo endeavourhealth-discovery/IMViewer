@@ -14,7 +14,6 @@ import SecondaryTree from "im-library";
 import Panel from "primevue/panel";
 import { LoggerService } from "im-library";
 import ProfileDisplay from "im-library";
-import { vi } from "vitest";
 
 Object.assign(navigator, {
   clipboard: {
@@ -195,7 +194,10 @@ describe("Concept.vue ___ not moduleIri", () => {
     mockDirectService = {
       directTo: vi.fn()
     };
-    mockQueryService = { querySummary: vi.fn() };
+    mockQueryService = {
+      querySummary: vi.fn().mockResolvedValue("{}"),
+      generateSQL: vi.fn().mockResolvedValue("")
+    };
     mockStore = {
       state: {
         conceptIri: "http://endhealth.info/im#CriticalCareEncounter",
