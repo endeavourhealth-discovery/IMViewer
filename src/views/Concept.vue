@@ -150,7 +150,7 @@ import EclDefinition from "@/components/concept/EclDefinition.vue";
 import { mapState } from "vuex";
 import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import Properties from "@/components/concept/Properties.vue";
-import { Env, Helpers, Vocabulary, LoggerService, Models } from "im-library";
+import { Helpers, Vocabulary, Models } from "im-library";
 import { DefinitionConfig, EntityReferenceNode, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
 import { QueryDefinition } from "im-library";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
@@ -305,7 +305,7 @@ export default defineComponent({
     },
 
     directToEditRoute() {
-      this.$directService.directTo(Env.EDITOR_URL, this.conceptIri, "editor");
+      this.$directService.directTo(this.$env.EDITOR_URL, this.conceptIri, "editor");
     },
 
     directToCreateRoute(): void {
@@ -378,7 +378,7 @@ export default defineComponent({
       if (configs.every(config => isObjectHasKeys(config, ["order"]))) {
         configs.sort(byOrder);
       } else {
-        LoggerService.error(undefined, "Failed to sort config for definition component layout. One or more config items are missing 'order' property.");
+        this.$loggerService.error(undefined, "Failed to sort config for definition component layout. One or more config items are missing 'order' property.");
       }
       return configs;
     },
@@ -456,10 +456,10 @@ export default defineComponent({
             await navigator.clipboard
               .writeText(copyConceptToClipboard(this.concept, this.definitionConfig.concat(this.summaryConfig), undefined, this.blockedIris))
               .then(() => {
-                this.$toast.add(LoggerService.success("Concept copied to clipboard"));
+                this.$toast.add(this.$loggerService.success("Concept copied to clipboard"));
               })
               .catch(err => {
-                this.$toast.add(LoggerService.error("Failed to copy concept to clipboard", err));
+                this.$toast.add(this.$loggerService.error("Failed to copy concept to clipboard", err));
               });
           }
         }
@@ -478,10 +478,10 @@ export default defineComponent({
             await navigator.clipboard
               .writeText(text)
               .then(() => {
-                this.$toast.add(LoggerService.success(label + " copied to clipboard"));
+                this.$toast.add(this.$loggerService.success(label + " copied to clipboard"));
               })
               .catch(err => {
-                this.$toast.add(LoggerService.error("Failed to copy " + label + " to clipboard", err));
+                this.$toast.add(this.$loggerService.error("Failed to copy " + label + " to clipboard", err));
               });
           }
         });

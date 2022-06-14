@@ -23,7 +23,7 @@ import * as d3 from "d3";
 import svgPanZoom from "svg-pan-zoom";
 import { RouteRecordName } from "vue-router";
 import { TTGraphData } from "im-library/dist/types/interfaces/Interfaces";
-import { Helpers, LoggerService } from "im-library";
+import { Helpers } from "im-library";
 const {
   GraphTranslator: { translateFromEntityBundle, toggleNodeByName, hasNodeChildrenByName },
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }
@@ -45,16 +45,16 @@ export default defineComponent({
     }
   },
   computed: {
-    nodeFontSize() {
+    nodeFontSize(): number {
       return this.radius / 5;
     },
-    pathFontSize() {
+    pathFontSize(): number {
       return this.radius / 5 + 3;
     },
-    maxLength() {
+    maxLength(): number {
       return this.radius / 2;
     },
-    viewBox() {
+    viewBox(): string[] {
       return ["" + -this.width / 2, "" + -this.height / 2, "" + this.width, "" + this.height];
     }
   },
@@ -279,7 +279,7 @@ export default defineComponent({
             this.redrawGraph();
           }
         } else {
-          this.$toast.add(LoggerService.warn("Node can not be expanded."));
+          this.$toast.add(this.$loggerService.warn("Node can not be expanded."));
         }
       }
     },

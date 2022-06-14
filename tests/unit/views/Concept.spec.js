@@ -12,9 +12,10 @@ import TermCodeTable from "im-library";
 import TextSectionHeader from "im-library";
 import SecondaryTree from "im-library";
 import Panel from "primevue/panel";
-import { LoggerService } from "im-library";
 import ProfileDisplay from "im-library";
 import { vi } from "vitest";
+import { Services } from "im-library";
+const { Env } = Services;
 
 Object.assign(navigator, {
   clipboard: {
@@ -177,6 +178,7 @@ describe("Concept.vue ___ not moduleIri", () => {
   let mockConfigService;
   let mockDirectService;
   let mockQueryService;
+  let mockLoggerService;
 
   beforeEach(async () => {
     vi.resetAllMocks();
@@ -196,6 +198,7 @@ describe("Concept.vue ___ not moduleIri", () => {
       directTo: vi.fn()
     };
     mockQueryService = { querySummary: vi.fn() };
+    mockLoggerService = { error: vi.fn(), warn: vi.fn(), info: vi.fn(), success: vi.fn(), debug: vi.fn() };
     mockStore = {
       state: {
         conceptIri: "http://endhealth.info/im#CriticalCareEncounter",
@@ -244,7 +247,9 @@ describe("Concept.vue ___ not moduleIri", () => {
           $configService: mockConfigService,
           $directService: mockDirectService,
           $entityService: mockEntityService,
-          $queryService: mockQueryService
+          $queryService: mockQueryService,
+          $loggerService: mockLoggerService,
+          $env: Env
         },
         directives: { tooltip: vi.fn() },
         stubs: { Panel: Panel, Menu: mockRef, FontAwesomeIcon: true }
@@ -642,7 +647,7 @@ describe("Concept.vue ___ not moduleIri", () => {
   });
 
   it("can getConfig ___ missing order property", async () => {
-    LoggerService.error = vi.fn();
+    mockLoggerService.error = vi.fn();
     mockConfigService.getComponentLayout.mockResolvedValue([
       { label: "Divider", predicate: "None", type: "Divider", size: "100%" },
       { label: "Name", predicate: "http://www.w3.org/2000/01/rdf-schema#label", type: "TextWithLabel", size: "50%", order: 0 },
@@ -658,8 +663,8 @@ describe("Concept.vue ___ not moduleIri", () => {
     await flushPromises();
     expect(mockConfigService.getComponentLayout).toHaveBeenCalledTimes(1);
     expect(mockConfigService.getComponentLayout).toHaveBeenCalledWith("description");
-    expect(LoggerService.error).toHaveBeenCalledTimes(1);
-    expect(LoggerService.error).toHaveBeenCalledWith(
+    expect(mockLoggerService.error).toHaveBeenCalledTimes(1);
+    expect(mockLoggerService.error).toHaveBeenCalledWith(
       undefined,
       "Failed to sort config for definition component layout. One or more config items are missing 'order' property."
     );
@@ -962,39 +967,39 @@ describe("Concept.vue ___ not moduleIri", () => {
     expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith(
       "Iri: http://endhealth.info/im#Encounter,\nStatus: Active,\nDescription: An interaction between a patient (or on behalf of the patient) and a health professional or health provider. \n\tIt includes consultations as well as care processes such as admission, discharges. It also includes the noting of a filing of a document or report.,\nTypes: [\n\tRecord type,\n\tNode shape,\n\tClass\n],\nName: Encounter (record type),\nHas sub types: [\n\tAdministrative entry,\n\tConsultation,\n\tHospital encounter\n]"
     );
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.success("Concept copied to clipboard"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.success("Concept copied to clipboard"));
 
     wrapper.vm.copyMenuItems[3].command();
     await flushPromises();
     expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith("Iri: http://endhealth.info/im#Encounter");
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.success("Iri copied to clipboard"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.success("Iri copied to clipboard"));
 
     wrapper.vm.copyMenuItems[4].command();
     await flushPromises();
     expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith("Status: Active");
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.success("Status copied to clipboard"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.success("Status copied to clipboard"));
 
     wrapper.vm.copyMenuItems[5].command();
     await flushPromises();
     expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith(
       "Description: An interaction between a patient (or on behalf of the patient) and a health professional or health provider. \n\tIt includes consultations as well as care processes such as admission, discharges. It also includes the noting of a filing of a document or report."
     );
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.success("Description copied to clipboard"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.success("Description copied to clipboard"));
 
     wrapper.vm.copyMenuItems[6].command();
     await flushPromises();
     expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith("Types: [\n\tRecord type,\n\tNode shape,\n\tClass\n]");
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.success("Types copied to clipboard"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.success("Types copied to clipboard"));
 
     wrapper.vm.copyMenuItems[7].command();
     await flushPromises();
     expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith("Name: Encounter (record type)");
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.success("Name copied to clipboard"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.success("Name copied to clipboard"));
 
     wrapper.vm.copyMenuItems[8].command();
     await flushPromises();
     expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith("Has sub types: [\n\tAdministrative entry,\n\tConsultation,\n\tHospital encounter\n]");
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.success("Has sub types copied to clipboard"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.success("Has sub types copied to clipboard"));
   });
 
   it("can run commands from copymenuItems ___ fail", async () => {
@@ -1033,39 +1038,39 @@ describe("Concept.vue ___ not moduleIri", () => {
     expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith(
       "Iri: http://endhealth.info/im#Encounter,\nStatus: Active,\nDescription: An interaction between a patient (or on behalf of the patient) and a health professional or health provider. \n\tIt includes consultations as well as care processes such as admission, discharges. It also includes the noting of a filing of a document or report.,\nTypes: [\n\tRecord type,\n\tNode shape,\n\tClass\n],\nName: Encounter (record type),\nHas sub types: [\n\tAdministrative entry,\n\tConsultation,\n\tHospital encounter\n]"
     );
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.error("Failed to copy concept to clipboard"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.error("Failed to copy concept to clipboard"));
 
     wrapper.vm.copyMenuItems[3].command();
     await flushPromises();
     expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith("Iri: http://endhealth.info/im#Encounter");
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.error("Failed to copy Iri to clipboard"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.error("Failed to copy Iri to clipboard"));
 
     wrapper.vm.copyMenuItems[4].command();
     await flushPromises();
     expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith("Status: Active");
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.error("Failed to copy Status to clipboard"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.error("Failed to copy Status to clipboard"));
 
     wrapper.vm.copyMenuItems[5].command();
     await flushPromises();
     expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith(
       "Description: An interaction between a patient (or on behalf of the patient) and a health professional or health provider. \n\tIt includes consultations as well as care processes such as admission, discharges. It also includes the noting of a filing of a document or report."
     );
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.error("Failed to copy Description to clipboard"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.error("Failed to copy Description to clipboard"));
 
     wrapper.vm.copyMenuItems[6].command();
     await flushPromises();
     expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith("Types: [\n\tRecord type,\n\tNode shape,\n\tClass\n]");
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.error("Failed to copy Types to clipboard"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.error("Failed to copy Types to clipboard"));
 
     wrapper.vm.copyMenuItems[7].command();
     await flushPromises();
     expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith("Name: Encounter (record type)");
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.error("Failed to copy Name to clipboard"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.error("Failed to copy Name to clipboard"));
 
     wrapper.vm.copyMenuItems[8].command();
     await flushPromises();
     expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith("Has sub types: [\n\tAdministrative entry,\n\tConsultation,\n\tHospital encounter\n]");
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.error("Failed to copy Has sub types to clipboard"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.error("Failed to copy Has sub types to clipboard"));
   });
 
   it("can wrapper isObjectHasKeys", () => {
@@ -1202,7 +1207,8 @@ describe("Concept.vue ___ moduleIri", () => {
           $configService: mockConfigService,
           $directService: mockDirectService,
           $entityService: mockEntityService,
-          $queryService: mockQueryService
+          $queryService: mockQueryService,
+          $env: Env
         },
         directives: { tooltip: vi.fn() },
         stubs: { Panel: Panel, Menu: mockRef }

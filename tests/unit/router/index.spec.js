@@ -4,13 +4,16 @@ import Toast from "primevue/toast";
 import store from "@/store/index";
 import { flushPromises, shallowMount } from "@vue/test-utils";
 import { vi } from "vitest";
+import { Services } from "im-library";
+const { Env } = Services;
 
 vi.mock("@/main", () => {
   return {
     default: {
       $entityService: {
         iriExists: vi.fn()
-      }
+      },
+      $env: { AUTH_URL: "" }
     }
   };
 });

@@ -5,8 +5,9 @@ import SelectButton from "primevue/selectbutton";
 import Checkbox from "primevue/checkbox";
 import Button from "primevue/button";
 import ProgressSpinner from "primevue/progressspinner";
-import { Vocabulary, LoggerService, Env } from "im-library";
+import { Vocabulary, Services } from "im-library";
 const { IM, RDFS } = Vocabulary;
+const { Env } = Services;
 
 describe("DownloadDialog.vue", () => {
   const CONCEPT = { "@id": "http://snomed.info/sct#298382003", "http://www.w3.org/2000/01/rdf-schema#label": "Scoliosis deformity of spine (disorder)" };
@@ -91,6 +92,7 @@ describe("DownloadDialog.vue", () => {
   let wrapper;
   let mockToast;
   let mockEntityService;
+  let mockLoggerService;
 
   beforeEach(async () => {
     vi.resetAllMocks();
@@ -105,11 +107,12 @@ describe("DownloadDialog.vue", () => {
       getEntityMembers: vi.fn().mockResolvedValue(MEMBERS),
       getEntityTermCodes: vi.fn().mockResolvedValue(TERMS)
     };
+    mockLoggerService = { error: vi.fn(), warn: vi.fn(), info: vi.fn(), success: vi.fn(), debug: vi.fn() };
 
     wrapper = shallowMount(DownloadDialog, {
       global: {
         components: { Dialog, SelectButton, Checkbox, Button, ProgressSpinner },
-        mocks: { $toast: mockToast, $entityService: mockEntityService }
+        mocks: { $toast: mockToast, $entityService: mockEntityService, $loggerService: mockLoggerService, $env: Env }
       },
       props: { conceptIri: "http://snomed.info/sct#298382003", showDialog: true }
     });
@@ -154,7 +157,7 @@ describe("DownloadDialog.vue", () => {
         "api/entity/download?iri=http:%2F%2Fsnomed.info%2Fsct%23298382003&format=excel&hasSubTypes=true&dataModelProperties=true&members=true&expandMembers=false&inferred=true&terms=true&isChildOf=false&hasChildren=false&inactive=false"
     );
     expect(mockToast.add).toHaveBeenCalledTimes(1);
-    expect(mockToast.add).toHaveBeenCalledWith(LoggerService.success("Download will begin shortly"));
+    expect(mockToast.add).toHaveBeenCalledWith(mockLoggerService.success("Download will begin shortly"));
   });
 
   it("can downloadConcept ___ fail", () => {
@@ -168,7 +171,7 @@ describe("DownloadDialog.vue", () => {
         "api/entity/download?iri=http:%2F%2Fsnomed.info%2Fsct%23298382003&format=excel&hasSubTypes=true&dataModelProperties=true&members=true&expandMembers=false&inferred=true&terms=true&isChildOf=false&hasChildren=false&inactive=false"
     );
     expect(mockToast.add).toHaveBeenCalledTimes(1);
-    expect(mockToast.add).toHaveBeenCalledWith(LoggerService.error("Download failed from server"));
+    expect(mockToast.add).toHaveBeenCalledWith(mockLoggerService.error("Download failed from server"));
   });
 
   it("Inits ___ success", async () => {
