@@ -37,7 +37,6 @@
   </div>
 </template>
 <script lang="ts">
-import EntityService from "@/services/EntityService";
 import { defineComponent } from "@vue/runtime-core";
 import { Helpers, Vocabulary } from "im-library";
 const {
@@ -86,7 +85,7 @@ export default defineComponent({
     },
 
     async getUsages(iri: string, pageIndex: number, pageSize: number): Promise<void> {
-      const usages = await EntityService.getEntityUsages(iri, pageIndex, pageSize);
+      const usages = await this.$entityService.getEntityUsages(iri, pageIndex, pageSize);
       this.usages = usages.map((usage: any) => {
         return {
           "@id": usage["@id"],
@@ -98,7 +97,7 @@ export default defineComponent({
     },
 
     async getRecordsSize(iri: string): Promise<void> {
-      this.recordsTotal = await EntityService.getUsagesTotalRecords(iri);
+      this.recordsTotal = await this.$entityService.getUsagesTotalRecords(iri);
       this.templateString = "Displaying {first} to {last} of {totalRecords} concepts";
     },
 

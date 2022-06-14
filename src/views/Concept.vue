@@ -149,14 +149,10 @@ import Mappings from "../components/concept/Mappings.vue";
 import EclDefinition from "@/components/concept/EclDefinition.vue";
 import { mapState } from "vuex";
 import DownloadDialog from "@/components/concept/DownloadDialog.vue";
-import EntityService from "@/services/EntityService";
-import ConfigService from "@/services/ConfigService";
-import DirectService from "@/services/DirectService";
 import Properties from "@/components/concept/Properties.vue";
 import { Env, Helpers, Vocabulary, LoggerService, Models } from "im-library";
 import { DefinitionConfig, EntityReferenceNode, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
 import { QueryDefinition } from "im-library";
-import QueryService from "@/services/QueryService";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
@@ -308,7 +304,7 @@ export default defineComponent({
     },
 
     directToEditRoute() {
-      DirectService.directTo(Env.EDITOR_URL, this.conceptIri, this, "editor");
+      this.$directService.directTo(Env.EDITOR_URL, this.conceptIri, "editor");
     },
 
     directToCreateRoute(): void {
@@ -316,7 +312,7 @@ export default defineComponent({
     },
 
     async getTerms(iri: string) {
-      const entity = await EntityService.getPartialEntity(iri, [IM.HAS_TERM_CODE]);
+      const entity = await this.$entityService.getPartialEntity(iri, [IM.HAS_TERM_CODE]);
       this.terms = isObjectHasKeys(entity, [IM.HAS_TERM_CODE])
         ? (entity[IM.HAS_TERM_CODE] as []).map(term => {
             return { name: term[RDFS.LABEL], code: term[IM.CODE] };
@@ -339,23 +335,23 @@ export default defineComponent({
       if (predicates.includes("inferred")) {
         predicates.splice(predicates.indexOf("inferred"), 1, "http://endhealth.info/im#definition");
       }
-      this.concept = await EntityService.getPartialEntity(iri, predicates);
+      this.concept = await this.$entityService.getPartialEntity(iri, predicates);
       this.concept["@id"] = iri;
-      const result = await EntityService.getPagedChildren(iri, 1, 10);
+      const result = await this.$entityService.getPagedChildren(iri, 1, 10);
       if (result && isObjectHasKeys(result, ["result", "totalCount"])) {
         const resultChildren = result.result.map((child: EntityReferenceNode) => {
           return { "@id": child["@id"], name: child.name };
         });
         this.concept["subtypes"] = { children: resultChildren, totalCount: result.totalCount, loadMore: this.loadMore };
       }
-      this.concept["termCodes"] = await EntityService.getEntityTermCodes(iri);
+      this.concept["termCodes"] = await this.$entityService.getEntityTermCodes(iri);
 
       this.profile = new Models.Query.Profile(this.concept);
     },
 
     async getDefinition(iri: string): Promise<void> {
-      const result = await EntityService.getDefinitionBundle(iri);
-      const hasMember = await EntityService.getPartialAndTotalCount(iri, IM.HAS_MEMBER, 1, 10);
+      const result = await this.$entityService.getDefinitionBundle(iri);
+      const hasMember = await this.$entityService.getPartialAndTotalCount(iri, IM.HAS_MEMBER, 1, 10);
       if (hasMember.totalCount !== 0 && isTTBundle(result)) {
         result.entity[IM.HAS_MEMBER] = hasMember.result;
         result.predicates[IM.HAS_MEMBER] = "has member";
@@ -375,9 +371,9 @@ export default defineComponent({
     },
 
     async getConfig(name: string): Promise<DefinitionConfig[]> {
-      const defaultPredicateNames = await ConfigService.getDefaultPredicateNames();
+      const defaultPredicateNames = await this.$configService.getDefaultPredicateNames();
       this.$store.commit("updateDefaultPredicateNames", defaultPredicateNames);
-      const configs = await ConfigService.getComponentLayout(name);
+      const configs = await this.$configService.getComponentLayout(name);
       if (configs.every(config => isObjectHasKeys(config, ["order"]))) {
         configs.sort(byOrder);
       } else {
@@ -502,7 +498,7 @@ export default defineComponent({
 
     async exportConcept(format: any) {
       this.loading = true;
-      const result = await EntityService.downloadConcept(this.conceptIri, format);
+      const result = await this.$entityService.downloadConcept(this.conceptIri, format);
       this.loading = false;
       const url = window.URL.createObjectURL(new Blob([result], { type: format === "turtle" ? "text/plain" : "application/javascript" }));
       const link = document.createElement("a");
@@ -527,7 +523,7 @@ export default defineComponent({
     async loadMore(children: any[], totalCount: number, nextPage: number, pageSize: number, loadButton: boolean, iri: string) {
       if (loadButton) {
         if (nextPage * pageSize < totalCount) {
-          const result = await EntityService.getPagedChildren(iri, nextPage, pageSize);
+          const result = await this.$entityService.getPagedChildren(iri, nextPage, pageSize);
           const resultChildren = result.result.map((child: EntityReferenceNode) => {
             return { "@id": child["@id"], name: child.name };
           });
@@ -535,7 +531,7 @@ export default defineComponent({
           nextPage = nextPage + 1;
           loadButton = true;
         } else if (nextPage * pageSize > totalCount) {
-          const result = await EntityService.getPagedChildren(iri, nextPage, pageSize);
+          const result = await this.$entityService.getPagedChildren(iri, nextPage, pageSize);
           const resultChildren = result.result.map((child: EntityReferenceNode) => {
             return { "@id": child["@id"], name: child.name };
           });
@@ -553,7 +549,7 @@ export default defineComponent({
     },
 
     async getQueryDefinition(iri: string) {
-      this.dataSet = await QueryService.querySummary(iri);
+      this.dataSet = await this.$queryService.querySummary(iri);
     }
   }
 });

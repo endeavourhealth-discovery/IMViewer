@@ -3,7 +3,6 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 import DataTable from "primevue/datatable";
 import Button from "primevue/button";
 import Column from "primevue/column";
-import EntityService from "@/services/EntityService";
 
 describe("Properties.vue", () => {
   let wrapper;
@@ -11,6 +10,7 @@ describe("Properties.vue", () => {
   let mockRoute;
   let mockRef;
   let docSpy;
+  let mockEntityService;
 
   beforeEach(async () => {
     vi.resetAllMocks();
@@ -28,96 +28,98 @@ describe("Properties.vue", () => {
     docSpy = vi.spyOn(document, "getElementById");
     docSpy.mockReturnValue(undefined);
 
-    EntityService.getDataModelProperties = vi.fn().mockResolvedValue([
-      {
-        property: {
-          name: "manufacturer",
-          "@id": "http://endhealth.info/im#manufacturer"
+    mockEntityService = {
+      getDataModelProperties: vi.fn().mockResolvedValue([
+        {
+          property: {
+            name: "manufacturer",
+            "@id": "http://endhealth.info/im#manufacturer"
+          },
+          type: {
+            name: "Concept",
+            "@id": "http://endhealth.info/im#Concept"
+          },
+          inheritedFrom: {}
         },
-        type: {
-          name: "Concept",
-          "@id": "http://endhealth.info/im#Concept"
+        {
+          property: {
+            name: "reaction",
+            "@id": "http://endhealth.info/im#reaction"
+          },
+          type: {
+            name: "Concept",
+            "@id": "http://endhealth.info/im#Concept"
+          },
+          inheritedFrom: { name: "InheritedParent" },
+          minExclusive: 1
         },
-        inheritedFrom: {}
-      },
-      {
-        property: {
-          name: "reaction",
-          "@id": "http://endhealth.info/im#reaction"
+        {
+          property: {
+            name: "vaccination procedure",
+            "@id": "http://endhealth.info/im#vaccinationProcedure"
+          },
+          type: {
+            name: "Value set Immunisations - Care connect",
+            "@id": "http://endhealth.info/im#VSET_Immunisations_CareConnect"
+          },
+          inheritedFrom: {},
+          minInclusive: 2
         },
-        type: {
-          name: "Concept",
-          "@id": "http://endhealth.info/im#Concept"
+        {
+          property: {
+            name: "vaccine product",
+            "@id": "http://endhealth.info/im#vaccineProduct"
+          },
+          type: {
+            name: "Concept",
+            "@id": "http://endhealth.info/im#Concept"
+          },
+          inheritedFrom: {},
+          maxInclusive: 3
         },
-        inheritedFrom: { name: "InheritedParent" },
-        minExclusive: 1
-      },
-      {
-        property: {
-          name: "vaccination procedure",
-          "@id": "http://endhealth.info/im#vaccinationProcedure"
+        {
+          property: {
+            name: "batch number",
+            "@id": "http://endhealth.info/im#batchNumber"
+          },
+          type: {
+            "@id": "http://www.w3.org/2001/XMLSchema#string"
+          },
+          inheritedFrom: {},
+          maxExclusive: 4
         },
-        type: {
-          name: "Value set Immunisations - Care connect",
-          "@id": "http://endhealth.info/im#VSET_Immunisations_CareConnect"
+        {
+          property: {
+            name: "dose sequence",
+            "@id": "http://endhealth.info/im#doseSequence"
+          },
+          type: {
+            "@id": "http://www.w3.org/2001/XMLSchema#string"
+          },
+          inheritedFrom: {}
         },
-        inheritedFrom: {},
-        minInclusive: 2
-      },
-      {
-        property: {
-          name: "vaccine product",
-          "@id": "http://endhealth.info/im#vaccineProduct"
+        {
+          property: {
+            name: "doses required",
+            "@id": "http://endhealth.info/im#dosesRequired"
+          },
+          type: {
+            "@id": "http://www.w3.org/2001/XMLSchema#string"
+          },
+          inheritedFrom: {}
         },
-        type: {
-          name: "Concept",
-          "@id": "http://endhealth.info/im#Concept"
-        },
-        inheritedFrom: {},
-        maxInclusive: 3
-      },
-      {
-        property: {
-          name: "batch number",
-          "@id": "http://endhealth.info/im#batchNumber"
-        },
-        type: {
-          "@id": "http://www.w3.org/2001/XMLSchema#string"
-        },
-        inheritedFrom: {},
-        maxExclusive: 4
-      },
-      {
-        property: {
-          name: "dose sequence",
-          "@id": "http://endhealth.info/im#doseSequence"
-        },
-        type: {
-          "@id": "http://www.w3.org/2001/XMLSchema#string"
-        },
-        inheritedFrom: {}
-      },
-      {
-        property: {
-          name: "doses required",
-          "@id": "http://endhealth.info/im#dosesRequired"
-        },
-        type: {
-          "@id": "http://www.w3.org/2001/XMLSchema#string"
-        },
-        inheritedFrom: {}
-      },
-      {
-        property: {
-          name: "expiry date",
-          "@id": "http://endhealth.info/im#expiryDate"
-        },
-        type: {
-          "@id": "http://www.w3.org/2001/XMLSchema#string"
-        },
-        inheritedFrom: {}
-      }
-    ]);
+        {
+          property: {
+            name: "expiry date",
+            "@id": "http://endhealth.info/im#expiryDate"
+          },
+          type: {
+            "@id": "http://www.w3.org/2001/XMLSchema#string"
+          },
+          inheritedFrom: {}
+        }
+      ])
+    };
 
     const error = console.error;
     console.error = vi.fn();
@@ -125,7 +127,7 @@ describe("Properties.vue", () => {
     wrapper = shallowMount(Properties, {
       global: {
         components: { DataTable, Column, Button },
-        mocks: { $router: mockRouter, $route: mockRoute },
+        mocks: { $router: mockRouter, $route: mockRoute, $entityService: mockEntityService },
         stubs: { DataTable: mockRef }
       },
       props: { conceptIri: "http://endhealth.info/im#Immunisation" }

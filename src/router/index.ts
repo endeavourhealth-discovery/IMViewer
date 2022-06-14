@@ -4,10 +4,10 @@ import Concept from "../views/Concept.vue";
 import store from "@/store/index";
 import { nextTick } from "vue";
 import { AccessDenied, Env, PageNotFound, SnomedLicense, EntityNotFound, Helpers } from "im-library";
-import EntityService from "@/services/EntityService";
 const {
   DataTypeCheckers: { isObjectHasKeys }
 } = Helpers;
+import vm from "@/main";
 
 const APP_TITLE = "IM Viewer";
 
@@ -90,7 +90,7 @@ router.beforeEach(async (to, from) => {
   if (to.name === "Concept" && isObjectHasKeys(to.params, ["selectedIri"])) {
     try {
       new URL(iri);
-      if (!(await EntityService.iriExists(iri))) {
+      if (!(await vm.$entityService.iriExists(iri))) {
         router.push({ name: "EntityNotFound" });
       }
     } catch (_error) {

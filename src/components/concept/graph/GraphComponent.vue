@@ -21,7 +21,6 @@
 import { defineComponent, PropType } from "@vue/runtime-core";
 import * as d3 from "d3";
 import svgPanZoom from "svg-pan-zoom";
-import EntityService from "@/services/EntityService";
 import { RouteRecordName } from "vue-router";
 import { TTGraphData } from "im-library/dist/types/interfaces/Interfaces";
 import { Helpers, LoggerService } from "im-library";
@@ -270,7 +269,7 @@ export default defineComponent({
         this.redrawGraph();
       } else {
         if (node.iri) {
-          const bundle = await EntityService.getPartialEntityBundle(node.iri, []);
+          const bundle = await this.$entityService.getPartialEntityBundle(node.iri, []);
           const data = translateFromEntityBundle(bundle, []);
           if (isArrayHasLength(data.children)) {
             data.children.forEach(child => {

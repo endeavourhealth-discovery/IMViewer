@@ -10,9 +10,7 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import EntityService from "@/services/EntityService";
 import GraphComponent from "./GraphComponent.vue";
-import ConfigService from "@/services/ConfigService";
 import { TTGraphData, TTBundle } from "im-library/dist/types/interfaces/Interfaces";
 import { Helpers, Vocabulary } from "im-library";
 const { IM } = Vocabulary;
@@ -60,12 +58,12 @@ export default defineComponent({
       this.data = translateFromEntityBundle(this.bundle, this.selectedIris);
     },
     async getDefaultPredicates() {
-      this.graphExcludePredicates = await ConfigService.getGraphExcludePredicates();
+      this.graphExcludePredicates = await this.$configService.getGraphExcludePredicates();
     },
     async getEntityBundle(iri: string) {
       this.loading = true;
-      this.bundle = await EntityService.getEntityByPredicateExclusions(iri, [IM.HAS_MEMBER]);
-      const hasMember = await EntityService.getPartialAndTotalCount(iri, IM.HAS_MEMBER, 1, 10);
+      this.bundle = await this.$entityService.getEntityByPredicateExclusions(iri, [IM.HAS_MEMBER]);
+      const hasMember = await this.$entityService.getPartialAndTotalCount(iri, IM.HAS_MEMBER, 1, 10);
       if (hasMember.totalCount !== 0) {
         this.bundle.entity[IM.HAS_MEMBER] = hasMember.result;
         this.bundle.predicates[IM.HAS_MEMBER] = "has member";
