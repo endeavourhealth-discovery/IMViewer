@@ -59,7 +59,7 @@ describe("Graph.vue", () => {
     };
 
     mockEntityService = {
-      getEntityByPredicateExclusions: vi.fn().mockResolvedValue({
+      getBundleByPredicateExclusions: vi.fn().mockResolvedValue({
         entity: {
           "@id": "http://snomed.info/sct#298382003",
           "http://endhealth.info/im#definitionalStatus": {
@@ -249,8 +249,8 @@ describe("Graph.vue", () => {
     vi.clearAllMocks();
     wrapper.vm.getEntityBundle("http://snomed.info/sct#203639008");
     expect(wrapper.vm.loading).toBe(true);
-    expect(mockEntityService.getEntityByPredicateExclusions).toHaveBeenCalledTimes(1);
-    expect(mockEntityService.getEntityByPredicateExclusions).toHaveBeenCalledWith("http://snomed.info/sct#203639008", ["http://endhealth.info/im#hasMember"]);
+    expect(mockEntityService.getBundleByPredicateExclusions).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getBundleByPredicateExclusions).toHaveBeenCalledWith("http://snomed.info/sct#203639008", ["http://endhealth.info/im#hasMember"]);
 
     await flushPromises();
     expect(wrapper.vm.data).toStrictEqual(TRANSLATED);
