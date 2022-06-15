@@ -62,7 +62,7 @@ export default defineComponent({
     },
     async getEntityBundle(iri: string) {
       this.loading = true;
-      this.bundle = await this.$entityService.getEntityByPredicateExclusions(iri, [IM.HAS_MEMBER]);
+      this.bundle = await this.$entityService.getBundleByPredicateExclusions(iri, [IM.HAS_MEMBER]);
       const hasMember = await this.$entityService.getPartialAndTotalCount(iri, IM.HAS_MEMBER, 1, 10);
       if (hasMember.totalCount !== 0) {
         this.bundle.entity[IM.HAS_MEMBER] = hasMember.result;
