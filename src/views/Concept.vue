@@ -250,7 +250,6 @@ export default defineComponent({
   },
   async mounted() {
     await this.init();
-    await this.getQueryDefinition();
   },
   data() {
     return {
@@ -391,6 +390,8 @@ export default defineComponent({
       await this.getDefinition(this.conceptIri);
       await this.getTerms(this.conceptIri);
       this.types = isObjectHasKeys(this.concept, [RDF.TYPE]) ? this.concept[RDF.TYPE] : ([] as TTIriRef[]);
+      if (this.isQuery)
+        await this.getQueryDefinition(this.conceptIri);
       this.header = this.concept[RDFS.LABEL];
       await this.setCopyMenuItems();
       this.setStoreType();
@@ -427,6 +428,8 @@ export default defineComponent({
           this.active = 2;
         } else if (this.isRecordModel) {
           this.active = 3;
+        } else if (this.isQuery) {
+          this.active = 4;
         } else {
           this.active = 0;
         }
@@ -545,8 +548,8 @@ export default defineComponent({
       this.splitterRightSize = event.sizes[1];
     },
 
-    async getQueryDefinition() {
-      this.dataSet = await this.$queryService.querySummary(this.conceptIri);
+    async getQueryDefinition(iri: string) {
+      this.dataSet = await this.$queryService.querySummary(iri);
     }
   }
 });
@@ -688,5 +691,10 @@ export default defineComponent({
 
 .name-tooltip {
   width: 80vw;
+}
+
+.query-definition pre {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 </style>

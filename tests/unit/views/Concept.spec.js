@@ -197,7 +197,10 @@ describe("Concept.vue ___ not moduleIri", () => {
     mockDirectService = {
       directTo: vi.fn()
     };
-    mockQueryService = { querySummary: vi.fn() };
+    mockQueryService = { 
+      querySummary: vi.fn().mockResolvedValue("{}"), 
+      generateSQL: vi.fn().mockResolvedValue("") 
+    };
     mockLoggerService = { error: vi.fn(), warn: vi.fn(), info: vi.fn(), success: vi.fn(), debug: vi.fn() };
     mockStore = {
       state: {
