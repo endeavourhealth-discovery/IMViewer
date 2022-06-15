@@ -73,7 +73,7 @@
 import { Auth } from "aws-amplify";
 import { defineComponent } from "@vue/runtime-core";
 import { ValueSetMember, ExportValueSet } from "im-library/dist/types/interfaces/Interfaces";
-import { Helpers, Vocabulary, LoggerService } from "im-library";
+import { Helpers, Vocabulary } from "im-library";
 const {
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }
 } = Helpers;
@@ -161,12 +161,12 @@ export default defineComponent({
     async downloadIMV1(): Promise<void> {
       this.downloading = true;
       try {
-        this.$toast.add(LoggerService.success("Download will begin shortly"));
+        this.$toast.add(this.$loggerService.success("Download will begin shortly"));
         const result = await this.$setService.IMV1(this.conceptIri);
         const label: string = (await this.$entityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
         this.downloadFile(result, label + ".txt");
       } catch (error) {
-        this.$toast.add(LoggerService.error("Download failed from server"));
+        this.$toast.add(this.$loggerService.error("Download failed from server"));
       } finally {
         this.downloading = false;
       }
@@ -175,14 +175,14 @@ export default defineComponent({
     async download(expanded: boolean, v1: boolean): Promise<void> {
       this.downloading = true;
       try {
-        this.$toast.add(LoggerService.success("Download will begin shortly"));
+        this.$toast.add(this.$loggerService.success("Download will begin shortly"));
         const result = expanded
           ? (await this.$entityService.getFullExportSet(this.conceptIri, v1)).data
           : await this.$setService.download(this.conceptIri, expanded, v1);
         const label: string = (await this.$entityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
         this.downloadFile(result, this.getFileName(label));
       } catch (error) {
-        this.$toast.add(LoggerService.error("Download failed from server"));
+        this.$toast.add(this.$loggerService.error("Download failed from server"));
       } finally {
         this.downloading = false;
       }
@@ -225,11 +225,11 @@ export default defineComponent({
         .publish(this.conceptIri)
         .then(() => {
           this.isPublishing = false;
-          this.$toast.add(LoggerService.success("Value set published", "Published to IM1 :" + this.conceptIri));
+          this.$toast.add(this.$loggerService.success("Value set published", "Published to IM1 :" + this.conceptIri));
         })
         .catch(() => {
           this.isPublishing = false;
-          this.$toast.add(LoggerService.error("Failed to publish value set", "Publish to IM1 FAILED :" + this.conceptIri));
+          this.$toast.add(this.$loggerService.error("Failed to publish value set", "Publish to IM1 FAILED :" + this.conceptIri));
         });
     },
 

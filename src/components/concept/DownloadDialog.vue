@@ -86,7 +86,7 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import { TTIriRef, EntityReferenceNode, TermCode, ExportValueSet, DataModelProperty, TTBundle } from "im-library/dist/types/interfaces/Interfaces";
-import { Vocabulary, Helpers, LoggerService, Env } from "im-library";
+import { Vocabulary, Helpers } from "im-library";
 const { IM, RDFS } = Vocabulary;
 const {
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys },
@@ -156,7 +156,7 @@ export default defineComponent({
       const modIri = iriToUrl(this.conceptIri);
 
       const url =
-        Env.API +
+        this.$env.API +
         "api/entity/download?iri=" +
         modIri +
         "&format=" +
@@ -181,9 +181,9 @@ export default defineComponent({
         this.includeInactive;
       const popup = window.open(url);
       if (!popup) {
-        this.$toast.add(LoggerService.error("Download failed from server"));
+        this.$toast.add(this.$loggerService.error("Download failed from server"));
       } else {
-        this.$toast.add(LoggerService.success("Download will begin shortly"));
+        this.$toast.add(this.$loggerService.success("Download will begin shortly"));
       }
       this.closeDownloadDialog();
     },

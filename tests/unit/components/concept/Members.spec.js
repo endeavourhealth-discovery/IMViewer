@@ -5,7 +5,6 @@ import InputText from "primevue/inputtext";
 import Checkbox from "primevue/checkbox";
 import Column from "primevue/column";
 import Button from "primevue/button";
-import { LoggerService } from "im-library";
 import Menu from "primevue/menu";
 
 describe("Members.vue", () => {
@@ -16,6 +15,7 @@ describe("Members.vue", () => {
   let docSpy;
   let mockEntityService;
   let mockSetService;
+  let mockLoggerService;
 
   let testMembers = {
     valueSet: {
@@ -121,6 +121,7 @@ describe("Members.vue", () => {
       getPartialAndTotalCount: vi.fn().mockResolvedValue({ totalCount: 0, result: [], pageSize: 10 })
     };
     mockSetService = { download: vi.fn().mockResolvedValue(true) };
+    mockLoggerService = { error: vi.fn(), warn: vi.fn(), info: vi.fn(), success: vi.fn(), debug: vi.fn() };
     mockRouter = { push: vi.fn() };
     mockToast = { add: vi.fn() };
     mockRef = { render: () => {}, methods: { toggle: vi.fn() } };
@@ -137,7 +138,7 @@ describe("Members.vue", () => {
     wrapper = shallowMount(Members, {
       global: {
         components: { DataTable, InputText, Checkbox, Column, Button, Menu },
-        mocks: { $router: mockRouter, $toast: mockToast, $entityService: mockEntityService, $setService: mockSetService },
+        mocks: { $router: mockRouter, $toast: mockToast, $entityService: mockEntityService, $setService: mockSetService, $loggerService: mockLoggerService },
         stubs: { DataTable: DataTable, Menu: mockRef }
       },
       props: { conceptIri: "http://endhealth.info/im#VSET_EthnicCategoryCEG16" }
@@ -234,7 +235,7 @@ describe("Members.vue", () => {
     wrapper.vm.download(true, false);
     expect(wrapper.vm.downloading).toBe(true);
     expect(mockToast.add).toHaveBeenCalledTimes(1);
-    expect(mockToast.add).toHaveBeenCalledWith(LoggerService.success("Download will begin shortly"));
+    expect(mockToast.add).toHaveBeenCalledWith(mockLoggerService.success("Download will begin shortly"));
     await flushPromises();
     expect(mockEntityService.getFullExportSet).toHaveBeenCalledTimes(1);
     expect(mockEntityService.getFullExportSet).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", false);
@@ -248,7 +249,7 @@ describe("Members.vue", () => {
     wrapper.vm.download(false, true);
     expect(wrapper.vm.downloading).toBe(true);
     expect(mockToast.add).toHaveBeenCalledTimes(1);
-    expect(mockToast.add).toHaveBeenCalledWith(LoggerService.success("Download will begin shortly"));
+    expect(mockToast.add).toHaveBeenCalledWith(mockLoggerService.success("Download will begin shortly"));
     await flushPromises();
     expect(mockSetService.download).toHaveBeenCalledTimes(1);
     expect(mockSetService.download).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", false, true);
@@ -263,11 +264,11 @@ describe("Members.vue", () => {
     wrapper.vm.download(false, false);
     expect(wrapper.vm.downloading).toBe(true);
     expect(mockToast.add).toHaveBeenCalledTimes(1);
-    expect(mockToast.add).toHaveBeenCalledWith(LoggerService.success("Download will begin shortly"));
+    expect(mockToast.add).toHaveBeenCalledWith(mockLoggerService.success("Download will begin shortly"));
     await flushPromises();
     expect(mockSetService.download).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.downloadFile).not.toHaveBeenCalled();
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.error("Download failed from server"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.error("Download failed from server"));
     expect(wrapper.vm.downloading).toBe(false);
   });
 
