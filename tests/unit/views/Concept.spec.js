@@ -801,6 +801,8 @@ describe("Concept.vue ___ not moduleIri", () => {
 
   it("can setActivePanel ___ sets", async () => {
     wrapper.vm.types = [{ "@id": "http://endhealth.info/im#ConceptSet", name: "Concept Set" }];
+    wrapper.vm.tabMap = new Map();
+    wrapper.vm.tabMap.set("Members", 2);
     await wrapper.vm.$nextTick();
     wrapper.vm.setActivePanel("Sets", "Ontology");
     expect(wrapper.vm.active).toBe(2);
@@ -808,6 +810,8 @@ describe("Concept.vue ___ not moduleIri", () => {
 
   it("can setActivePanel ___ recordModel", async () => {
     wrapper.vm.types = [{ "@id": "http://www.w3.org/ns/shacl#NodeShape", name: "Node shape" }];
+    wrapper.vm.tabMap = new Map();
+    wrapper.vm.tabMap.set("Properties", 3);
     await wrapper.vm.$nextTick();
     wrapper.vm.setActivePanel("DataModel", "Ontology");
     expect(wrapper.vm.active).toBe(3);

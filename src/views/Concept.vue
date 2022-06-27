@@ -157,7 +157,7 @@ const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
   CopyConceptToClipboard: { copyConceptToClipboard, conceptObjectToCopyString },
-  DataTypeCheckers: { isObjectHasKeys },
+  DataTypeCheckers: { isObjectHasKeys, isArrayHasLength },
   Sorters: { byOrder },
   TypeGuards: { isTTBundle }
 } = Helpers;
@@ -228,6 +228,7 @@ export default defineComponent({
     },
 
     selectedEntityType(newValue, oldValue) {
+      this.setTabMap();
       this.setActivePanel(newValue, oldValue);
     },
 
@@ -254,6 +255,7 @@ export default defineComponent({
   data() {
     return {
       loading: true,
+      tabMap: new Map(),
       editDialogView: true,
       showDownloadDialog: false,
       concept: {} as any,
@@ -390,8 +392,7 @@ export default defineComponent({
       await this.getDefinition(this.conceptIri);
       await this.getTerms(this.conceptIri);
       this.types = isObjectHasKeys(this.concept, [RDF.TYPE]) ? this.concept[RDF.TYPE] : ([] as TTIriRef[]);
-      if (this.isQuery)
-        await this.getQueryDefinition(this.conceptIri);
+      if (this.isQuery) await this.getQueryDefinition(this.conceptIri);
       this.header = this.concept[RDFS.LABEL];
       await this.setCopyMenuItems();
       this.setStoreType();
@@ -425,15 +426,23 @@ export default defineComponent({
         this.active = this.conceptActivePanel;
       } else {
         if (this.isSet) {
-          this.active = 2;
+          this.active = this.tabMap.get("Members");
         } else if (this.isRecordModel) {
-          this.active = 3;
+          this.active = this.tabMap.get("Properties");
         } else if (this.isQuery) {
-          this.active = 4;
+          this.active = this.tabMap.get("Query");
         } else {
           this.active = 0;
         }
       }
+    },
+
+    setTabMap() {
+      const tabList = document.getElementsByClassName("p-tabview-nav-content")?.[0]?.children?.[0]?.children as HTMLCollectionOf<HTMLElement>;
+      if (isArrayHasLength(tabList))
+        for (let i = 0; i < tabList.length; i++) {
+          if (tabList[i].innerText) this.tabMap.set(tabList[i].innerText, i);
+        }
     },
 
     openDownloadDialog(): void {
