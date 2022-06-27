@@ -228,7 +228,6 @@ export default defineComponent({
     },
 
     selectedEntityType(newValue, oldValue) {
-      this.setTabMap();
       this.setActivePanel(newValue, oldValue);
     },
 
@@ -255,7 +254,7 @@ export default defineComponent({
   data() {
     return {
       loading: true,
-      tabMap: new Map(),
+      tabMap: {} as Map<string, number>,
       editDialogView: true,
       showDownloadDialog: false,
       concept: {} as any,
@@ -398,6 +397,8 @@ export default defineComponent({
       this.setStoreType();
       const allConfigs = this.definitionConfig.concat(this.summaryConfig);
       this.conceptAsString = copyConceptToClipboard(this.concept, allConfigs, undefined, this.blockedIris);
+      this.tabMap = new Map<string, number>();
+      this.setTabMap();
       this.loading = false;
       document.title = this.header || "";
     },
@@ -426,11 +427,11 @@ export default defineComponent({
         this.active = this.conceptActivePanel;
       } else {
         if (this.isSet) {
-          this.active = this.tabMap.get("Members");
+          this.active = this.tabMap.get("Members") || 0;
         } else if (this.isRecordModel) {
-          this.active = this.tabMap.get("Properties");
+          this.active = this.tabMap.get("Properties") || 0;
         } else if (this.isQuery) {
-          this.active = this.tabMap.get("Query");
+          this.active = this.tabMap.get("Query") || 0;
         } else {
           this.active = 0;
         }
@@ -439,7 +440,7 @@ export default defineComponent({
 
     setTabMap() {
       const tabList = document.getElementsByClassName("p-tabview-nav-content")?.[0]?.children?.[0]?.children as HTMLCollectionOf<HTMLElement>;
-      if (isArrayHasLength(tabList))
+      if (tabList && tabList.length)
         for (let i = 0; i < tabList.length; i++) {
           if (tabList[i].innerText) this.tabMap.set(tabList[i].innerText, i);
         }
