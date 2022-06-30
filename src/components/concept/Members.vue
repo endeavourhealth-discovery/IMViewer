@@ -49,6 +49,9 @@
             {{ subSet }}
           </span>
         </span>
+        <span v-if="slotProps.data.type === 'IS_SUBSET_OF'" class="group-header">
+          Is Subset Of
+        </span>
         <span v-if="slotProps.data.type === 'INCLUDED_SELF'" class="group-header">
           Included Members (self only)
         </span>
