@@ -394,7 +394,7 @@ export default defineComponent({
       await this.setCopyMenuItems();
       this.setStoreType();
       const allConfigs = this.definitionConfig.concat(this.summaryConfig);
-      this.conceptAsString = copyConceptToClipboard(this.concept, allConfigs, undefined, Config.Values.XML_SCHEMA_DATATYPES);
+      this.conceptAsString = copyConceptToClipboard(this.concept, allConfigs, undefined, Config.XmlSchemaDatatypes);
       this.tabMap = new Map<string, number>();
       this.setTabMap();
       this.loading = false;
@@ -465,7 +465,7 @@ export default defineComponent({
           label: "All",
           command: async () => {
             await navigator.clipboard
-              .writeText(copyConceptToClipboard(this.concept, this.definitionConfig.concat(this.summaryConfig), undefined, Config.Values.XML_SCHEMA_DATATYPES))
+              .writeText(copyConceptToClipboard(this.concept, this.definitionConfig.concat(this.summaryConfig), undefined, Config.XmlSchemaDatatypes))
               .then(() => {
                 this.$toast.add(this.$loggerService.success("Concept copied to clipboard"));
               })
