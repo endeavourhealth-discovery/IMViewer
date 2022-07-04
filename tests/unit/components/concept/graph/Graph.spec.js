@@ -40,24 +40,6 @@ describe("Graph.vue", () => {
   beforeEach(async () => {
     vi.resetAllMocks();
 
-    mockConfigService = {
-      getGraphExcludePredicates: vi
-        .fn()
-        .mockResolvedValue([
-          "http://endhealth.info/im#matchedTo",
-          "http://www.w3.org/2000/01/rdf-schema#label",
-          "http://endhealth.info/im#status",
-          "http://endhealth.info/im#Status",
-          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-          "http://www.w3.org/2000/01/rdf-schema#comment",
-          "http://endhealth.info/im#isChildOf",
-          "http://endhealth.info/im#hasChildren",
-          "http://endhealth.info/im#definition",
-          "http://endhealth.info/im#usageStats",
-          "http://endhealth.info/im#isA"
-        ])
-    };
-
     mockEntityService = {
       getBundleByPredicateExclusions: vi.fn().mockResolvedValue({
         entity: {

@@ -46,10 +46,8 @@ describe("state", () => {
       "favourites",
       "snomedReturnUrl",
       "authReturnUrl",
-      "blockedIris",
       "selectedEntityType",
       "conceptActivePanel",
-      "defaultPredicateNames",
       "arrayObjectNameListboxWithLabelStartExpanded",
       "tagSeverityMatches",
       "textDefinitionStartExpanded",
@@ -59,10 +57,8 @@ describe("state", () => {
     expect(store.state.currentUser).toEqual({});
     expect(store.state.isLoggedIn).toBeFalsy();
     expect(store.state.snomedLicenseAccepted).toBeNull();
-    expect(store.state.blockedIris).toStrictEqual([]);
     expect(store.state.selectedEntityType).toBe("");
     expect(store.state.conceptActivePanel).toBe(0);
-    expect(store.state.defaultPredicateNames).toStrictEqual([]);
   });
 });
 
@@ -91,12 +87,6 @@ describe("mutations", () => {
     expect(store.state.snomedLicenseAccepted).toBe("true");
   });
 
-  it("can update blockedIris", () => {
-    const testIris = ["iri1", "iri2", "iri3"];
-    store.commit("updateBlockedIris", testIris);
-    expect(store.state.blockedIris).toStrictEqual(testIris);
-  });
-
   it("can updateSelectedEntityType", () => {
     store.commit("updateSelectedEntityType", "class");
     expect(store.state.selectedEntityType).toBe("class");
@@ -108,15 +98,6 @@ describe("mutations", () => {
   });
 });
 describe("actions", () => {
-  it("can fetchBlockedIris", async () => {
-    const iris = ["http://www.w3.org/2001/XMLSchema#string", "http://www.w3.org/2001/XMLSchema#boolean"];
-    vm.$configService.getXmlSchemaDataTypes = vi.fn().mockResolvedValue(iris);
-    store.dispatch("fetchBlockedIris");
-    await flushPromises();
-    expect(vm.$configService.getXmlSchemaDataTypes).toHaveBeenCalledTimes(1);
-    expect(store.state.blockedIris).toStrictEqual(iris);
-  });
-
   it("can logoutCurrentUser ___ 200", async () => {
     AuthService.signOut = vi.fn().mockResolvedValue(new CustomAlert(200, "logout successful"));
     vm.$loggerService.error = vi.fn();

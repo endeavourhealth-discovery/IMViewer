@@ -150,7 +150,7 @@ import EclDefinition from "@/components/concept/EclDefinition.vue";
 import { mapState } from "vuex";
 import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import Properties from "@/components/concept/Properties.vue";
-import { Helpers, Vocabulary, Models } from "im-library";
+import { Helpers, Vocabulary, Models, Config } from "im-library";
 import { DefinitionConfig, EntityReferenceNode, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
 import { QueryDefinition } from "im-library";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
@@ -220,7 +220,7 @@ export default defineComponent({
       return isProperty(this.types);
     },
 
-    ...mapState(["conceptIri", "selectedEntityType", "conceptActivePanel", "activeModule", "blockedIris", "favourites"])
+    ...mapState(["conceptIri", "selectedEntityType", "conceptActivePanel", "activeModule", "favourites"])
   },
   watch: {
     async conceptIri() {
@@ -372,8 +372,6 @@ export default defineComponent({
     },
 
     async getConfig(name: string): Promise<DefinitionConfig[]> {
-      const defaultPredicateNames = await this.$configService.getDefaultPredicateNames();
-      this.$store.commit("updateDefaultPredicateNames", defaultPredicateNames);
       const configs = await this.$configService.getComponentLayout(name);
       if (configs.every(config => isObjectHasKeys(config, ["order"]))) {
         configs.sort(byOrder);
@@ -396,7 +394,7 @@ export default defineComponent({
       await this.setCopyMenuItems();
       this.setStoreType();
       const allConfigs = this.definitionConfig.concat(this.summaryConfig);
-      this.conceptAsString = copyConceptToClipboard(this.concept, allConfigs, undefined, this.blockedIris);
+      this.conceptAsString = copyConceptToClipboard(this.concept, allConfigs, undefined, Config.Values.XML_SCHEMA_DATATYPES);
       this.tabMap = new Map<string, number>();
       this.setTabMap();
       this.loading = false;
@@ -467,7 +465,7 @@ export default defineComponent({
           label: "All",
           command: async () => {
             await navigator.clipboard
-              .writeText(copyConceptToClipboard(this.concept, this.definitionConfig.concat(this.summaryConfig), undefined, this.blockedIris))
+              .writeText(copyConceptToClipboard(this.concept, this.definitionConfig.concat(this.summaryConfig), undefined, Config.Values.XML_SCHEMA_DATATYPES))
               .then(() => {
                 this.$toast.add(this.$loggerService.success("Concept copied to clipboard"));
               })

@@ -152,7 +152,6 @@ describe("router", () => {
       vi.resetAllMocks();
       window.sessionStorage.clear();
       store.state.snomedLicenseAccepted = "true";
-      store.state.blockedIris = ["http://www.w3.org/2001/XMLSchema#string"];
       store.dispatch = vi.fn().mockResolvedValue({ authenticated: true });
       router.push("/");
       await router.isReady();

@@ -3,7 +3,7 @@ import Home from "../views/Home.vue";
 import Concept from "../views/Concept.vue";
 import store from "@/store/index";
 import { nextTick } from "vue";
-import { AccessDenied, PageNotFound, SnomedLicense, EntityNotFound, Helpers } from "im-library";
+import { AccessDenied, PageNotFound, SnomedLicense, EntityNotFound, Helpers, Config } from "im-library";
 const {
   DataTypeCheckers: { isObjectHasKeys }
 } = Helpers;
@@ -64,7 +64,7 @@ router.beforeEach(async (to, from) => {
     store.commit("updateSnomedReturnUrl", currentUrl);
     store.commit("updateAuthReturnUrl", currentUrl);
   }
-  if (iri && store.state.blockedIris.includes(iri)) {
+  if (iri && Config.Values.XML_SCHEMA_DATATYPES.includes(iri)) {
     return false;
   }
   if (iri) {

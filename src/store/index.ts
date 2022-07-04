@@ -19,10 +19,8 @@ export default createStore({
     favourites: JSON.parse(localStorage.getItem("favourites") || "[]") as string[],
     snomedReturnUrl: "",
     authReturnUrl: "",
-    blockedIris: [] as string[],
     selectedEntityType: "",
     conceptActivePanel: 0,
-    defaultPredicateNames: [] as string[],
     arrayObjectNameListboxWithLabelStartExpanded: [],
     tagSeverityMatches: [
       { "@id": IM.ACTIVE, severity: "success" },
@@ -71,9 +69,6 @@ export default createStore({
       localStorage.setItem("recentLocalActivity", JSON.stringify(activity));
       state.recentLocalActivity = JSON.stringify(activity);
     },
-    updateBlockedIris(state, blockedIris) {
-      state.blockedIris = blockedIris;
-    },
     updateConceptIri(state, conceptIri) {
       state.conceptIri = conceptIri;
       localStorage.setItem("viewerSelectedConcept", conceptIri);
@@ -100,9 +95,6 @@ export default createStore({
     updateConceptActivePanel(state, number) {
       state.conceptActivePanel = number;
     },
-    updateDefaultPredicateNames(state, names) {
-      state.defaultPredicateNames = names;
-    },
     updateArrayObjectNameListboxWithLabelStartExpanded(state, items) {
       state.arrayObjectNameListboxWithLabelStartExpanded = items;
     },
@@ -114,10 +106,6 @@ export default createStore({
     }
   },
   actions: {
-    async fetchBlockedIris({ commit }) {
-      const blockedIris = await vm.$configService.getXmlSchemaDataTypes();
-      commit("updateBlockedIris", blockedIris);
-    },
     async logoutCurrentUser({ commit }) {
       let result = new CustomAlert(500, "Logout (store) failed");
       await AuthService.signOut().then(res => {

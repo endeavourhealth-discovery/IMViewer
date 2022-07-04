@@ -12,7 +12,7 @@
 import { defineComponent } from "@vue/runtime-core";
 import GraphComponent from "./GraphComponent.vue";
 import { TTGraphData, TTBundle } from "im-library/dist/types/interfaces/Interfaces";
-import { Helpers, Vocabulary } from "im-library";
+import { Config, Helpers, Vocabulary } from "im-library";
 const { IM } = Vocabulary;
 const {
   GraphTranslator: { translateFromEntityBundle }
@@ -40,13 +40,12 @@ export default defineComponent({
       selectedIris: [] as string[],
       predicatesIris: [] as string[],
       bundle: {} as TTBundle,
-      graphExcludePredicates: [] as string[],
+      graphExcludePredicates: Config.Values.GRAPH_EXCLUDE_PREDICATES,
       options: [] as { iri: string; name: string }[],
       predicates: [] as any
     };
   },
   async mounted() {
-    await this.getDefaultPredicates();
     await this.getEntityBundle(this.conceptIri);
   },
   methods: {
@@ -56,9 +55,6 @@ export default defineComponent({
         this.selectedIris.push(i.iri);
       });
       this.data = translateFromEntityBundle(this.bundle, this.selectedIris);
-    },
-    async getDefaultPredicates() {
-      this.graphExcludePredicates = await this.$configService.getGraphExcludePredicates();
     },
     async getEntityBundle(iri: string) {
       this.loading = true;
