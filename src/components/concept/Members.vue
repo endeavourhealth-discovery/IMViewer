@@ -111,12 +111,12 @@ export default defineComponent({
       subsets: [] as string[],
       expandedRowGroups: ["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"],
       downloadMenu: [
-        { label: "Definition", command: () => this.download(false) },
+        { label: "Definition", command: () => this.download(false, false) },
         { label: "Expanded Core", command: () => this.download(true, false) },
         { label: "Expanded Legacy", command: () => this.download(true, true) }
       ],
       downloadMenu1: [
-        { label: "Definition", command: () => this.download(false) },
+        { label: "Definition", command: () => this.download(false, false) },
         { label: "Expanded Core", command: () => this.download(true, false) },
         { label: "Expanded Legacy", command: () => this.download(true, true) },
         { label: "IMv1", command: () => this.downloadIMV1() }
@@ -175,13 +175,11 @@ export default defineComponent({
       }
     },
 
-    async download(expanded: boolean, v1: boolean): Promise<void> {
+    async download(core: boolean, legacy: boolean): Promise<void> {
       this.downloading = true;
       try {
         this.$toast.add(this.$loggerService.success("Download will begin shortly"));
-        const result = expanded
-          ? (await this.$entityService.getFullExportSet(this.conceptIri, v1)).data
-          : await this.$setService.download(this.conceptIri, expanded, v1);
+        const result = (await this.$entityService.getFullExportSet(this.conceptIri, core, legacy)).data;
         const label: string = (await this.$entityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
         this.downloadFile(result, this.getFileName(label));
       } catch (error) {
