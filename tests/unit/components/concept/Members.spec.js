@@ -168,7 +168,7 @@ describe("Members.vue", () => {
   it("can run downloadMenu commands", () => {
     wrapper.vm.download = vi.fn();
     wrapper.vm.downloadMenu[0].command();
-    expect(wrapper.vm.download).toHaveBeenLastCalledWith(false);
+    expect(wrapper.vm.download).toHaveBeenLastCalledWith(false, false);
     wrapper.vm.downloadMenu[1].command();
     expect(wrapper.vm.download).toHaveBeenLastCalledWith(true, false);
     wrapper.vm.downloadMenu[2].command();
@@ -238,7 +238,7 @@ describe("Members.vue", () => {
     expect(mockToast.add).toHaveBeenCalledWith(mockLoggerService.success("Download will begin shortly"));
     await flushPromises();
     expect(mockEntityService.getFullExportSet).toHaveBeenCalledTimes(1);
-    expect(mockEntityService.getFullExportSet).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", false);
+    expect(mockEntityService.getFullExportSet).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", true, false);
     expect(wrapper.vm.downloadFile).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.downloadFile).toHaveBeenCalledWith(true, wrapper.vm.getFileName("Test Set"));
     expect(wrapper.vm.downloading).toBe(false);
@@ -251,8 +251,8 @@ describe("Members.vue", () => {
     expect(mockToast.add).toHaveBeenCalledTimes(1);
     expect(mockToast.add).toHaveBeenCalledWith(mockLoggerService.success("Download will begin shortly"));
     await flushPromises();
-    expect(mockSetService.download).toHaveBeenCalledTimes(1);
-    expect(mockSetService.download).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", false, true);
+    expect(mockEntityService.getFullExportSet).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getFullExportSet).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", false, true);
     expect(wrapper.vm.downloadFile).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.downloadFile).toHaveBeenCalledWith(true, wrapper.vm.getFileName("Test Set"));
     expect(wrapper.vm.downloading).toBe(false);
@@ -260,13 +260,13 @@ describe("Members.vue", () => {
 
   it("can download ___ fail", async () => {
     wrapper.vm.downloadFile = vi.fn();
-    mockSetService.download = vi.fn().mockRejectedValue(false);
+    mockEntityService.getFullExportSet = vi.fn().mockRejectedValue(false);
     wrapper.vm.download(false, false);
     expect(wrapper.vm.downloading).toBe(true);
     expect(mockToast.add).toHaveBeenCalledTimes(1);
     expect(mockToast.add).toHaveBeenCalledWith(mockLoggerService.success("Download will begin shortly"));
     await flushPromises();
-    expect(mockSetService.download).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getFullExportSet).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.downloadFile).not.toHaveBeenCalled();
     expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.error("Download failed from server"));
     expect(wrapper.vm.downloading).toBe(false);
