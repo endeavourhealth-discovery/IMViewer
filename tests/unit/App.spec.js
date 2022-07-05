@@ -25,8 +25,7 @@ describe("App.vue", () => {
 
   it("should check auth and update store history count on mount", async () => {
     await flushPromises();
-    expect(mockStore.dispatch).toHaveBeenCalledTimes(2);
+    expect(mockStore.dispatch).toHaveBeenCalledTimes(1);
     expect(mockStore.dispatch).toHaveBeenCalledWith("authenticateCurrentUser");
-    expect(mockStore.dispatch).toHaveBeenCalledWith("fetchBlockedIris");
   });
 });

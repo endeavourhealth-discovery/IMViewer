@@ -60,7 +60,6 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import EntityService from "@/services/EntityService";
 import { RouteRecordName } from "vue-router";
 import { GraphData } from "im-library/dist/types/interfaces/Interfaces";
 
@@ -95,7 +94,7 @@ export default defineComponent({
 
     async getGraph(iri: string): Promise<void> {
       this.loading = true;
-      this.graph = await EntityService.getEntityGraph(iri);
+      this.graph = await this.$entityService.getEntityGraph(iri);
       this.loading = false;
     },
 

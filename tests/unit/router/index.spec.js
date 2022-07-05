@@ -3,6 +3,22 @@ import App from "@/App.vue";
 import Toast from "primevue/toast";
 import store from "@/store/index";
 import { flushPromises, shallowMount } from "@vue/test-utils";
+import { vi } from "vitest";
+import { Services } from "im-library";
+const { Env } = Services;
+
+vi.mock("@/main", () => {
+  return {
+    default: {
+      $entityService: {
+        iriExists: vi.fn()
+      },
+      $env: { AUTH_URL: "" }
+    }
+  };
+});
+
+import vm from "@/main";
 
 describe("router", () => {
   beforeEach(() => {
@@ -136,7 +152,6 @@ describe("router", () => {
       vi.resetAllMocks();
       window.sessionStorage.clear();
       store.state.snomedLicenseAccepted = "true";
-      store.state.blockedIris = ["http://www.w3.org/2001/XMLSchema#string"];
       store.dispatch = vi.fn().mockResolvedValue({ authenticated: true });
       router.push("/");
       await router.isReady();
@@ -169,6 +184,7 @@ describe("router", () => {
       store.state.snomedLicenseAccepted = "true";
       store.commit = vi.fn();
       store.dispatch = vi.fn().mockResolvedValue({ authenticated: true });
+      vm.$entityService.iriExists = vi.fn().mockResolvedValue(true);
       router.push("/");
       await router.isReady();
 

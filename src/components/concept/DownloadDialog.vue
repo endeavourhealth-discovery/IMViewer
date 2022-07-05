@@ -84,13 +84,13 @@
 </template>
 
 <script lang="ts">
-import EntityService from "@/services/EntityService";
 import { defineComponent } from "@vue/runtime-core";
-import { TTIriRef, EntityReferenceNode, PartialBundle, TermCode, ExportValueSet, DataModelProperty } from "im-library/dist/types/interfaces/Interfaces";
-import { Vocabulary, Helpers, LoggerService, Env } from "im-library";
+import { TTIriRef, EntityReferenceNode, TermCode, ExportValueSet, DataModelProperty, TTBundle } from "im-library/dist/types/interfaces/Interfaces";
+import { Vocabulary, Helpers } from "im-library";
 const { IM, RDFS } = Vocabulary;
 const {
-  DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }
+  DataTypeCheckers: { isArrayHasLength, isObjectHasKeys },
+  Converters: { iriToUrl }
 } = Helpers;
 
 export default defineComponent({
@@ -114,7 +114,7 @@ export default defineComponent({
   data() {
     return {
       concept: {} as any,
-      definition: {} as PartialBundle,
+      definition: {} as TTBundle,
       hasSubTypes: [] as EntityReferenceNode[],
       isChildOf: [] as TTIriRef[],
       hasChildren: [] as any[],
@@ -153,10 +153,10 @@ export default defineComponent({
     },
 
     downloadConcept(): void {
-      const modIri = this.conceptIri.replace(/\//gi, "%2F").replace(/#/gi, "%23");
+      const modIri = iriToUrl(this.conceptIri);
 
       const url =
-        Env.api +
+        this.$env.API +
         "api/entity/download?iri=" +
         modIri +
         "&format=" +
@@ -181,16 +181,16 @@ export default defineComponent({
         this.includeInactive;
       const popup = window.open(url);
       if (!popup) {
-        this.$toast.add(LoggerService.error("Download failed from server"));
+        this.$toast.add(this.$loggerService.error("Download failed from server"));
       } else {
-        this.$toast.add(LoggerService.success("Download will begin shortly"));
+        this.$toast.add(this.$loggerService.success("Download will begin shortly"));
       }
       this.closeDownloadDialog();
     },
 
     async init(iri: string): Promise<void> {
       this.loading = true;
-      this.concept = await EntityService.getPartialEntity(iri, [RDFS.LABEL, IM.IS_CHILD_OF, IM.HAS_CHILDREN]);
+      this.concept = await this.$entityService.getPartialEntity(iri, [RDFS.LABEL, IM.IS_CHILD_OF, IM.HAS_CHILDREN]);
       if (isObjectHasKeys(this.concept, [IM.IS_CHILD_OF]) && isArrayHasLength(this.concept[IM.IS_CHILD_OF])) {
         this.isChildOf = this.concept[IM.IS_CHILD_OF];
       }
@@ -198,15 +198,15 @@ export default defineComponent({
         this.hasChildren = this.concept[IM.HAS_CHILDREN];
       }
 
-      this.definition = await EntityService.getDefinitionBundle(iri);
+      this.definition = await this.$entityService.getDefinitionBundle(iri);
 
-      this.hasSubTypes = await EntityService.getEntityChildren(iri);
+      this.hasSubTypes = await this.$entityService.getEntityChildren(iri);
 
-      this.terms = await EntityService.getEntityTermCodes(iri);
+      this.terms = await this.$entityService.getEntityTermCodes(iri);
 
-      this.dataModelProperties = await EntityService.getDataModelProperties(iri);
+      this.dataModelProperties = await this.$entityService.getDataModelProperties(iri);
 
-      this.members = await EntityService.getEntityMembers(iri, this.expandMembers, false);
+      this.members = await this.$entityService.getEntityMembers(iri, this.expandMembers, false);
 
       this.setIncludeBooleans();
       this.loading = false;

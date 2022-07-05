@@ -5,9 +5,6 @@ import InputText from "primevue/inputtext";
 import Checkbox from "primevue/checkbox";
 import Column from "primevue/column";
 import Button from "primevue/button";
-import EntityService from "@/services/EntityService";
-import SetService from "@/services/SetService";
-import { LoggerService } from "im-library";
 import Menu from "primevue/menu";
 
 describe("Members.vue", () => {
@@ -16,6 +13,10 @@ describe("Members.vue", () => {
   let mockToast;
   let mockRef;
   let docSpy;
+  let mockEntityService;
+  let mockSetService;
+  let mockLoggerService;
+
   let testMembers = {
     valueSet: {
       name: "CEG 16+1 Ethnic category (concept set)",
@@ -112,10 +113,15 @@ describe("Members.vue", () => {
   beforeEach(async () => {
     vi.resetAllMocks();
 
-    EntityService.getEntityMembers = vi.fn().mockResolvedValue(testMembers);
-    EntityService.getFullExportSet = vi.fn().mockResolvedValue({ data: true });
-    EntityService.getPartialEntity = vi.fn().mockResolvedValue({ "http://www.w3.org/2000/01/rdf-schema#label": "Test Set" });
-    SetService.download = vi.fn().mockResolvedValue(true);
+    mockEntityService = {
+      getEntityMembers: vi.fn().mockResolvedValue(testMembers),
+      getFullExportSet: vi.fn().mockResolvedValue({ data: true }),
+      getPartialEntity: vi.fn().mockResolvedValue({ "http://www.w3.org/2000/01/rdf-schema#label": "Test Set" }),
+      getHasMember: vi.fn().mockResolvedValue(testMembers),
+      getPartialAndTotalCount: vi.fn().mockResolvedValue({ totalCount: 0, result: [], pageSize: 10 })
+    };
+    mockSetService = { download: vi.fn().mockResolvedValue(true) };
+    mockLoggerService = { error: vi.fn(), warn: vi.fn(), info: vi.fn(), success: vi.fn(), debug: vi.fn() };
     mockRouter = { push: vi.fn() };
     mockToast = { add: vi.fn() };
     mockRef = { render: () => {}, methods: { toggle: vi.fn() } };
@@ -132,7 +138,7 @@ describe("Members.vue", () => {
     wrapper = shallowMount(Members, {
       global: {
         components: { DataTable, InputText, Checkbox, Column, Button, Menu },
-        mocks: { $router: mockRouter, $toast: mockToast },
+        mocks: { $router: mockRouter, $toast: mockToast, $entityService: mockEntityService, $setService: mockSetService, $loggerService: mockLoggerService },
         stubs: { DataTable: DataTable, Menu: mockRef }
       },
       props: { conceptIri: "http://endhealth.info/im#VSET_EthnicCategoryCEG16" }
@@ -162,54 +168,17 @@ describe("Members.vue", () => {
   it("can run downloadMenu commands", () => {
     wrapper.vm.download = vi.fn();
     wrapper.vm.downloadMenu[0].command();
-    expect(wrapper.vm.download).toHaveBeenLastCalledWith(false);
+    expect(wrapper.vm.download).toHaveBeenLastCalledWith(false, false);
     wrapper.vm.downloadMenu[1].command();
     expect(wrapper.vm.download).toHaveBeenLastCalledWith(true, false);
     wrapper.vm.downloadMenu[2].command();
     expect(wrapper.vm.download).toHaveBeenLastCalledWith(true, true);
   });
 
-  it("adds event listener to setTableWidth on resize", async () => {
-    console.error = vi.fn();
-    await flushPromises();
-    const spy = vi.spyOn(wrapper.vm, "setTableWidth");
-    window.dispatchEvent(new Event("resize"));
-    await wrapper.vm.$nextTick();
-    expect(spy).toHaveBeenCalledTimes(1);
-    spy.mockReset();
-  });
-
-  it("can remove eventListener", () => {
-    console.error = vi.fn();
-    const spy = vi.spyOn(window, "removeEventListener");
-    wrapper.unmount();
-    expect(spy).toHaveBeenCalled();
-    spy.mockReset();
-  });
-
-  it("can resize", () => {
-    console.error = vi.fn();
-    wrapper.vm.setTableWidth = vi.fn();
-    wrapper.vm.onResize();
-    expect(wrapper.vm.setTableWidth).toHaveBeenCalledTimes(1);
-  });
-
   it("can watch conceptIri", async () => {
     wrapper.vm.getMembers = vi.fn();
     wrapper.vm.$options.watch.conceptIri.call(wrapper.vm, "http://snomed.info/sct#92491000000104");
     expect(wrapper.vm.getMembers).toHaveBeenCalledTimes(1);
-  });
-
-  it("can set width onRowGroupExpand", () => {
-    wrapper.vm.setTableWidth = vi.fn();
-    wrapper.vm.onRowGroupExpand();
-    expect(wrapper.vm.setTableWidth).toHaveBeenCalledTimes(1);
-  });
-
-  it("can set width onRowGroupExpand", () => {
-    wrapper.vm.setTableWidth = vi.fn();
-    wrapper.vm.onRowGroupCollapse();
-    expect(wrapper.vm.setTableWidth).toHaveBeenCalledTimes(1);
   });
 
   it("can getMembers ___ success", async () => {
@@ -222,12 +191,11 @@ describe("Members.vue", () => {
     expect(wrapper.vm.expandedRowGroups).toStrictEqual(["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"]);
     expect(wrapper.vm.selected).toStrictEqual({});
     expect(wrapper.vm.subsets).toStrictEqual([]);
-    expect(EntityService.getEntityMembers).toHaveBeenCalledTimes(1);
-    expect(EntityService.getEntityMembers).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", false, false, 2000, true);
+    expect(mockEntityService.getEntityMembers).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getEntityMembers).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", false, false, 20, true);
     await flushPromises();
     expect(wrapper.vm.members).toStrictEqual(testMembers);
     expect(wrapper.vm.loading).toBe(false);
-    expect(wrapper.vm.setTableWidth).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.sortMembers).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.setSubsets).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.combinedMembers).toStrictEqual(testCombinedMembers);
@@ -267,10 +235,10 @@ describe("Members.vue", () => {
     wrapper.vm.download(true, false);
     expect(wrapper.vm.downloading).toBe(true);
     expect(mockToast.add).toHaveBeenCalledTimes(1);
-    expect(mockToast.add).toHaveBeenCalledWith(LoggerService.success("Download will begin shortly"));
+    expect(mockToast.add).toHaveBeenCalledWith(mockLoggerService.success("Download will begin shortly"));
     await flushPromises();
-    expect(EntityService.getFullExportSet).toHaveBeenCalledTimes(1);
-    expect(EntityService.getFullExportSet).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", false);
+    expect(mockEntityService.getFullExportSet).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getFullExportSet).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", true, false);
     expect(wrapper.vm.downloadFile).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.downloadFile).toHaveBeenCalledWith(true, wrapper.vm.getFileName("Test Set"));
     expect(wrapper.vm.downloading).toBe(false);
@@ -281,10 +249,10 @@ describe("Members.vue", () => {
     wrapper.vm.download(false, true);
     expect(wrapper.vm.downloading).toBe(true);
     expect(mockToast.add).toHaveBeenCalledTimes(1);
-    expect(mockToast.add).toHaveBeenCalledWith(LoggerService.success("Download will begin shortly"));
+    expect(mockToast.add).toHaveBeenCalledWith(mockLoggerService.success("Download will begin shortly"));
     await flushPromises();
-    expect(SetService.download).toHaveBeenCalledTimes(1);
-    expect(SetService.download).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", false, true);
+    expect(mockEntityService.getFullExportSet).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getFullExportSet).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", false, true);
     expect(wrapper.vm.downloadFile).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.downloadFile).toHaveBeenCalledWith(true, wrapper.vm.getFileName("Test Set"));
     expect(wrapper.vm.downloading).toBe(false);
@@ -292,15 +260,15 @@ describe("Members.vue", () => {
 
   it("can download ___ fail", async () => {
     wrapper.vm.downloadFile = vi.fn();
-    SetService.download = vi.fn().mockRejectedValue(false);
+    mockEntityService.getFullExportSet = vi.fn().mockRejectedValue(false);
     wrapper.vm.download(false, false);
     expect(wrapper.vm.downloading).toBe(true);
     expect(mockToast.add).toHaveBeenCalledTimes(1);
-    expect(mockToast.add).toHaveBeenCalledWith(LoggerService.success("Download will begin shortly"));
+    expect(mockToast.add).toHaveBeenCalledWith(mockLoggerService.success("Download will begin shortly"));
     await flushPromises();
-    expect(SetService.download).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getFullExportSet).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.downloadFile).not.toHaveBeenCalled();
-    expect(mockToast.add).toHaveBeenLastCalledWith(LoggerService.error("Download failed from server"));
+    expect(mockToast.add).toHaveBeenLastCalledWith(mockLoggerService.error("Download failed from server"));
     expect(wrapper.vm.downloading).toBe(false);
   });
 
@@ -364,41 +332,6 @@ describe("Members.vue", () => {
     wrapper.vm.members.members = [];
     wrapper.vm.sortMembers();
     expect(wrapper.vm.members.members).toStrictEqual([]);
-  });
-
-  it("resizes", async () => {
-    wrapper.vm.setTableWidth = vi.fn();
-    wrapper.vm.onResize();
-    await flushPromises();
-    expect(wrapper.vm.setTableWidth).toHaveBeenCalledTimes(1);
-  });
-
-  it("can setTableWidth", () => {
-    const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ width: 100 });
-    mockElement.getElementsByClassName = vi.fn().mockReturnValue([mockElement]);
-    mockElement.style.width = "10px";
-    docSpy.mockReturnValue(mockElement);
-    wrapper.vm.setTableWidth();
-    expect(mockElement.style.width).not.toBe("10px");
-  });
-
-  it("can setTableWidth ___ container fail", () => {
-    LoggerService.error = vi.fn();
-    docSpy.mockReturnValue(undefined);
-    wrapper.vm.setTableWidth();
-    expect(LoggerService.error).toHaveBeenCalledTimes(1);
-    expect(LoggerService.error).toHaveBeenCalledWith(undefined, "Failed to set members table width. Required element(s) not found.");
-  });
-
-  it("can setTableWidth ___ table fail", () => {
-    const mockElement = document.createElement("div");
-    mockElement.getBoundingClientRect = vi.fn().mockReturnValue({ width: 100 });
-    mockElement.getElementsByClassName = vi.fn().mockReturnValue([]);
-    mockElement.style.width = "10px";
-    docSpy.mockReturnValue(mockElement);
-    wrapper.vm.setTableWidth();
-    expect(mockElement.style.width).toBe("10px");
   });
 
   it("can toggle", () => {

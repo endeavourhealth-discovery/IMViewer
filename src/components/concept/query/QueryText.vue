@@ -1,11 +1,10 @@
 <template>
   <h4>Generated SQL</h4>
-  <pre>{{sql}}</pre>
+  <pre>{{ sql }}</pre>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import QueryService from '@/services/QueryService';
 
 export default defineComponent({
   name: "QueryText",
@@ -27,7 +26,7 @@ export default defineComponent({
   },
   methods: {
     async generateSQL(iri: string) {
-      this.sql = await QueryService.generateSQL(iri);
+      this.sql = await this.$queryService.generateSQL(iri);
     }
   }
 });

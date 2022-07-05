@@ -7,7 +7,7 @@
           <span class="entity-name" v-tooltip="{ value: header, class: 'name-tooltip' }">{{ header }}</span>
           <div v-if="isObjectHasKeysWrapper(concept, ['http://endhealth.info/im#definition'])">
             <Button
-              icon="far fa-copy"
+              icon="fa-regular fa-copy"
               class="p-button-rounded p-button-text p-button-secondary topbar-content-button"
               @click="toggle($event, 'copyMenu')"
               v-tooltip="'Copy concept to clipboard'"
@@ -15,7 +15,7 @@
             <Menu id="copy-options" ref="copyMenu" :model="copyMenuItems" :popup="true" />
           </div>
           <Button
-            icon="fas fa-cloud-download-alt"
+            icon="fa-solid fa-cloud-arrow-down"
             class="p-button-rounded p-button-text p-button-secondary topbar-content-button"
             @click="toggle($event, 'downloadMenu')"
             v-tooltip.bottom="'Download concept'"
@@ -27,45 +27,51 @@
             v-if="isFavourite(concept['@id'])"
             style="color: #e39a36"
             icon="pi pi-fw pi-star-fill"
-            class="p-button-rounded p-button-text "
+            class="p-button-rounded p-button-text topbar-content-button-fav"
+            v-tooltip.bottom="'Unfavourite'"
             @click="updateFavourites(concept)"
           />
 
-          <Button v-else icon="pi pi-fw pi-star" class="p-button-rounded p-button-text p-button-plain" @click="updateFavourites(concept)" />
+          <Button
+            v-else
+            icon="pi pi-fw pi-star"
+            class="p-button-rounded p-button-text p-button-plain topbar-content-button"
+            v-tooltip.bottom="'Favourite'"
+            @click="updateFavourites(concept)"
+          />
+          <Button
+            icon="fa-solid fa-pencil"
+            class="p-button-rounded p-button-text p-button-plain topbar-content-button"
+            @click="directToEditRoute"
+            v-tooltip.bottom="'Edit concept'"
+          />
         </div>
-        <!--<button
+        <!-- <button
             class="p-panel-header-icon p-link p-mr-2"
             @click="directToCreateRoute"
             v-tooltip.bottom="'Create new concept'"
           >
-            <i class="fas fa-plus-circle" aria-hidden="true"></i>
-          </button>
-          <button
-            class="p-panel-header-icon p-link p-mr-2"
-            @click="directToEditRoute"
-            v-tooltip.bottom="'Edit concept'"
-          >
-            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
-          </button>-->
+            <i class="fa-solid fa-plus-circle" aria-hidden="true"></i>
+          </button> -->
       </template>
     </TopBar>
   </div>
   <div id="concept-main-container">
-    <Splitter stateKey="viewerConceptSplitterHorizontal" stateStorage="local" class="mainSplitter">
-      <SplitterPanel :size="20" :minSize="10" class="leftSplitterPanel">
+    <Splitter stateKey="viewerConceptSplitterHorizontal" stateStorage="local" class="main-splitter" @resizeend="updateSplitter">
+      <SplitterPanel :size="20" :minSize="10" class="left-splitter-panel">
         <div v-if="loading" class="loading-container">
           <ProgressSpinner />
         </div>
-        <div v-else class="leftSplitterContent">
+        <div v-else class="left-splitter-content">
           <Definition :concept="concept" :configs="summaryConfig" class="definition" />
           <TextSectionHeader id="hierarchy-header" size="100%" label="Hierarchy position" :show="true" />
-          <SecondaryTree :conceptIri="conceptIri" class="leftHierarchy" />
+          <SecondaryTree :conceptIri="conceptIri" class="left-hierarchy" />
         </div>
       </SplitterPanel>
-      <SplitterPanel :size="80" :minSize="20" class="rightSplitterPanel">
+      <SplitterPanel :size="80" :minSize="20" class="right-splitter-panel">
         <div id="concept-content-dialogs-container">
           <div id="concept-panel-container">
-            <TabView v-model:activeIndex="active" :lazy="true" class="tabView">
+            <TabView v-model:activeIndex="active" :lazy="true" class="tab-view">
               <TabPanel header="Details">
                 <div v-if="loading" class="loading-container">
                   <ProgressSpinner />
@@ -111,12 +117,13 @@
               </TabPanel>
               <TabPanel header="Graph">
                 <div class="concept-panel-content" id="graph-container">
-                  <Graph :conceptIri="conceptIri" />
+                  <Graph :conceptIri="conceptIri" :splitterRightSize="splitterRightSize" />
                 </div>
               </TabPanel>
               <TabPanel header="Query" v-if="isQuery">
                 <div class="concept-panel-content" id="query-container">
-                  <ProfileDisplay theme="light" :modelValue="profile" :activeProfile="activeProfile" />
+                  <h4>Query Definition</h4>
+                  <QueryDefinition :modelValue="dataSet" :edit="false"></QueryDefinition>
                   <QueryText class="queryText" :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
@@ -142,17 +149,17 @@ import Mappings from "../components/concept/Mappings.vue";
 import EclDefinition from "@/components/concept/EclDefinition.vue";
 import { mapState } from "vuex";
 import DownloadDialog from "@/components/concept/DownloadDialog.vue";
-import EntityService from "@/services/EntityService";
-import ConfigService from "@/services/ConfigService";
 import Properties from "@/components/concept/Properties.vue";
-import { Helpers, Vocabulary, LoggerService, Models } from "im-library";
-import { DefinitionConfig, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
+import { Helpers, Vocabulary, Models, Config } from "im-library";
+import { DefinitionConfig, EntityReferenceNode, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
+import { QueryDefinition } from "im-library";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
   CopyConceptToClipboard: { copyConceptToClipboard, conceptObjectToCopyString },
-  DataTypeCheckers: { isObjectHasKeys },
-  Sorters: { byOrder }
+  DataTypeCheckers: { isObjectHasKeys, isArrayHasLength },
+  Sorters: { byOrder },
+  TypeGuards: { isTTBundle }
 } = Helpers;
 
 export default defineComponent({
@@ -168,7 +175,8 @@ export default defineComponent({
     Mappings,
     Properties,
     EclDefinition,
-    QueryText
+    QueryText,
+    QueryDefinition
   },
   computed: {
     activeProfile: {
@@ -212,7 +220,7 @@ export default defineComponent({
       return isProperty(this.types);
     },
 
-    ...mapState(["conceptIri", "selectedEntityType", "conceptActivePanel", "activeModule", "blockedIris", "favourites"])
+    ...mapState(["conceptIri", "selectedEntityType", "conceptActivePanel", "activeModule", "favourites"])
   },
   watch: {
     async conceptIri() {
@@ -221,6 +229,10 @@ export default defineComponent({
 
     selectedEntityType(newValue, oldValue) {
       this.setActivePanel(newValue, oldValue);
+    },
+
+    async conceptActivePanel() {
+      this.active = this.conceptActivePanel;
     },
 
     active(newValue) {
@@ -242,6 +254,7 @@ export default defineComponent({
   data() {
     return {
       loading: true,
+      tabMap: {} as Map<string, number>,
       editDialogView: true,
       showDownloadDialog: false,
       concept: {} as any,
@@ -276,7 +289,9 @@ export default defineComponent({
         //   }
         // }
       ] as any,
-      selectedOption: {} as any
+      selectedOption: {} as any,
+      splitterRightSize: 0,
+      dataSet: {} as any
     };
   },
   methods: {
@@ -289,11 +304,8 @@ export default defineComponent({
       return this.favourites.includes(iri);
     },
 
-    directToEditRoute(): void {
-      this.$router.push({
-        name: "Edit",
-        params: { iri: this.concept["@id"] }
-      });
+    directToEditRoute() {
+      this.$directService.directTo(this.$env.EDITOR_URL, this.conceptIri, "editor");
     },
 
     directToCreateRoute(): void {
@@ -301,7 +313,7 @@ export default defineComponent({
     },
 
     async getTerms(iri: string) {
-      const entity = await EntityService.getPartialEntity(iri, [IM.HAS_TERM_CODE]);
+      const entity = await this.$entityService.getPartialEntity(iri, [IM.HAS_TERM_CODE]);
       this.terms = isObjectHasKeys(entity, [IM.HAS_TERM_CODE])
         ? (entity[IM.HAS_TERM_CODE] as []).map(term => {
             return { name: term[RDFS.LABEL], code: term[IM.CODE] };
@@ -324,17 +336,31 @@ export default defineComponent({
       if (predicates.includes("inferred")) {
         predicates.splice(predicates.indexOf("inferred"), 1, "http://endhealth.info/im#definition");
       }
-      this.concept = await EntityService.getPartialEntity(iri, predicates);
+      this.concept = await this.$entityService.getPartialEntity(iri, predicates);
       this.concept["@id"] = iri;
-      this.concept["subtypes"] = await EntityService.getEntityChildren(iri);
-
-      this.concept["termCodes"] = await EntityService.getEntityTermCodes(iri);
+      const result = await this.$entityService.getPagedChildren(iri, 1, 10);
+      if (result && isObjectHasKeys(result, ["result", "totalCount"])) {
+        const resultChildren = result.result.map((child: EntityReferenceNode) => {
+          return { "@id": child["@id"], name: child.name };
+        });
+        this.concept["subtypes"] = { children: resultChildren, totalCount: result.totalCount, loadMore: this.loadMore };
+      }
+      this.concept["termCodes"] = await this.$entityService.getEntityTermCodes(iri);
 
       this.profile = new Models.Query.Profile(this.concept);
     },
 
     async getDefinition(iri: string): Promise<void> {
-      const result = await EntityService.getDefinitionBundle(iri);
+      const result = await this.$entityService.getDefinitionBundle(iri);
+      const hasMember = await this.$entityService.getPartialAndTotalCount(iri, IM.HAS_MEMBER, 1, 10);
+      if (hasMember.totalCount !== 0 && isTTBundle(result)) {
+        result.entity[IM.HAS_MEMBER] = hasMember.result;
+        result.predicates[IM.HAS_MEMBER] = "has member";
+      }
+      if (hasMember.totalCount >= 10 && isTTBundle(result)) {
+        result.entity[IM.HAS_MEMBER] = result.entity[IM.HAS_MEMBER].concat({ "@id": this.conceptIri, name: "see more..." });
+      }
+
       if (isObjectHasKeys(result, ["entity"]) && isObjectHasKeys(result.entity, [RDFS.SUBCLASS_OF, IM.ROLE_GROUP])) {
         const roleGroup = result.entity[IM.ROLE_GROUP];
         delete result.entity[IM.ROLE_GROUP];
@@ -346,13 +372,11 @@ export default defineComponent({
     },
 
     async getConfig(name: string): Promise<DefinitionConfig[]> {
-      const defaultPredicateNames = await ConfigService.getDefaultPredicateNames();
-      this.$store.commit("updateDefaultPredicateNames", defaultPredicateNames);
-      const configs = await ConfigService.getComponentLayout(name);
+      const configs = await this.$configService.getComponentLayout(name);
       if (configs.every(config => isObjectHasKeys(config, ["order"]))) {
         configs.sort(byOrder);
       } else {
-        LoggerService.error(undefined, "Failed to sort config for definition component layout. One or more config items are missing 'order' property.");
+        this.$loggerService.error(undefined, "Failed to sort config for definition component layout. One or more config items are missing 'order' property.");
       }
       return configs;
     },
@@ -365,11 +389,14 @@ export default defineComponent({
       await this.getDefinition(this.conceptIri);
       await this.getTerms(this.conceptIri);
       this.types = isObjectHasKeys(this.concept, [RDF.TYPE]) ? this.concept[RDF.TYPE] : ([] as TTIriRef[]);
+      if (this.isQuery) await this.getQueryDefinition(this.conceptIri);
       this.header = this.concept[RDFS.LABEL];
       await this.setCopyMenuItems();
       this.setStoreType();
       const allConfigs = this.definitionConfig.concat(this.summaryConfig);
-      this.conceptAsString = copyConceptToClipboard(this.concept, allConfigs, undefined, this.blockedIris);
+      this.conceptAsString = copyConceptToClipboard(this.concept, allConfigs, undefined, Config.XmlSchemaDatatypes);
+      this.tabMap = new Map<string, number>();
+      this.setTabMap();
       this.loading = false;
       document.title = this.header || "";
     },
@@ -398,13 +425,23 @@ export default defineComponent({
         this.active = this.conceptActivePanel;
       } else {
         if (this.isSet) {
-          this.active = 2;
+          this.active = this.tabMap.get("Members") || 0;
         } else if (this.isRecordModel) {
-          this.active = 3;
+          this.active = this.tabMap.get("Properties") || 0;
+        } else if (this.isQuery) {
+          this.active = this.tabMap.get("Query") || 0;
         } else {
           this.active = 0;
         }
       }
+    },
+
+    setTabMap() {
+      const tabList = document.getElementsByClassName("p-tabview-nav-content")?.[0]?.children?.[0]?.children as HTMLCollectionOf<HTMLElement>;
+      if (tabList && tabList.length)
+        for (let i = 0; i < tabList.length; i++) {
+          if (tabList[i].innerText) this.tabMap.set(tabList[i].innerText, i);
+        }
     },
 
     openDownloadDialog(): void {
@@ -428,12 +465,12 @@ export default defineComponent({
           label: "All",
           command: async () => {
             await navigator.clipboard
-              .writeText(copyConceptToClipboard(this.concept, this.definitionConfig.concat(this.summaryConfig), undefined, this.blockedIris))
+              .writeText(copyConceptToClipboard(this.concept, this.definitionConfig.concat(this.summaryConfig), undefined, Config.XmlSchemaDatatypes))
               .then(() => {
-                this.$toast.add(LoggerService.success("Concept copied to clipboard"));
+                this.$toast.add(this.$loggerService.success("Concept copied to clipboard"));
               })
               .catch(err => {
-                this.$toast.add(LoggerService.error("Failed to copy concept to clipboard", err));
+                this.$toast.add(this.$loggerService.error("Failed to copy concept to clipboard", err));
               });
           }
         }
@@ -452,23 +489,24 @@ export default defineComponent({
             await navigator.clipboard
               .writeText(text)
               .then(() => {
-                this.$toast.add(LoggerService.success(label + " copied to clipboard"));
+                this.$toast.add(this.$loggerService.success(label + " copied to clipboard"));
               })
               .catch(err => {
-                this.$toast.add(LoggerService.error("Failed to copy " + label + " to clipboard", err));
+                this.$toast.add(this.$loggerService.error("Failed to copy " + label + " to clipboard", err));
               });
           }
         });
       }
     },
 
-    isObjectHasKeysWrapper(object: any, keys: string[]) {
-      return isObjectHasKeys(object, keys);
+    isObjectHasKeysWrapper(object: any, keys?: string[]) {
+      if (keys) return isObjectHasKeys(object, keys);
+      else return isObjectHasKeys(object);
     },
 
     async exportConcept(format: any) {
       this.loading = true;
-      const result = await EntityService.downloadConcept(this.conceptIri, format);
+      const result = await this.$entityService.downloadConcept(this.conceptIri, format);
       this.loading = false;
       const url = window.URL.createObjectURL(new Blob([result], { type: format === "turtle" ? "text/plain" : "application/javascript" }));
       const link = document.createElement("a");
@@ -488,6 +526,38 @@ export default defineComponent({
     toggle(event: any, refId: string) {
       const x = this.$refs[refId] as any;
       x.toggle(event);
+    },
+
+    async loadMore(children: any[], totalCount: number, nextPage: number, pageSize: number, loadButton: boolean, iri: string) {
+      if (loadButton) {
+        if (nextPage * pageSize < totalCount) {
+          const result = await this.$entityService.getPagedChildren(iri, nextPage, pageSize);
+          const resultChildren = result.result.map((child: EntityReferenceNode) => {
+            return { "@id": child["@id"], name: child.name };
+          });
+          children = children.concat(resultChildren);
+          nextPage = nextPage + 1;
+          loadButton = true;
+        } else if (nextPage * pageSize > totalCount) {
+          const result = await this.$entityService.getPagedChildren(iri, nextPage, pageSize);
+          const resultChildren = result.result.map((child: EntityReferenceNode) => {
+            return { "@id": child["@id"], name: child.name };
+          });
+          children = children.concat(resultChildren);
+          loadButton = false;
+        } else {
+          loadButton = false;
+        }
+      }
+      return { children: children, totalCount: totalCount, nextPage: nextPage, pageSize: pageSize, loadButton: loadButton, iri: iri };
+    },
+
+    updateSplitter(event: any) {
+      this.splitterRightSize = event.sizes[1];
+    },
+
+    async getQueryDefinition(iri: string) {
+      this.dataSet = await this.$queryService.querySummary(iri);
     }
   }
 });
@@ -500,7 +570,7 @@ export default defineComponent({
   background-color: #ffffff;
 }
 
-.mainSplitter {
+.main-splitter {
   height: 100%;
 }
 
@@ -516,6 +586,7 @@ export default defineComponent({
 .concept-panel-content {
   overflow: auto;
   background-color: #ffffff;
+  height: 100%;
 }
 
 .loading-container {
@@ -541,11 +612,15 @@ export default defineComponent({
   border-top: solid lightgrey 1px;
 }
 
-.leftSplitterPanel {
+.left-splitter-panel {
   display: flex;
 }
 
-.leftSplitterContent {
+.right-splitter-panel {
+  overflow: auto;
+}
+
+.left-splitter-content {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -556,13 +631,13 @@ export default defineComponent({
   flex: 0;
 }
 
-.leftHierarchy {
+.left-hierarchy {
   overflow: auto;
   flex: 0 1 auto;
   border: none !important;
 }
 
-.tabView {
+.tab-view {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -612,7 +687,22 @@ export default defineComponent({
   flex: 0 0 auto;
 }
 
+.topbar-content-button:hover {
+  background-color: #6c757d !important;
+  color: #ffffff !important;
+}
+
+.topbar-content-button-fav:hover {
+  background-color: #e39a36 !important;
+  color: #ffffff !important;
+}
+
 .name-tooltip {
   width: 80vw;
+}
+
+.query-definition pre {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 </style>

@@ -33,6 +33,7 @@ export default defineComponent({
     concept: { type: Object, required: true },
     configs: { type: Array as PropType<Array<DefinitionConfig>>, required: true }
   },
+
   methods: {
     showItem(config: DefinitionConfig, index: number): boolean {
       let dataResults = [];

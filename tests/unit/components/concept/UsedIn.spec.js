@@ -2,31 +2,94 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 import UsedIn from "@/components/concept/UsedIn.vue";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
-import EntityService from "@/services/EntityService";
 
 describe("UsedIn.vue", () => {
   let wrapper;
   let mockRouter;
   let mockToast;
   let docSpy;
+  let mockEntityService;
+
   const USAGES = [
-    { "@id": "http://endhealth.info/im#AccidentAndEmergencyEncounter", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2000/01/rdf-schema#Class", "name": "Class" }, { "@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape" }], "http://www.w3.org/2000/01/rdf-schema#label": "Accident and emergency encounter (entry type)" },
-    { "@id": "http://endhealth.info/im#AllergyIntoleranceAndAdverseReaction", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2000/01/rdf-schema#Class", "name": "Class" }, { "@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape" }], "http://www.w3.org/2000/01/rdf-schema#label": "Allergy, intolerance and adverse reaction  (entry type)" },
-    { "@id": "http://endhealth.info/im#Appointment", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2000/01/rdf-schema#Class", "name": "Class" }, { "@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape" }], "http://www.w3.org/2000/01/rdf-schema#label": "Appointment  (entry type)" },
-    { "@id": "http://endhealth.info/im#AppointmentAttendanceHistory", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2000/01/rdf-schema#Class", "name": "Class" }, { "@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape" }], "http://www.w3.org/2000/01/rdf-schema#label": "Appointment attendance history  (entry type)" },
-    { "@id": "http://endhealth.info/im#AppointmentSession", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [{ "@id": "http://www.w3.org/2000/01/rdf-schema#Class", "name": "Class" }, { "@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape" }], "http://www.w3.org/2000/01/rdf-schema#label": "Appointment session  (entry type)" },
-  ]
+    {
+      "@id": "http://endhealth.info/im#AccidentAndEmergencyEncounter",
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+        { "@id": "http://www.w3.org/2000/01/rdf-schema#Class", name: "Class" },
+        { "@id": "http://www.w3.org/ns/shacl#NodeShape", name: "Node shape" }
+      ],
+      "http://www.w3.org/2000/01/rdf-schema#label": "Accident and emergency encounter (entry type)"
+    },
+    {
+      "@id": "http://endhealth.info/im#AllergyIntoleranceAndAdverseReaction",
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+        { "@id": "http://www.w3.org/2000/01/rdf-schema#Class", name: "Class" },
+        { "@id": "http://www.w3.org/ns/shacl#NodeShape", name: "Node shape" }
+      ],
+      "http://www.w3.org/2000/01/rdf-schema#label": "Allergy, intolerance and adverse reaction  (entry type)"
+    },
+    {
+      "@id": "http://endhealth.info/im#Appointment",
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+        { "@id": "http://www.w3.org/2000/01/rdf-schema#Class", name: "Class" },
+        { "@id": "http://www.w3.org/ns/shacl#NodeShape", name: "Node shape" }
+      ],
+      "http://www.w3.org/2000/01/rdf-schema#label": "Appointment  (entry type)"
+    },
+    {
+      "@id": "http://endhealth.info/im#AppointmentAttendanceHistory",
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+        { "@id": "http://www.w3.org/2000/01/rdf-schema#Class", name: "Class" },
+        { "@id": "http://www.w3.org/ns/shacl#NodeShape", name: "Node shape" }
+      ],
+      "http://www.w3.org/2000/01/rdf-schema#label": "Appointment attendance history  (entry type)"
+    },
+    {
+      "@id": "http://endhealth.info/im#AppointmentSession",
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+        { "@id": "http://www.w3.org/2000/01/rdf-schema#Class", name: "Class" },
+        { "@id": "http://www.w3.org/ns/shacl#NodeShape", name: "Node shape" }
+      ],
+      "http://www.w3.org/2000/01/rdf-schema#label": "Appointment session  (entry type)"
+    }
+  ];
   const TRANSFORMED_USAGES = [
-    { "@id": "http://endhealth.info/im#AccidentAndEmergencyEncounter", "name": "Accident and emergency encounter (entry type)", "icon": ["fas", "project-diagram"], "colour": "#781c8188" },
-    { "@id": "http://endhealth.info/im#AllergyIntoleranceAndAdverseReaction", "name": "Allergy, intolerance and adverse reaction  (entry type)", "icon": ["fas", "project-diagram"], "colour": "#781c8188" },
-    { "@id": "http://endhealth.info/im#Appointment", "name": "Appointment  (entry type)", "icon": ["fas", "project-diagram"], "colour": "#781c8188" },
-    { "@id": "http://endhealth.info/im#AppointmentAttendanceHistory", "name": "Appointment attendance history  (entry type)", "icon": ["fas", "project-diagram"], "colour": "#781c8188" },
-    { "@id": "http://endhealth.info/im#AppointmentSession", "name": "Appointment session  (entry type)", "icon": ["fas", "project-diagram"], "colour": "#781c8188" }
-  ]
+    {
+      "@id": "http://endhealth.info/im#AccidentAndEmergencyEncounter",
+      name: "Accident and emergency encounter (entry type)",
+      icon: ["fa-solid", "fa-diagram-project"],
+      colour: "#781c8188"
+    },
+    {
+      "@id": "http://endhealth.info/im#AllergyIntoleranceAndAdverseReaction",
+      name: "Allergy, intolerance and adverse reaction  (entry type)",
+      icon: ["fa-solid", "fa-diagram-project"],
+      colour: "#781c8188"
+    },
+    {
+      "@id": "http://endhealth.info/im#Appointment",
+      name: "Appointment  (entry type)",
+      icon: ["fa-solid", "fa-diagram-project"],
+      colour: "#781c8188"
+    },
+    {
+      "@id": "http://endhealth.info/im#AppointmentAttendanceHistory",
+      name: "Appointment attendance history  (entry type)",
+      icon: ["fa-solid", "fa-diagram-project"],
+      colour: "#781c8188"
+    },
+    {
+      "@id": "http://endhealth.info/im#AppointmentSession",
+      name: "Appointment session  (entry type)",
+      icon: ["fa-solid", "fa-diagram-project"],
+      colour: "#781c8188"
+    }
+  ];
   beforeEach(async () => {
     vi.resetAllMocks();
-    EntityService.getEntityUsages = vi.fn().mockResolvedValue(USAGES);
-    EntityService.getUsagesTotalRecords = vi.fn().mockResolvedValue(50);
+    mockEntityService = {
+      getEntityUsages: vi.fn().mockResolvedValue(USAGES),
+      getUsagesTotalRecords: vi.fn().mockResolvedValue(50)
+    };
     mockRouter = {
       push: vi.fn()
     };
@@ -45,7 +108,7 @@ describe("UsedIn.vue", () => {
     wrapper = shallowMount(UsedIn, {
       global: {
         components: { DataTable, Column },
-        mocks: { $router: mockRouter, $toast: mockToast }
+        mocks: { $router: mockRouter, $toast: mockToast, $entityService: mockEntityService }
       },
       props: { conceptIri: "http://snomed.info/sct#298382003" }
     });
@@ -104,8 +167,8 @@ describe("UsedIn.vue", () => {
   it("gets usages", async () => {
     wrapper.vm.getUsages("http://snomed.info/sct#298382003", 0, 25);
     await flushPromises();
-    expect(EntityService.getEntityUsages).toHaveBeenCalledTimes(1);
-    expect(EntityService.getEntityUsages).toHaveBeenCalledWith("http://snomed.info/sct#298382003", 0, 25);
+    expect(mockEntityService.getEntityUsages).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getEntityUsages).toHaveBeenCalledWith("http://snomed.info/sct#298382003", 0, 25);
     expect(wrapper.vm.usages).toStrictEqual(TRANSFORMED_USAGES);
   });
 
@@ -113,8 +176,8 @@ describe("UsedIn.vue", () => {
     wrapper.vm.records = 0;
     wrapper.vm.getRecordsSize("http://snomed.info/sct#298382003");
     await flushPromises();
-    expect(EntityService.getUsagesTotalRecords).toHaveBeenCalledTimes(1);
-    expect(EntityService.getUsagesTotalRecords).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
+    expect(mockEntityService.getUsagesTotalRecords).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getUsagesTotalRecords).toHaveBeenCalledWith("http://snomed.info/sct#298382003");
     expect(wrapper.vm.recordsTotal).toBe(50);
   });
 

@@ -1,11 +1,12 @@
 import { createStore } from "vuex";
 import AuthService from "@/services/AuthService";
-import ConfigService from "@/services/ConfigService";
-import { Models, Vocabulary, Constants, LoggerService } from "im-library";
+import { Models, Vocabulary, Constants } from "im-library";
 import { RecentActivityItem } from "im-library/dist/types/interfaces/Interfaces";
 const { User, CustomAlert } = Models;
 const { IM } = Vocabulary;
 const { Avatars } = Constants;
+
+import vm from "@/main";
 
 export default createStore({
   // update stateType.ts when adding new state!
@@ -18,10 +19,8 @@ export default createStore({
     favourites: JSON.parse(localStorage.getItem("favourites") || "[]") as string[],
     snomedReturnUrl: "",
     authReturnUrl: "",
-    blockedIris: [] as string[],
     selectedEntityType: "",
     conceptActivePanel: 0,
-    defaultPredicateNames: [] as string[],
     arrayObjectNameListboxWithLabelStartExpanded: [],
     tagSeverityMatches: [
       { "@id": IM.ACTIVE, severity: "success" },
@@ -29,7 +28,7 @@ export default createStore({
       { "@id": IM.INACTIVE, severity: "danger" }
     ],
     textDefinitionStartExpanded: ["Definition"],
-    activeProfile: { uuid: "", activeClausePath: "" },
+    activeProfile: { uuid: "", activeClausePath: "" }
   },
   mutations: {
     updateActiveProfile(state, value) {
@@ -70,9 +69,6 @@ export default createStore({
       localStorage.setItem("recentLocalActivity", JSON.stringify(activity));
       state.recentLocalActivity = JSON.stringify(activity);
     },
-    updateBlockedIris(state, blockedIris) {
-      state.blockedIris = blockedIris;
-    },
     updateConceptIri(state, conceptIri) {
       state.conceptIri = conceptIri;
       localStorage.setItem("viewerSelectedConcept", conceptIri);
@@ -99,9 +95,6 @@ export default createStore({
     updateConceptActivePanel(state, number) {
       state.conceptActivePanel = number;
     },
-    updateDefaultPredicateNames(state, names) {
-      state.defaultPredicateNames = names;
-    },
     updateArrayObjectNameListboxWithLabelStartExpanded(state, items) {
       state.arrayObjectNameListboxWithLabelStartExpanded = items;
     },
@@ -113,10 +106,6 @@ export default createStore({
     }
   },
   actions: {
-    async fetchBlockedIris({ commit }) {
-      const blockedIris = await ConfigService.getXmlSchemaDataTypes();
-      commit("updateBlockedIris", blockedIris);
-    },
     async logoutCurrentUser({ commit }) {
       let result = new CustomAlert(500, "Logout (store) failed");
       await AuthService.signOut().then(res => {
@@ -145,9 +134,9 @@ export default createStore({
         } else {
           dispatch("logoutCurrentUser").then(resLogout => {
             if (resLogout.status === 200) {
-              LoggerService.info(undefined, "Force logout successful");
+              vm.$loggerService.info(undefined, "Force logout successful");
             } else {
-              LoggerService.error(undefined, "Force logout failed");
+              vm.$loggerService.error(undefined, "Force logout failed");
             }
           });
         }

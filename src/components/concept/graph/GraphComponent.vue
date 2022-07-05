@@ -1,12 +1,19 @@
 <template>
-  <div id="force-layout-graph">
-    <svg id="force-layout-svg">
-      <defs id="defs">
-        <marker id="arrow" markerUnits="strokeWidth" markerWidth="12" markerHeight="12" viewBox="0 0 12 12" refX="25" refY="6" orient="auto-start-reverse">
-          <path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill: #781c81;"></path>
-        </marker>
-      </defs>
-    </svg>
+  <div class="graph-controls-container">
+    <div id="force-layout-graph">
+      <svg id="force-layout-svg">
+        <defs id="defs">
+          <marker id="arrow" markerUnits="strokeWidth" markerWidth="12" markerHeight="12" viewBox="0 0 12 12" refX="25" refY="6" orient="auto-start-reverse">
+            <path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill: #781c81;"></path>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+    <div class="custom-control-buttons">
+      <Button class="svg-pan-zoom-control p-button-secondary" icon="pi pi-plus" @click="zoomIn" />
+      <Button class="svg-pan-zoom-control p-button-secondary" label="RESET" @click="resetZoom" />
+      <Button class="svg-pan-zoom-control p-button-secondary" icon="pi pi-minus" @click="zoomOut" />
+    </div>
   </div>
 </template>
 
@@ -14,10 +21,9 @@
 import { defineComponent, PropType } from "@vue/runtime-core";
 import * as d3 from "d3";
 import svgPanZoom from "svg-pan-zoom";
-import EntityService from "@/services/EntityService";
 import { RouteRecordName } from "vue-router";
 import { TTGraphData } from "im-library/dist/types/interfaces/Interfaces";
-import { Helpers, LoggerService } from "im-library";
+import { Helpers } from "im-library";
 const {
   GraphTranslator: { translateFromEntityBundle, toggleNodeByName, hasNodeChildrenByName },
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }
@@ -26,25 +32,29 @@ const {
 export default defineComponent({
   name: "GraphComponent",
   props: {
-    data: { type: Object as PropType<TTGraphData>, required: true, default: {} as TTGraphData }
+    data: { type: Object as PropType<TTGraphData>, required: true, default: {} as TTGraphData },
+    splitterRightSize: { type: Number, required: true }
   },
   watch: {
     data(newValue) {
       this.root = d3.hierarchy(newValue);
       this.drawGraph();
+    },
+    splitterRightSize() {
+      this.drawGraph();
     }
   },
   computed: {
-    nodeFontSize() {
+    nodeFontSize(): number {
       return this.radius / 5;
     },
-    pathFontSize() {
+    pathFontSize(): number {
       return this.radius / 5 + 3;
     },
-    maxLength() {
+    maxLength(): number {
       return this.radius / 2;
     },
-    viewBox() {
+    viewBox(): string[] {
       return ["" + -this.width / 2, "" + -this.height / 2, "" + this.width, "" + this.height];
     }
   },
@@ -174,8 +184,8 @@ export default defineComponent({
             .style("opacity", 0.9);
           div
             .html(d.path[0]["__data__"]["data"]["name"] + "<div/> Press ctr+click to navigate")
-            .style("left", d.x + "px")
-            .style("top", d.y + 10 + "px");
+            .style("left", d.layerX + "px")
+            .style("top", d.layerY + 10 + "px");
         })
         .on("mouseout", (_d: any) => {
           div
@@ -217,7 +227,7 @@ export default defineComponent({
 
       this.svgPan = svgPanZoom("#force-layout-svg", {
         zoomEnabled: true,
-        controlIconsEnabled: true,
+        controlIconsEnabled: false,
         fit: false,
         center: true,
         dblClickZoomEnabled: false
@@ -237,11 +247,14 @@ export default defineComponent({
 
     navigate(iri: string) {
       const currentRoute = this.$route.name as RouteRecordName | undefined;
-      if (iri)
+      if (iri === "seeMore") {
+        this.$store.commit("updateConceptActivePanel", 2);
+      } else if (iri) {
         this.$router.push({
           name: currentRoute,
           params: { selectedIri: iri }
         });
+      }
     },
 
     redrawGraph() {
@@ -256,7 +269,7 @@ export default defineComponent({
         this.redrawGraph();
       } else {
         if (node.iri) {
-          const bundle = await EntityService.getPartialEntityBundle(node.iri, []);
+          const bundle = await this.$entityService.getPartialEntityBundle(node.iri, []);
           const data = translateFromEntityBundle(bundle, []);
           if (isArrayHasLength(data.children)) {
             data.children.forEach(child => {
@@ -266,7 +279,7 @@ export default defineComponent({
             this.redrawGraph();
           }
         } else {
-          this.$toast.add(LoggerService.warn("Node can not be expanded."));
+          this.$toast.add(this.$loggerService.warn("Node can not be expanded."));
         }
       }
     },
@@ -303,29 +316,74 @@ export default defineComponent({
       if (isObjectHasKeys(this.simulation, ["stop"])) {
         this.simulation.stop();
       }
+    },
+
+    zoomIn() {
+      this.svgPan.zoomIn();
+    },
+
+    resetZoom() {
+      this.svgPan.resetZoom();
+    },
+
+    zoomOut() {
+      this.svgPan.zoomOut();
     }
   }
 });
 </script>
 
-<style>
-#force-layout-svg {
-  height: calc(100vh - 13em);
+<style scoped>
+.graph-controls-container {
+  flex: 1 1 auto;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+#force-layout-graph {
+  height: 100%;
   width: 100%;
 }
 
-circle:hover {
+.custom-control-buttons {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.svg-pan-zoom-control {
+  opacity: 33%;
+  padding: 0.25rem !important;
+  width: auto !important;
+  background-color: black !important;
+}
+
+.svg-pan-zoom-control:hover {
+  opacity: 100%;
+}
+
+#force-layout-svg {
+  height: 100%;
+  width: 100%;
+}
+
+#force-layout-graph:deep(circle):hover {
   stroke: steelblue;
   stroke-width: 3px;
   cursor: grab;
 }
 
-circle:active {
+#force-layout-graph:deep(circle):active {
   cursor: grabbing;
   cursor: -moz-grabbing;
   cursor: -webkit-grabbing;
 }
-foreignObject p {
+#force-layout-graph:deep(p) {
   text-align: center;
   position: relative;
   top: 50%;
@@ -334,12 +392,12 @@ foreignObject p {
   transform: translateY(-50%);
 }
 
-foreignObject:hover {
+#force-layout-graph:deep(foreignObject):hover {
   font-weight: 600;
   cursor: pointer;
 }
 
-div.tooltip {
+#force-layout-graph:deep(.tooltip) {
   position: absolute;
   text-align: center;
   width: 120px;
