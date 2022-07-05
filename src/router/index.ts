@@ -64,7 +64,7 @@ router.beforeEach(async (to, from) => {
     store.commit("updateSnomedReturnUrl", currentUrl);
     store.commit("updateAuthReturnUrl", currentUrl);
   }
-  if (iri && Config.Values.XML_SCHEMA_DATATYPES.includes(iri)) {
+  if (iri && Config.XmlSchemaDatatypes.includes(iri)) {
     return false;
   }
   if (iri) {

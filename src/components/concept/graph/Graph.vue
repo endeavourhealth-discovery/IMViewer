@@ -40,7 +40,7 @@ export default defineComponent({
       selectedIris: [] as string[],
       predicatesIris: [] as string[],
       bundle: {} as TTBundle,
-      graphExcludePredicates: Config.Values.GRAPH_EXCLUDE_PREDICATES,
+      graphExcludePredicates: Config.GraphExcludePredicates,
       options: [] as { iri: string; name: string }[],
       predicates: [] as any
     };
