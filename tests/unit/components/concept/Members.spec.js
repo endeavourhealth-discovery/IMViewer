@@ -159,10 +159,11 @@ describe("Members.vue", () => {
     expect(wrapper.vm.selected).toStrictEqual({});
     expect(wrapper.vm.subsets).toStrictEqual(['Subset - "other Black, African or Caribbean background"', "Subset - African"]);
     expect(wrapper.vm.expandedRowGroups).toStrictEqual(["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"]);
-    expect(wrapper.vm.downloadMenu).toHaveLength(3);
-    expect(wrapper.vm.downloadMenu[0].label).toBe("Definition");
-    expect(wrapper.vm.downloadMenu[1].label).toBe("Expanded Core");
-    expect(wrapper.vm.downloadMenu[2].label).toBe("Expanded Legacy");
+    expect(wrapper.vm.downloadMenu).toHaveLength(4);
+    expect(wrapper.vm.downloadMenu[0].label).toBe("Definition Only");
+    expect(wrapper.vm.downloadMenu[1].label).toBe("Core");
+    expect(wrapper.vm.downloadMenu[2].label).toBe("Core & Legacy");
+    expect(wrapper.vm.downloadMenu[3].label).toBe("Core & Legacy (Flat)");
   });
 
   it("can run downloadMenu commands", () => {
@@ -238,7 +239,7 @@ describe("Members.vue", () => {
     expect(mockToast.add).toHaveBeenCalledWith(mockLoggerService.success("Download will begin shortly"));
     await flushPromises();
     expect(mockEntityService.getFullExportSet).toHaveBeenCalledTimes(1);
-    expect(mockEntityService.getFullExportSet).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", true, false);
+    expect(mockEntityService.getFullExportSet).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", true, false, false);
     expect(wrapper.vm.downloadFile).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.downloadFile).toHaveBeenCalledWith(true, wrapper.vm.getFileName("Test Set"));
     expect(wrapper.vm.downloading).toBe(false);
@@ -252,7 +253,7 @@ describe("Members.vue", () => {
     expect(mockToast.add).toHaveBeenCalledWith(mockLoggerService.success("Download will begin shortly"));
     await flushPromises();
     expect(mockEntityService.getFullExportSet).toHaveBeenCalledTimes(1);
-    expect(mockEntityService.getFullExportSet).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", false, true);
+    expect(mockEntityService.getFullExportSet).toHaveBeenCalledWith("http://endhealth.info/im#VSET_EthnicCategoryCEG16", false, true, false);
     expect(wrapper.vm.downloadFile).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.downloadFile).toHaveBeenCalledWith(true, wrapper.vm.getFileName("Test Set"));
     expect(wrapper.vm.downloading).toBe(false);
