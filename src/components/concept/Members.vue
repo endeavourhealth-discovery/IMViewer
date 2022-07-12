@@ -23,8 +23,8 @@
             </template>
             <Button type="button" label="Download..." @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" :loading="downloading" />
             <template id="overlay_menu">
-              <Menu ref="menu" v-if="checkAuthorization()" :model="downloadMenu1" :popup="true" />
-              <Menu ref="menu" v-else :model="downloadMenu" :popup="true" />
+              <Menu ref="menu" v-if="checkAuthorization()" :model="downloadMenu1" :popup="true" appendTo="body"/>
+              <Menu ref="menu" v-else :model="downloadMenu" :popup="true" appendTo="body"/>
             </template>
           </div>
         </div>
@@ -111,14 +111,16 @@ export default defineComponent({
       subsets: [] as string[],
       expandedRowGroups: ["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"],
       downloadMenu: [
-        { label: "Definition", command: () => this.download(false, false) },
-        { label: "Expanded Core", command: () => this.download(true, false) },
-        { label: "Expanded Legacy", command: () => this.download(true, true) }
+        { label: "Definition Only", command: () => this.download(false, false) },
+        { label: "Core", command: () => this.download(true, false) },
+        { label: "Core & Legacy", command: () => this.download(true, true) },
+        { label: "Core & Legacy (Flat)", command: () => this.download(true, true, true) },
       ],
       downloadMenu1: [
-        { label: "Definition", command: () => this.download(false, false) },
-        { label: "Expanded Core", command: () => this.download(true, false) },
-        { label: "Expanded Legacy", command: () => this.download(true, true) },
+        { label: "Definition Only", command: () => this.download(false, false) },
+        { label: "Core", command: () => this.download(true, false) },
+        { label: "Core & Legacy", command: () => this.download(true, true) },
+        { label: "Core & Legacy (Flat)", command: () => this.download(true, true, true) },
         { label: "IMv1", command: () => this.downloadIMV1() }
       ],
       isPublishing: false,
@@ -175,11 +177,11 @@ export default defineComponent({
       }
     },
 
-    async download(core: boolean, legacy: boolean): Promise<void> {
+    async download(core: boolean, legacy: boolean, flat: boolean = false): Promise<void> {
       this.downloading = true;
       try {
         this.$toast.add(this.$loggerService.success("Download will begin shortly"));
-        const result = (await this.$entityService.getFullExportSet(this.conceptIri, core, legacy)).data;
+        const result = (await this.$entityService.getFullExportSet(this.conceptIri, core, legacy, flat)).data;
         const label: string = (await this.$entityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
         this.downloadFile(result, this.getFileName(label));
       } catch (error) {

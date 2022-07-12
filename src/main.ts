@@ -83,6 +83,7 @@ import axios from "axios";
 import IMLibrary, { Helpers, Services } from "im-library";
 import "im-library/dist/style.css";
 import Profile from "@/components/query/Profile.vue";
+import TieredMenu from 'primevue/tieredmenu';
 const {
   DataTypeCheckers: { isObjectHasKeys }
 } = Helpers;
@@ -137,6 +138,7 @@ const app = createApp(App)
   .component("MultiSelect", MultiSelect)
   .component("OverlayPanel", OverlayPanel)
   .component("Menu", Menu)
+  .component("TieredMenu", TieredMenu)
   .component("Chart", Chart)
   .component("Menubar", Menubar)
   .component("InlineMessage", InlineMessage)

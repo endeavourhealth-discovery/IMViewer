@@ -2,11 +2,7 @@ import store from "@/store/index";
 import { flushPromises } from "@vue/test-utils";
 import AuthService from "@/services/AuthService";
 import { Models, Vocabulary } from "im-library";
-const {
-  User,
-  Search: { SearchRequest },
-  CustomAlert
-} = Models;
+const { User, CustomAlert } = Models;
 const { IM } = Vocabulary;
 
 vi.mock("@/main", () => {
