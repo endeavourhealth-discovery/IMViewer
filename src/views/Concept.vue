@@ -124,7 +124,7 @@
                 <div class="concept-panel-content" id="query-container">
                   <h4>Query Definition</h4>
                   <QueryDefinition :modelValue="dataSet" :edit="false"></QueryDefinition>
-                  <QueryText class="queryText" :conceptIri="conceptIri" />
+                  <QueryText :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
             </TabView>
