@@ -67,8 +67,8 @@ describe("Mappings.vue", () => {
     { iri: "http://www.w3.org/2001/XMLSchema#", prefix: "xsd", name: "xsd namespace" }
   ];
   const SIMPLE_MAPS = [
-    { "@id": "http://endhealth.info/emis#^ESCTAM784250", name: "Amputation of right foot", scheme: "EMIS (inc. Read2 like) namespace" },
-    { "@id": "http://endhealth.info/emis#^ESCTAM784250", name: "Amputation of right foot", scheme: "EMIS (inc. Read2 like) namespace" }
+    { "@id": "http://endhealth.info/emis#_ESCTAM784250", name: "Amputation of right foot", scheme: "EMIS (inc. Read2 like) namespace", code: "^ESCTAM784250" },
+    { "@id": "http://endhealth.info/emis#_ESCTAM784250", name: "Amputation of right foot", scheme: "EMIS (inc. Read2 like) namespace", code: "^ESCTAM784250" }
   ];
 
   beforeEach(async () => {
@@ -282,13 +282,13 @@ describe("Mappings.vue", () => {
                 mapItems: [
                   {
                     code: "^ESCTAM784250",
-                    iri: "http://endhealth.info/emis#^ESCTAM784250",
+                    iri: "http://endhealth.info/emis#_ESCTAM784250",
                     name: "Amputation of right foot",
                     scheme: "EMIS (inc. Read2 like) namespace"
                   },
                   {
                     code: "^ESCTAM784250",
-                    iri: "http://endhealth.info/emis#^ESCTAM784250",
+                    iri: "http://endhealth.info/emis#_ESCTAM784250",
                     name: "Amputation of right foot",
                     scheme: "EMIS (inc. Read2 like) namespace"
                   }
@@ -315,13 +315,13 @@ describe("Mappings.vue", () => {
         mapItems: [
           {
             code: "^ESCTAM784250",
-            iri: "http://endhealth.info/emis#^ESCTAM784250",
+            iri: "http://endhealth.info/emis#_ESCTAM784250",
             name: "Amputation of right foot",
             scheme: "EMIS (inc. Read2 like) namespace"
           },
           {
             code: "^ESCTAM784250",
-            iri: "http://endhealth.info/emis#^ESCTAM784250",
+            iri: "http://endhealth.info/emis#_ESCTAM784250",
             name: "Amputation of right foot",
             scheme: "EMIS (inc. Read2 like) namespace"
           }
@@ -336,13 +336,13 @@ describe("Mappings.vue", () => {
           mapItems: [
             {
               code: "^ESCTAM784250",
-              iri: "http://endhealth.info/emis#^ESCTAM784250",
+              iri: "http://endhealth.info/emis#_ESCTAM784250",
               name: "Amputation of right foot",
               scheme: "EMIS (inc. Read2 like) namespace"
             },
             {
               code: "^ESCTAM784250",
-              iri: "http://endhealth.info/emis#^ESCTAM784250",
+              iri: "http://endhealth.info/emis#_ESCTAM784250",
               name: "Amputation of right foot",
               scheme: "EMIS (inc. Read2 like) namespace"
             }
@@ -356,13 +356,13 @@ describe("Mappings.vue", () => {
       [
         {
           code: "^ESCTAM784250",
-          iri: "http://endhealth.info/emis#^ESCTAM784250",
+          iri: "http://endhealth.info/emis#_ESCTAM784250",
           name: "Amputation of right foot",
           scheme: "EMIS (inc. Read2 like) namespace"
         },
         {
           code: "^ESCTAM784250",
-          iri: "http://endhealth.info/emis#^ESCTAM784250",
+          iri: "http://endhealth.info/emis#_ESCTAM784250",
           name: "Amputation of right foot",
           scheme: "EMIS (inc. Read2 like) namespace"
         }
@@ -388,68 +388,68 @@ describe("Mappings.vue", () => {
   it("can generateSimpleMapsNamespaces ___ isArray ___ found", () => {
     wrapper.vm.simpleMaps = [
       {
-        "@id": "http://endhealth.info/emis#^ESCTAM784250",
+        "@id": "http://endhealth.info/emis#_ESCTAM784250",
         code: "^ESCTAM784250",
         name: "Amputation of right foot",
         scheme: "unknown"
       },
-      { "@id": "http://endhealth.info/emis#^ESCTAM784250", code: "^ESCTAM784250", name: "Amputation of right foot", scheme: "unknown" }
+      { "@id": "http://endhealth.info/emis#_ESCTAM784250", code: "^ESCTAM784250", name: "Amputation of right foot", scheme: "unknown" }
     ];
     wrapper.vm.getSimpleMapsNamespaces();
     expect(wrapper.vm.simpleMaps).toStrictEqual([
       {
-        "@id": "http://endhealth.info/emis#^ESCTAM784250",
+        "@id": "http://endhealth.info/emis#_ESCTAM784250",
         code: "^ESCTAM784250",
         name: "Amputation of right foot",
         scheme: "EMIS (inc. Read2 like) namespace"
       },
-      { "@id": "http://endhealth.info/emis#^ESCTAM784250", code: "^ESCTAM784250", name: "Amputation of right foot", scheme: "EMIS (inc. Read2 like) namespace" }
+      { "@id": "http://endhealth.info/emis#_ESCTAM784250", code: "^ESCTAM784250", name: "Amputation of right foot", scheme: "EMIS (inc. Read2 like) namespace" }
     ]);
   });
 
   it("can generateSimpleMapsNamespaces ___ not isArray ___ found", () => {
     wrapper.vm.simpleMaps = [
       {
-        "@id": "http://endhealth.info/emis#^ESCTAM784250",
+        "@id": "http://endhealth.info/emis#_ESCTAM784250",
         code: "^ESCTAM784250",
         name: "Amputation of right foot",
         scheme: "unknown"
       },
-      { "@id": "http://endhealth.info/emis#^ESCTAM784250", code: "^ESCTAM784250", name: "Amputation of right foot", scheme: "unknown" }
+      { "@id": "http://endhealth.info/emis#_ESCTAM784250", code: "^ESCTAM784250", name: "Amputation of right foot", scheme: "unknown" }
     ];
     wrapper.vm.namespaces = [];
     wrapper.vm.getSimpleMapsNamespaces();
     expect(wrapper.vm.simpleMaps).toStrictEqual([
       {
-        "@id": "http://endhealth.info/emis#^ESCTAM784250",
+        "@id": "http://endhealth.info/emis#_ESCTAM784250",
         code: "^ESCTAM784250",
         name: "Amputation of right foot",
         scheme: "unknown"
       },
-      { "@id": "http://endhealth.info/emis#^ESCTAM784250", code: "^ESCTAM784250", name: "Amputation of right foot", scheme: "unknown" }
+      { "@id": "http://endhealth.info/emis#_ESCTAM784250", code: "^ESCTAM784250", name: "Amputation of right foot", scheme: "unknown" }
     ]);
   });
 
   it("can generateSimpleMapsNamespaces ___ isArray ___ not found", () => {
     wrapper.vm.simpleMaps = [
       {
-        "@id": "http://endhealth.info/emis#^ESCTAM784250",
+        "@id": "http://endhealth.info/emis#_ESCTAM784250",
         code: "^ESCTAM784250",
         name: "Amputation of right foot",
         scheme: "unknown"
       },
-      { "@id": "http://endhealth.info/emis#^ESCTAM784250", code: "^ESCTAM784250", name: "Amputation of right foot", scheme: "unknown" }
+      { "@id": "http://endhealth.info/emis#_ESCTAM784250", code: "^ESCTAM784250", name: "Amputation of right foot", scheme: "unknown" }
     ];
     wrapper.vm.namespaces = [{ iri: "testIri", name: "testName" }];
     wrapper.vm.getSimpleMapsNamespaces();
     expect(wrapper.vm.simpleMaps).toStrictEqual([
       {
-        "@id": "http://endhealth.info/emis#^ESCTAM784250",
+        "@id": "http://endhealth.info/emis#_ESCTAM784250",
         code: "^ESCTAM784250",
         name: "Amputation of right foot",
         scheme: "None"
       },
-      { "@id": "http://endhealth.info/emis#^ESCTAM784250", code: "^ESCTAM784250", name: "Amputation of right foot", scheme: "None" }
+      { "@id": "http://endhealth.info/emis#_ESCTAM784250", code: "^ESCTAM784250", name: "Amputation of right foot", scheme: "None" }
     ]);
   });
 
