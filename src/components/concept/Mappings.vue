@@ -247,7 +247,6 @@ export default defineComponent({
           } else {
             mapItem.scheme = "None";
           }
-          mapItem.code = mapItem["@id"].split("#")[1];
         });
       }
     },
