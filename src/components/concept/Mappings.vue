@@ -15,7 +15,10 @@
     <template #someOf="slotProps">
       <span>{{ slotProps.node.data.label }}</span>
     </template>
-    <template #simpleMaps="slotProps">
+    <template #matchedFrom="slotProps">
+      <span>{{ slotProps.node.data.label }}</span>
+    </template>
+    <template #matchedTo="slotProps">
       <span>{{ slotProps.node.data.label }}</span>
     </template>
     <template #childList="slotProps">
@@ -39,8 +42,12 @@
         </tbody>
       </table>
     </template>
-    <template #simpleMapsList="slotProps">
-      <SimpleMaps v-if="slotProps.node.data.mapItems.length" :data="slotProps.node.data.mapItems" @toggleOverlay="handleSimpleMapsToggle" />
+    <template #matchedFromList="slotProps">
+      <SimpleMaps v-if="slotProps.node.data.mapItems.length" :data="slotProps.node.data.mapItems" @toggleOverlay="handleMatchedFromToggle" />
+      <span v-else>None</span>
+    </template>
+    <template #matchedToList="slotProps">
+      <SimpleMaps v-if="slotProps.node.data.mapItems.length" :data="slotProps.node.data.mapItems" @toggleOverlay="handleMatchedToToggle" />
       <span v-else>None</span>
     </template>
     <template #default>
@@ -60,7 +67,16 @@
     </div>
   </OverlayPanel>
 
-  <OverlayPanel ref="opSimpleMaps" id="overlay-panel-simple-maps">
+  <OverlayPanel ref="opMatchedFrom" id="overlay-panel-simple-maps">
+    <div class="flex flex-column justify-contents-start simple-maps-overlay">
+      <p><strong>Name: </strong>{{ hoveredResult.name }}</p>
+      <p><strong>Iri: </strong>{{ hoveredResult.iri }}</p>
+      <p><strong>Namespace: </strong>{{ hoveredResult.scheme }}</p>
+      <p><strong>Code: </strong>{{ hoveredResult.code }}</p>
+    </div>
+  </OverlayPanel>
+
+  <OverlayPanel ref="opMatchedTo" id="overlay-panel-simple-maps">
     <div class="flex flex-column justify-contents-start simple-maps-overlay">
       <p><strong>Name: </strong>{{ hoveredResult.name }}</p>
       <p><strong>Iri: </strong>{{ hoveredResult.iri }}</p>
@@ -95,7 +111,8 @@ export default defineComponent({
       mappings: [] as any[],
       data: {} as any,
       hoveredResult: {} as any,
-      simpleMaps: [] as SimpleMap[],
+      matchedFrom: [] as SimpleMap[],
+      matchedTo: [] as SimpleMap[],
       namespaces: [] as Namespace[],
       loading: false
     };
@@ -116,7 +133,8 @@ export default defineComponent({
       this.data = {};
 
       this.namespaces = await this.$entityService.getNamespaces();
-      this.simpleMaps = await this.$entityService.getSimpleMaps(this.conceptIri);
+      this.matchedFrom = await this.$entityService.getMatchedFrom(this.conceptIri);
+      this.matchedTo = await this.$entityService.getMatchedTo(this.conceptIri);
     },
 
     createChartTableNode(
@@ -203,27 +221,36 @@ export default defineComponent({
         data: { label: "Has map" },
         children: [] as ChartMapNode[] | ChartTableNode[]
       };
-      if (!(isArrayHasLength(mappingObject) || isObjectHasKeys(mappingObject)) && !isArrayHasLength(this.simpleMaps)) {
+      if (!(isArrayHasLength(mappingObject) || isObjectHasKeys(mappingObject)) && !isArrayHasLength(this.matchedFrom) && !isArrayHasLength(this.matchedTo)) {
         return [];
       }
       if (isArrayHasLength(mappingObject) || isObjectHasKeys(mappingObject)) {
         parentNode.children = this.generateChildNodes(mappingObject, "0", 0);
       }
-      if (isArrayHasLength(this.simpleMaps)) {
-        const simpleMapsChildren = this.generateSimpleMapsNodes(this.simpleMaps, "0_" + parentNode.children.length, 0);
+      if (isArrayHasLength(this.matchedFrom)) {
+        const matchedFromChildren = this.generateSimpleMapsNodes(this.matchedFrom, "0_" + parentNode.children.length, 0, "matchedFromList");
         parentNode.children.push({
           key: "0_" + parentNode.children.length,
-          type: "simpleMaps",
-          data: { label: "Simple maps" },
-          children: simpleMapsChildren
+          type: "matchedFrom",
+          data: { label: "Matched From" },
+          children: matchedFromChildren
+        });
+      }
+      if (isArrayHasLength(this.matchedTo)) {
+        const matchedToChildren = this.generateSimpleMapsNodes(this.matchedTo, "0_" + parentNode.children.length, 0, "matchedToList");
+        parentNode.children.push({
+          key: "0_" + parentNode.children.length,
+          type: "matchedTo",
+          data: { label: "Matched To" },
+          children: matchedToChildren
         });
       }
       return parentNode;
     },
 
-    generateSimpleMapsNodes(simpleMaps: SimpleMap[], location: string, positionInLevel: number): ChartTableNode[] {
+    generateSimpleMapsNodes(simpleMaps: SimpleMap[], location: string, positionInLevel: number, type: string): ChartTableNode[] {
       if (!isArrayHasLength(simpleMaps)) {
-        return [this.createChartTableNode([], location, positionInLevel, "simpleMapsList")];
+        return [this.createChartTableNode([], location, positionInLevel, type)];
       }
       const simpleMapsList = [] as SimpleMapIri[];
       simpleMaps.forEach((mapItem: SimpleMap) => {
@@ -235,12 +262,22 @@ export default defineComponent({
         });
       });
       simpleMapsList.sort(byScheme);
-      return [this.createChartTableNode(simpleMapsList, location, positionInLevel, "simpleMapsList")];
+      return [this.createChartTableNode(simpleMapsList, location, positionInLevel, type)];
     },
 
     getSimpleMapsNamespaces(): void {
-      if (isArrayHasLength(this.simpleMaps) && isArrayHasLength(this.namespaces)) {
-        this.simpleMaps.forEach((mapItem: SimpleMap) => {
+      if (isArrayHasLength(this.matchedFrom) && isArrayHasLength(this.namespaces)) {
+        this.matchedFrom.forEach((mapItem: SimpleMap) => {
+          const found = this.namespaces.find((namespace: Namespace) => namespace.iri.toLowerCase() === (mapItem["@id"].split("#")[0] + "#").toLowerCase());
+          if (found && isObjectHasKeys(found, ["name"])) {
+            mapItem.scheme = found.name;
+          } else {
+            mapItem.scheme = "None";
+          }
+        });
+      }
+      if (isArrayHasLength(this.matchedTo) && isArrayHasLength(this.namespaces)) {
+        this.matchedTo.forEach((mapItem: SimpleMap) => {
           const found = this.namespaces.find((namespace: Namespace) => namespace.iri.toLowerCase() === (mapItem["@id"].split("#")[0] + "#").toLowerCase());
           if (found && isObjectHasKeys(found, ["name"])) {
             mapItem.scheme = found.name;
@@ -257,8 +294,12 @@ export default defineComponent({
       x.toggle(event);
     },
 
-    handleSimpleMapsToggle(event: any, data: any) {
-      this.toggle(event, data, "opSimpleMaps");
+    handleMatchedFromToggle(event: any, data: any) {
+      this.toggle(event, data, "opMatchedFrom");
+    },
+
+    handleMatchedToToggle(event: any, data: any) {
+      this.toggle(event, data, "opMatchedTo");
     }
   }
 });

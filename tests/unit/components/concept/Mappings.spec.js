@@ -66,10 +66,13 @@ describe("Mappings.vue", () => {
     { iri: "http://endhealth.info/vision#", prefix: "vis", name: "Vision (incl. Read2) namespace" },
     { iri: "http://www.w3.org/2001/XMLSchema#", prefix: "xsd", name: "xsd namespace" }
   ];
-  const SIMPLE_MAPS = [
+  const MATCHED_FROM = [
     { "@id": "http://endhealth.info/emis#_ESCTAM784250", name: "Amputation of right foot", scheme: "EMIS (inc. Read2 like) namespace", code: "^ESCTAM784250" },
     { "@id": "http://endhealth.info/emis#_ESCTAM784250", name: "Amputation of right foot", scheme: "EMIS (inc. Read2 like) namespace", code: "^ESCTAM784250" }
   ];
+    const MATCHED_TO = [
+        { "@id": "http://snomed.info/sct#123456", name: "Asthma", scheme: "Snomed-CT namespace", code: "123456" }
+    ];
 
   beforeEach(async () => {
     vi.resetAllMocks();
@@ -85,7 +88,8 @@ describe("Mappings.vue", () => {
     mockEntityService = {
       getPartialEntity: vi.fn().mockResolvedValue(HAS_MAPS),
       getNamespaces: vi.fn().mockResolvedValue(NAMESPACES),
-      getSimpleMaps: vi.fn().mockResolvedValue(SIMPLE_MAPS)
+      getMatchedFrom: vi.fn().mockResolvedValue(MATCHED_FROM),
+      getMatchedTo: vi.fn().mockResolvedValue(MATCHED_TO)
     };
 
     wrapper = shallowMount(Mappings, {
@@ -115,12 +119,15 @@ describe("Mappings.vue", () => {
     await flushPromises();
     expect(mockEntityService.getPartialEntity).toHaveBeenCalledTimes(1);
     expect(mockEntityService.getPartialEntity).toHaveBeenCalledWith("http://snomed.info/sct#723312009", ["http://endhealth.info/im#hasMap"]);
-    expect(mockEntityService.getSimpleMaps).toHaveBeenCalledTimes(1);
-    expect(mockEntityService.getSimpleMaps).toHaveBeenCalledWith("http://snomed.info/sct#723312009");
+    expect(mockEntityService.getMatchedFrom).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getMatchedFrom).toHaveBeenCalledWith("http://snomed.info/sct#723312009");
+      expect(mockEntityService.getMatchedTo).toHaveBeenCalledTimes(1);
+      expect(mockEntityService.getMatchedTo).toHaveBeenCalledWith("http://snomed.info/sct#723312009");
     expect(mockEntityService.getNamespaces).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.mappings).toStrictEqual(HAS_MAPS[IM.HAS_MAP]);
     expect(wrapper.vm.namespaces).toStrictEqual(NAMESPACES);
-    expect(wrapper.vm.simpleMaps).toStrictEqual(SIMPLE_MAPS);
+    expect(wrapper.vm.matchedFrom).toStrictEqual(MATCHED_FROM);
+    expect(wrapper.vm.matchedTo).toStrictEqual(MATCHED_TO);
   });
 
   it("can get mappings ___ fail no hasMap", async () => {
@@ -135,8 +142,8 @@ describe("Mappings.vue", () => {
     mockEntityService.getPartialEntity = vi.fn().mockResolvedValue({});
     wrapper.vm.getMappings();
     await flushPromises();
-    expect(wrapper.vm.simpleMaps).toStrictEqual(SIMPLE_MAPS);
-    expect(mockEntityService.getSimpleMaps).toHaveBeenCalledTimes(1);
+    expect(wrapper.vm.matchedFrom).toStrictEqual(MATCHED_FROM);
+    expect(mockEntityService.getMatchedFrom).toHaveBeenCalledTimes(1);
   });
 
   it("can create chartTableNode", () => {
@@ -244,10 +251,16 @@ describe("Mappings.vue", () => {
       children: [
         {
           key: "0_" + 0,
-          type: "simpleMaps",
-          data: { label: "Simple maps" },
+          type: "matchedFrom",
+          data: { label: "Matched From" },
           children: []
-        }
+        },
+          {
+              key: "0_" + 1,
+              type: "matchedTo",
+              data: { label: "Matched To" },
+              children: []
+          }
       ]
     });
     expect(wrapper.vm.generateChildNodes).toHaveBeenCalledTimes(1);
@@ -256,7 +269,8 @@ describe("Mappings.vue", () => {
   it("can createChartStructure ___ complex only", () => {
     wrapper.vm.generateChildNodes = vi.fn().mockReturnValue([]);
     wrapper.vm.generateSimpleMapsNodes = vi.fn().mockReturnValue([]);
-    wrapper.vm.simpleMaps = [];
+    wrapper.vm.matchedFrom = [];
+    wrapper.vm.matchedTo = [];
     expect(wrapper.vm.createChartStructure(HAS_MAPS[IM.HAS_MAP])).toStrictEqual({
       key: "0",
       type: "hasMap",
@@ -268,7 +282,8 @@ describe("Mappings.vue", () => {
   });
 
   it("can create chart structure ___ empty mappingObject", () => {
-    wrapper.vm.simpleMaps = [];
+    wrapper.vm.matchedFrom = [];
+    wrapper.vm.matchedTo = [];
     expect(wrapper.vm.createChartStructure([])).toStrictEqual([]);
   });
 
@@ -295,13 +310,34 @@ describe("Mappings.vue", () => {
                 ]
               },
               key: "0_0_0",
-              type: "simpleMapsList"
+              type: "matchedFromList"
             }
           ],
-          data: { label: "Simple maps" },
+          data: { label: "Matched From" },
           key: "0_0",
-          type: "simpleMaps"
-        }
+          type: "matchedFrom"
+        },
+          {
+              children: [
+                  {
+                      data: {
+                          mapItems: [
+                              {
+                                  code: "123456",
+                                  iri: "http://snomed.info/sct#123456",
+                                  name: "Asthma",
+                                  scheme: "Snomed-CT namespace"
+                              }
+                          ]
+                      },
+                      key: "0_1_0",
+                      type: "matchedToList"
+                  }
+              ],
+              data: { label: "Matched To" },
+              key: "0_1",
+              type: "matchedTo"
+          }
       ],
       data: { label: "Has map" },
       key: "0",
@@ -328,9 +364,9 @@ describe("Mappings.vue", () => {
         ]
       },
       key: "location_1",
-      type: "simpleMapsList"
+      type: "matchedFrom"
     });
-    expect(wrapper.vm.generateSimpleMapsNodes(SIMPLE_MAPS, "location", 1)).toStrictEqual([
+    expect(wrapper.vm.generateSimpleMapsNodes(MATCHED_FROM, "location", 1, "matchedFrom")).toStrictEqual([
       {
         data: {
           mapItems: [
@@ -349,7 +385,7 @@ describe("Mappings.vue", () => {
           ]
         },
         key: "location_1",
-        type: "simpleMapsList"
+        type: "matchedFrom"
       }
     ]);
     expect(wrapper.vm.createChartTableNode).toHaveBeenCalledWith(
@@ -369,7 +405,7 @@ describe("Mappings.vue", () => {
       ],
       "location",
       1,
-      "simpleMapsList"
+      "matchedFrom"
     );
   });
 
@@ -379,14 +415,14 @@ describe("Mappings.vue", () => {
         mapItems: []
       },
       key: "location_1",
-      type: "simpleMapsList"
+      type: "matchedFrom"
     });
-    expect(wrapper.vm.generateSimpleMapsNodes([], "location", 1)).toStrictEqual([{ data: { mapItems: [] }, key: "location_1", type: "simpleMapsList" }]);
-    expect(wrapper.vm.createChartTableNode).toHaveBeenCalledWith([], "location", 1, "simpleMapsList");
+    expect(wrapper.vm.generateSimpleMapsNodes([], "location", 1, "matchedFrom")).toStrictEqual([{ data: { mapItems: [] }, key: "location_1", type: "matchedFrom" }]);
+    expect(wrapper.vm.createChartTableNode).toHaveBeenCalledWith([], "location", 1, "matchedFrom");
   });
 
   it("can generateSimpleMapsNamespaces ___ isArray ___ found", () => {
-    wrapper.vm.simpleMaps = [
+    wrapper.vm.matchedFrom = [
       {
         "@id": "http://endhealth.info/emis#_ESCTAM784250",
         code: "^ESCTAM784250",
@@ -396,7 +432,7 @@ describe("Mappings.vue", () => {
       { "@id": "http://endhealth.info/emis#_ESCTAM784250", code: "^ESCTAM784250", name: "Amputation of right foot", scheme: "unknown" }
     ];
     wrapper.vm.getSimpleMapsNamespaces();
-    expect(wrapper.vm.simpleMaps).toStrictEqual([
+    expect(wrapper.vm.matchedFrom).toStrictEqual([
       {
         "@id": "http://endhealth.info/emis#_ESCTAM784250",
         code: "^ESCTAM784250",
@@ -408,7 +444,7 @@ describe("Mappings.vue", () => {
   });
 
   it("can generateSimpleMapsNamespaces ___ not isArray ___ found", () => {
-    wrapper.vm.simpleMaps = [
+    wrapper.vm.matchedFrom = [
       {
         "@id": "http://endhealth.info/emis#_ESCTAM784250",
         code: "^ESCTAM784250",
@@ -419,7 +455,7 @@ describe("Mappings.vue", () => {
     ];
     wrapper.vm.namespaces = [];
     wrapper.vm.getSimpleMapsNamespaces();
-    expect(wrapper.vm.simpleMaps).toStrictEqual([
+    expect(wrapper.vm.matchedFrom).toStrictEqual([
       {
         "@id": "http://endhealth.info/emis#_ESCTAM784250",
         code: "^ESCTAM784250",
@@ -431,7 +467,7 @@ describe("Mappings.vue", () => {
   });
 
   it("can generateSimpleMapsNamespaces ___ isArray ___ not found", () => {
-    wrapper.vm.simpleMaps = [
+    wrapper.vm.matchedFrom = [
       {
         "@id": "http://endhealth.info/emis#_ESCTAM784250",
         code: "^ESCTAM784250",
@@ -442,7 +478,7 @@ describe("Mappings.vue", () => {
     ];
     wrapper.vm.namespaces = [{ iri: "testIri", name: "testName" }];
     wrapper.vm.getSimpleMapsNamespaces();
-    expect(wrapper.vm.simpleMaps).toStrictEqual([
+    expect(wrapper.vm.matchedFrom).toStrictEqual([
       {
         "@id": "http://endhealth.info/emis#_ESCTAM784250",
         code: "^ESCTAM784250",
@@ -457,15 +493,15 @@ describe("Mappings.vue", () => {
     wrapper.vm.toggle(
       "testEvent",
       { name: "Scoliosis deformity of spine", iri: "http://endhealth.info/tpp#Xa6vS", scheme: "TPP (inc.CTV3) namespace", code: "Xa6vS" },
-      "opSimpleMaps"
+      "opMatchedFrom"
     );
     expect(mockRef.methods.toggle).toHaveBeenCalledTimes(1);
     expect(mockRef.methods.toggle).toHaveBeenCalledWith("testEvent");
   });
 
-  it("can handleSimpleMapsToggle", () => {
+  it("can handleMatchedFrom toggle", () => {
     wrapper.vm.toggle = vi.fn();
-    wrapper.vm.handleSimpleMapsToggle("testEvent", {
+    wrapper.vm.handleMatchedFromToggle("testEvent", {
       name: "Scoliosis deformity of spine",
       iri: "http://endhealth.info/tpp#Xa6vS",
       scheme: "TPP (inc.CTV3) namespace",
@@ -475,7 +511,7 @@ describe("Mappings.vue", () => {
     expect(wrapper.vm.toggle).toHaveBeenCalledWith(
       "testEvent",
       { name: "Scoliosis deformity of spine", iri: "http://endhealth.info/tpp#Xa6vS", scheme: "TPP (inc.CTV3) namespace", code: "Xa6vS" },
-      "opSimpleMaps"
+      "opMatchedFrom"
     );
   });
 });
