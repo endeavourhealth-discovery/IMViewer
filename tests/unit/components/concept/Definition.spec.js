@@ -3,9 +3,10 @@ import Definition from "@/components/concept/Definition.vue";
 import Divider from "primevue/divider";
 import TextHTMLWithLabel from "im-library";
 import TextWithLabel from "im-library";
-import ArrayObjectNamesToStringWithLabel from "im-library"
-import ArrayObjectNameListboxWithLabel from "im-library"
+import ArrayObjectNamesToStringWithLabel from "im-library";
+import ArrayObjectNameListboxWithLabel from "im-library";
 import ObjectNameWithLabel from "im-library";
+import { setupServer } from "msw/node";
 
 describe("Definition.vue ___ no headers", () => {
   let wrapper;
@@ -163,6 +164,21 @@ describe("Definition.vue ___ no headers", () => {
     { label: "Divider", predicate: "dataModelProperties", type: "Divider", size: "100%", order: 10 },
     { label: "Data model properties", predicate: "dataModelProperties", type: "DataModelProperties", size: "100%", order: 11 }
   ];
+
+  const restHandlers = [];
+  const server = setupServer(...restHandlers);
+
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+  });
 
   beforeEach(() => {
     vi.resetAllMocks();

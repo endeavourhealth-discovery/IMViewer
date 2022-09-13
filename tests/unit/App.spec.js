@@ -2,10 +2,26 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 import App from "@/App.vue";
 import Toast from "primevue/toast";
 import ProgressSpinner from "primevue/progressspinner";
+import { setupServer } from "msw/node";
 
 describe("App.vue", () => {
   let wrapper;
   let mockStore;
+
+  const restHandlers = [];
+  const server = setupServer(...restHandlers);
+
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+  });
 
   beforeEach(() => {
     vi.resetAllMocks();

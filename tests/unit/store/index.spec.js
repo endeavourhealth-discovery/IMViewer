@@ -1,6 +1,7 @@
 import store from "@/store/index";
 import { flushPromises } from "@vue/test-utils";
 import AuthService from "@/services/AuthService";
+import { setupServer } from "msw/node";
 import { Models, Vocabulary } from "im-library";
 const { User, CustomAlert } = Models;
 const { IM } = Vocabulary;
@@ -94,6 +95,21 @@ describe("mutations", () => {
   });
 });
 describe("actions", () => {
+  const restHandlers = [];
+  const server = setupServer(...restHandlers);
+
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+  });
+
   it("can logoutCurrentUser ___ 200", async () => {
     AuthService.signOut = vi.fn().mockResolvedValue(new CustomAlert(200, "logout successful"));
     vm.$loggerService.error = vi.fn();

@@ -2,6 +2,7 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 import UsedIn from "@/components/concept/UsedIn.vue";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+import { setupServer } from "msw/node";
 
 describe("UsedIn.vue", () => {
   let wrapper;
@@ -84,6 +85,22 @@ describe("UsedIn.vue", () => {
       colour: "#781c8188"
     }
   ];
+
+  const restHandlers = [];
+  const server = setupServer(...restHandlers);
+
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+  });
+
   beforeEach(async () => {
     vi.resetAllMocks();
     mockEntityService = {

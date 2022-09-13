@@ -3,6 +3,7 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 import DataTable from "primevue/datatable";
 import Button from "primevue/button";
 import Column from "primevue/column";
+import { setupServer } from "msw/node";
 
 describe("Properties.vue", () => {
   let wrapper;
@@ -11,6 +12,21 @@ describe("Properties.vue", () => {
   let mockRef;
   let docSpy;
   let mockEntityService;
+
+  const restHandlers = [];
+  const server = setupServer(...restHandlers);
+
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+  });
 
   beforeEach(async () => {
     vi.resetAllMocks();

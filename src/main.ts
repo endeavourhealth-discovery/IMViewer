@@ -4,6 +4,7 @@ import router from "./router";
 import store from "./store";
 import PrimeVue from "primevue/config";
 import VueClipboard from "vue3-clipboard";
+import { worker } from "./mocks/browser";
 
 // Font Awesome
 import { library, dom } from "@fortawesome/fontawesome-svg-core";
@@ -79,11 +80,16 @@ import { Amplify, Auth } from "aws-amplify";
 import awsconfig from "./aws-exports";
 import axios from "axios";
 
+// msw initialising
+if (import.meta.env.MODE === "mock") {
+  worker.start();
+}
+
 // IMLibrary imports
 import IMLibrary, { Helpers, Services } from "im-library";
 import "im-library/dist/style.css";
 import Profile from "@/components/query/Profile.vue";
-import TieredMenu from 'primevue/tieredmenu';
+import TieredMenu from "primevue/tieredmenu";
 const {
   DataTypeCheckers: { isObjectHasKeys }
 } = Helpers;

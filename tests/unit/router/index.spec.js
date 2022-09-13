@@ -4,6 +4,7 @@ import Toast from "primevue/toast";
 import store from "@/store/index";
 import { flushPromises, shallowMount } from "@vue/test-utils";
 import { vi } from "vitest";
+import { setupServer } from "msw/node";
 import { Services } from "im-library";
 const { Env } = Services;
 
@@ -21,6 +22,21 @@ vi.mock("@/main", () => {
 import vm from "@/main";
 
 describe("router", () => {
+  const restHandlers = [];
+  const server = setupServer(...restHandlers);
+
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+  });
+
   beforeEach(() => {
     console.log = vi.fn();
   });
