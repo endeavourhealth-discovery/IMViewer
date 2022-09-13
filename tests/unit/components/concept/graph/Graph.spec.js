@@ -2,6 +2,7 @@ import Graph from "@/components/concept/graph/Graph.vue";
 import { flushPromises, shallowMount } from "@vue/test-utils";
 import ProgressSpinner from "primevue/progressspinner";
 import MultiSelect from "primevue/multiselect";
+import { setupServer } from "msw/node";
 import { Helpers } from "im-library";
 const { GraphTranslator } = Helpers;
 
@@ -36,6 +37,21 @@ describe("Graph.vue", () => {
     ],
     _children: []
   };
+
+  const restHandlers = [];
+  const server = setupServer(...restHandlers);
+
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+  });
 
   beforeEach(async () => {
     vi.resetAllMocks();

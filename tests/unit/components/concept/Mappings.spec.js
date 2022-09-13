@@ -4,6 +4,7 @@ import SimpleMaps from "@/components/concept/mapping/SimpleMaps.vue";
 import ProgressSpinner from "primevue/progressspinner";
 import OrganizationChart from "primevue/organizationchart";
 import OverlayPanel from "primevue/overlaypanel";
+import { setupServer } from "msw/node";
 import { Vocabulary } from "im-library";
 const { IM } = Vocabulary;
 
@@ -70,9 +71,22 @@ describe("Mappings.vue", () => {
     { "@id": "http://endhealth.info/emis#_ESCTAM784250", name: "Amputation of right foot", scheme: "EMIS (inc. Read2 like) namespace", code: "^ESCTAM784250" },
     { "@id": "http://endhealth.info/emis#_ESCTAM784250", name: "Amputation of right foot", scheme: "EMIS (inc. Read2 like) namespace", code: "^ESCTAM784250" }
   ];
-    const MATCHED_TO = [
-        { "@id": "http://snomed.info/sct#123456", name: "Asthma", scheme: "Snomed-CT namespace", code: "123456" }
-    ];
+  const MATCHED_TO = [{ "@id": "http://snomed.info/sct#123456", name: "Asthma", scheme: "Snomed-CT namespace", code: "123456" }];
+
+  const restHandlers = [];
+  const server = setupServer(...restHandlers);
+
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+  });
 
   beforeEach(async () => {
     vi.resetAllMocks();
@@ -121,8 +135,8 @@ describe("Mappings.vue", () => {
     expect(mockEntityService.getPartialEntity).toHaveBeenCalledWith("http://snomed.info/sct#723312009", ["http://endhealth.info/im#hasMap"]);
     expect(mockEntityService.getMatchedFrom).toHaveBeenCalledTimes(1);
     expect(mockEntityService.getMatchedFrom).toHaveBeenCalledWith("http://snomed.info/sct#723312009");
-      expect(mockEntityService.getMatchedTo).toHaveBeenCalledTimes(1);
-      expect(mockEntityService.getMatchedTo).toHaveBeenCalledWith("http://snomed.info/sct#723312009");
+    expect(mockEntityService.getMatchedTo).toHaveBeenCalledTimes(1);
+    expect(mockEntityService.getMatchedTo).toHaveBeenCalledWith("http://snomed.info/sct#723312009");
     expect(mockEntityService.getNamespaces).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.mappings).toStrictEqual(HAS_MAPS[IM.HAS_MAP]);
     expect(wrapper.vm.namespaces).toStrictEqual(NAMESPACES);
@@ -255,12 +269,12 @@ describe("Mappings.vue", () => {
           data: { label: "Matched From" },
           children: []
         },
-          {
-              key: "0_" + 1,
-              type: "matchedTo",
-              data: { label: "Matched To" },
-              children: []
-          }
+        {
+          key: "0_" + 1,
+          type: "matchedTo",
+          data: { label: "Matched To" },
+          children: []
+        }
       ]
     });
     expect(wrapper.vm.generateChildNodes).toHaveBeenCalledTimes(1);
@@ -317,27 +331,27 @@ describe("Mappings.vue", () => {
           key: "0_0",
           type: "matchedFrom"
         },
-          {
-              children: [
+        {
+          children: [
+            {
+              data: {
+                mapItems: [
                   {
-                      data: {
-                          mapItems: [
-                              {
-                                  code: "123456",
-                                  iri: "http://snomed.info/sct#123456",
-                                  name: "Asthma",
-                                  scheme: "Snomed-CT namespace"
-                              }
-                          ]
-                      },
-                      key: "0_1_0",
-                      type: "matchedToList"
+                    code: "123456",
+                    iri: "http://snomed.info/sct#123456",
+                    name: "Asthma",
+                    scheme: "Snomed-CT namespace"
                   }
-              ],
-              data: { label: "Matched To" },
-              key: "0_1",
-              type: "matchedTo"
-          }
+                ]
+              },
+              key: "0_1_0",
+              type: "matchedToList"
+            }
+          ],
+          data: { label: "Matched To" },
+          key: "0_1",
+          type: "matchedTo"
+        }
       ],
       data: { label: "Has map" },
       key: "0",
@@ -417,7 +431,9 @@ describe("Mappings.vue", () => {
       key: "location_1",
       type: "matchedFrom"
     });
-    expect(wrapper.vm.generateSimpleMapsNodes([], "location", 1, "matchedFrom")).toStrictEqual([{ data: { mapItems: [] }, key: "location_1", type: "matchedFrom" }]);
+    expect(wrapper.vm.generateSimpleMapsNodes([], "location", 1, "matchedFrom")).toStrictEqual([
+      { data: { mapItems: [] }, key: "location_1", type: "matchedFrom" }
+    ]);
     expect(wrapper.vm.createChartTableNode).toHaveBeenCalledWith([], "location", 1, "matchedFrom");
   });
 

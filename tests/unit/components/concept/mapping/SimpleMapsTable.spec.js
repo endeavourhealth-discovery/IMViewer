@@ -2,6 +2,7 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 import SimpleMaps from "@/components/concept/mapping/SimpleMaps.vue";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+import { setupServer } from "msw/node";
 
 describe("SimpleMapsTable.vue", () => {
   let wrapper;
@@ -11,6 +12,21 @@ describe("SimpleMapsTable.vue", () => {
     { name: "Amputation of right foot", iri: "http://endhealth.info/emis#^ESCTAM784250", scheme: "EMIS (inc. Read2 like) namespace" },
     { name: "Amputation of right foot", iri: "http://endhealth.info/emis#^ESCTAM784250", scheme: "EMIS (inc. Read2 like) namespace" }
   ];
+
+  const restHandlers = [];
+  const server = setupServer(...restHandlers);
+
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+  });
 
   beforeEach(async () => {
     vi.resetAllMocks();

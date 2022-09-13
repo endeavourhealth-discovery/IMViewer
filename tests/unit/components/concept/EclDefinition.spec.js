@@ -1,9 +1,25 @@
 import EclDefinition from "@/components/concept/EclDefinition.vue";
 import { flushPromises, shallowMount } from "@vue/test-utils";
+import { setupServer } from "msw/node";
 
 describe("EclDefinition.vue", () => {
   let wrapper;
   let mockEntityService;
+
+  const restHandlers = [];
+  const server = setupServer(...restHandlers);
+
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+  });
 
   beforeEach(async () => {
     vi.resetAllMocks();

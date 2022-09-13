@@ -2,6 +2,7 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 import EntityChart from "@/components/concept/EntityChart.vue";
 import ProgressSpinner from "primevue/progressspinner";
 import OrganizationChart from "primevue/organizationchart";
+import { setupServer } from "msw/node";
 
 describe("Graph.vue", () => {
   let wrapper;
@@ -227,6 +228,21 @@ describe("Graph.vue", () => {
     ],
     leafNodes: []
   };
+
+  const restHandlers = [];
+  const server = setupServer(...restHandlers);
+
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+  });
 
   beforeEach(() => {
     vi.resetAllMocks();

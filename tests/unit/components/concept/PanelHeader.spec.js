@@ -1,8 +1,24 @@
 import { shallowMount } from "@vue/test-utils";
 import PanelHeader from "@/components/concept/PanelHeader.vue";
+import { setupServer } from "msw/node";
 
 describe("PanelHeader.vue", () => {
   let wrapper;
+
+  const restHandlers = [];
+  const server = setupServer(...restHandlers);
+
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+  });
 
   beforeEach(() => {
     wrapper = shallowMount(PanelHeader, {
