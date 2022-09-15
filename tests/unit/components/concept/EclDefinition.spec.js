@@ -6,21 +6,6 @@ describe("EclDefinition.vue", () => {
   let wrapper;
   let mockEntityService;
 
-  const restHandlers = [];
-  const server = setupServer(...restHandlers);
-
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "error" });
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
-  afterEach(() => {
-    server.resetHandlers();
-  });
-
   beforeEach(async () => {
     vi.resetAllMocks();
 

@@ -4,21 +4,6 @@ import { setupServer } from "msw/node";
 import { describe } from "vitest";
 
 describe("Home.vue", () => {
-  const restHandlers = [];
-  const server = setupServer(...restHandlers);
-
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "error" });
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
-  afterEach(() => {
-    server.resetHandlers();
-  });
-
   describe("route = Concept", () => {
     let wrapper;
     let mockStore;

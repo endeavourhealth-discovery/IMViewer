@@ -24,47 +24,92 @@ describe("Graph.vue", () => {
         children: [],
         _children: []
       },
-      {name: "middle-node-http://www.w3.org/2000/01/rdf-schema#subClassOf", iri: "", relToParent: "subClassOf", children: [
+      {
+        name: "middle-node-http://www.w3.org/2000/01/rdf-schema#subClassOf",
+        iri: "",
+        relToParent: "subClassOf",
+        children: [
           { name: "Curvature of spine", iri: "http://snomed.info/sct#64217002", relToParent: "Curvature of spine", children: [], _children: [] },
-          { name: "Disorder of musculoskeletal system", iri: "http://snomed.info/sct#928000", relToParent: "Disorder of musculoskeletal system", children: [], _children: [] },
-          { name: "Disorder of vertebral column", iri: "http://snomed.info/sct#699699005", relToParent: "Disorder of vertebral column", children: [], _children: [] },
-        ], _children: []},
+          {
+            name: "Disorder of musculoskeletal system",
+            iri: "http://snomed.info/sct#928000",
+            relToParent: "Disorder of musculoskeletal system",
+            children: [],
+            _children: []
+          },
+          {
+            name: "Disorder of vertebral column",
+            iri: "http://snomed.info/sct#699699005",
+            relToParent: "Disorder of vertebral column",
+            children: [],
+            _children: []
+          }
+        ],
+        _children: []
+      },
       { name: "298382003", iri: undefined, relToParent: "code", children: [], _children: [] },
-      {name: "middle-node-1", iri: "", relToParent: "Group Number 1", children: [
+      {
+        name: "middle-node-1",
+        iri: "",
+        relToParent: "Group Number 1",
+        children: [
           { name: "Lateral abnormal curvature", iri: "http://snomed.info/sct#31739005", relToParent: "Associated morphology", children: [], _children: [] },
           { name: "Musculoskeletal structure of spine", iri: "http://snomed.info/sct#289959001", relToParent: "Finding site", children: [], _children: [] }
-        ], _children: []},
+        ],
+        _children: []
+      },
       // {name: "middle-node-2", iri: "", relToParent: "Group Number 2", children: [
       //     { name: "Musculoskeletal structure of spine", iri: "http://snomed.info/sct#289959001", relToParent: "Finding site", children: [], _children: [] }
       //   ], _children: []},
-      {name: "middle-node-http://endhealth.info/im#hasMap", iri: "", relToParent: "mapped to", children: [
+      {
+        name: "middle-node-http://endhealth.info/im#hasMap",
+        iri: "",
+        relToParent: "mapped to",
+        children: [
           { name: "Scoliosis, unspecified", iri: "http://endhealth.info/icd10#M419", relToParent: "Scoliosis, unspecified", children: [], _children: [] },
           { name: "Other forms of scoliosis", iri: "http://endhealth.info/icd10#M418", relToParent: "Other forms of scoliosis", children: [], _children: [] },
-          { name: "Congenital deformity of spine", iri: "http://endhealth.info/icd10#Q675", relToParent: "Congenital deformity of spine", children: [], _children: [] },
-        ], _children: []},
-      {name: "middle-node-http://endhealth.info/im#hasMember", iri: "", relToParent: "has member", children: [
-          { name: "Adult critical care encounter", iri: "http://endhealth.info/im#1641000252107", relToParent: "Adult critical care encounter", children: [], _children: [] },
-          { name: "Neonatal critical care encounter", iri: "http://endhealth.info/im#831000252103", relToParent: "Neonatal critical care encounter", children: [], _children: [] },
-          { name: "Paediatric critical care encounter", iri: "http://endhealth.info/im#2811000252102", relToParent: "Paediatric critical care encounter", children: [], _children: [] }
-        ], _children: []}
+          {
+            name: "Congenital deformity of spine",
+            iri: "http://endhealth.info/icd10#Q675",
+            relToParent: "Congenital deformity of spine",
+            children: [],
+            _children: []
+          }
+        ],
+        _children: []
+      },
+      {
+        name: "middle-node-http://endhealth.info/im#hasMember",
+        iri: "",
+        relToParent: "has member",
+        children: [
+          {
+            name: "Adult critical care encounter",
+            iri: "http://endhealth.info/im#1641000252107",
+            relToParent: "Adult critical care encounter",
+            children: [],
+            _children: []
+          },
+          {
+            name: "Neonatal critical care encounter",
+            iri: "http://endhealth.info/im#831000252103",
+            relToParent: "Neonatal critical care encounter",
+            children: [],
+            _children: []
+          },
+          {
+            name: "Paediatric critical care encounter",
+            iri: "http://endhealth.info/im#2811000252102",
+            relToParent: "Paediatric critical care encounter",
+            children: [],
+            _children: []
+          }
+        ],
+        _children: []
+      }
     ],
     _children: []
   };
-
-  const restHandlers = [];
-  const server = setupServer(...restHandlers);
-
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "error" });
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
-  afterEach(() => {
-    server.resetHandlers();
-  });
 
   beforeEach(async () => {
     vi.resetAllMocks();
@@ -118,14 +163,18 @@ describe("Graph.vue", () => {
           "http://endhealth.info/im#roleGroup": [
             {
               "http://endhealth.info/im#groupNumber": 1,
-              "http://snomed.info/sct#116676008": [{
-                "@id": "http://snomed.info/sct#31739005",
-                name: "Lateral abnormal curvature"
-              }],
-              "http://snomed.info/sct#363698007": [{
-                "@id": "http://snomed.info/sct#289959001",
-                name: "Musculoskeletal structure of spine"
-              }]
+              "http://snomed.info/sct#116676008": [
+                {
+                  "@id": "http://snomed.info/sct#31739005",
+                  name: "Lateral abnormal curvature"
+                }
+              ],
+              "http://snomed.info/sct#363698007": [
+                {
+                  "@id": "http://snomed.info/sct#289959001",
+                  name: "Musculoskeletal structure of spine"
+                }
+              ]
             }
           ],
           "http://endhealth.info/im#Status": {

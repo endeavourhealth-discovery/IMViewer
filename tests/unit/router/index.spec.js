@@ -22,21 +22,6 @@ vi.mock("@/main", () => {
 import vm from "@/main";
 
 describe("router", () => {
-  const restHandlers = [];
-  const server = setupServer(...restHandlers);
-
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "error" });
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
-  afterEach(() => {
-    server.resetHandlers();
-  });
-
   beforeEach(() => {
     console.log = vi.fn();
   });

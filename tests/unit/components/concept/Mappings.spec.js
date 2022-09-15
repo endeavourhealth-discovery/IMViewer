@@ -73,21 +73,6 @@ describe("Mappings.vue", () => {
   ];
   const MATCHED_TO = [{ "@id": "http://snomed.info/sct#123456", name: "Asthma", scheme: "Snomed-CT namespace", code: "123456" }];
 
-  const restHandlers = [];
-  const server = setupServer(...restHandlers);
-
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "error" });
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
-  afterEach(() => {
-    server.resetHandlers();
-  });
-
   beforeEach(async () => {
     vi.resetAllMocks();
     mockStore = {
