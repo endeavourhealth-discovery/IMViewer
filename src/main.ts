@@ -93,13 +93,7 @@ import TieredMenu from "primevue/tieredmenu";
 const {
   DataTypeCheckers: { isObjectHasKeys }
 } = Helpers;
-const { ConfigService, DirectService, EntityService, Env, LoggerService, QueryService, SetService } = Services;
-
-const configService = new ConfigService(axios);
-const directService = new DirectService(store);
-const entityService = new EntityService(axios);
-const queryService = new QueryService(axios);
-const setService = new SetService(axios);
+const { Env } = Services;
 
 Amplify.configure(awsconfig);
 Auth.configure(awsconfig);
@@ -165,17 +159,7 @@ const app = createApp(App)
   .component("InputSwitch", InputSwitch)
   .component("Tag", Tag);
 
-app.config.globalProperties.$configService = configService;
-app.config.globalProperties.$directService = directService;
-app.config.globalProperties.$entityService = entityService;
-app.config.globalProperties.$env = Env;
-app.config.globalProperties.$loggerService = LoggerService;
-app.config.globalProperties.$queryService = queryService;
-app.config.globalProperties.$setService = setService;
-
 const vm = app.mount("#app");
-
-export default vm;
 
 axios.interceptors.request.use(async request => {
   if (store.state.isLoggedIn && Env.API && request.url?.startsWith(Env.API)) {

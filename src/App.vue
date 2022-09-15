@@ -8,24 +8,22 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { defineComponent, onMounted, ref, provide } from "vue";
 import ProgressSpinner from "primevue/progressspinner";
+import { useStore } from "vuex";
+import axios from "axios";
 
-export default defineComponent({
-  name: "App",
-  components: { ProgressSpinner: ProgressSpinner },
-  async mounted() {
-    // check for user and log them in if found or logout if not
-    this.loading = true;
-    await this.$store.dispatch("authenticateCurrentUser");
-    this.loading = false;
-  },
-  data() {
-    return {
-      loading: false
-    };
-  }
+const store = useStore();
+
+provide("axios", axios);
+
+let loading = ref(true);
+
+onMounted(() => {
+  loading.value = true;
+  store.dispatch("authenticateCurrentUser");
+  loading.value = false;
 });
 </script>
 

@@ -6,26 +6,26 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-import { mapState } from "vuex";
+<script setup lang="ts">
+import { computed, defineComponent, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 
-export default defineComponent({
-  name: "Home",
-  computed: mapState(["conceptIri"]),
-  async mounted() {
-    this.updateRoute();
-  },
-  methods: {
-    updateRoute(): void {
-      if (!this.conceptIri) {
-        this.$router.back();
-      } else {
-        this.$router.push({ name: "Concept", params: { selectedIri: this.conceptIri } });
-      }
-    }
-  }
+const router = useRouter();
+const store = useStore();
+const conceptIri = computed(() => store.state.conceptIri);
+
+onMounted(() => {
+  updateRoute();
 });
+
+function updateRoute(): void {
+  if (!conceptIri.value) {
+    router.back();
+  } else {
+    router.push({ name: "Concept", params: { selectedIri: conceptIri.value } });
+  }
+}
 </script>
 
 <style scoped>

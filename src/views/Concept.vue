@@ -9,7 +9,7 @@
             <Button
               icon="fa-regular fa-copy"
               class="p-button-rounded p-button-text p-button-secondary topbar-content-button"
-              @click="toggle($event, 'copyMenu')"
+              @click="toggleCopyMenu($event)"
               v-tooltip="'Copy concept to clipboard'"
             />
             <Menu id="copy-options" ref="copyMenu" :model="copyMenuItems" :popup="true" />
@@ -17,7 +17,7 @@
           <Button
             icon="fa-solid fa-cloud-arrow-down"
             class="p-button-rounded p-button-text p-button-secondary topbar-content-button"
-            @click="toggle($event, 'downloadMenu')"
+            @click="toggleDownloadMenu($event)"
             v-tooltip.bottom="'Download concept'"
             aria-haspopup="true"
             aria-controls="overlay_menu"
@@ -95,12 +95,12 @@
                   <EntityChart :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
-              <TabPanel header="Properties" v-if="isRecordModel">
+              <TabPanel header="Properties" v-if="isRecordModel(types)">
                 <div class="concept-panel-content" id="properties-container">
                   <Properties :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
-              <TabPanel header="Members" v-if="isSet">
+              <TabPanel header="Members" v-if="isValueSet(types)">
                 <div class="concept-panel-content" id="members-container">
                   <Members :conceptIri="conceptIri" />
                 </div>
@@ -110,7 +110,7 @@
                   <TermCodeTable :terms="terms" />
                 </div>
               </TabPanel>
-              <TabPanel header="ECL" v-if="isSet && isObjectHasKeysWrapper(concept['http://endhealth.info/im#definition'])">
+              <TabPanel header="ECL" v-if="isValueSet(types) && isObjectHasKeysWrapper(concept['http://endhealth.info/im#definition'])">
                 <div class="concept-panel-content" id="ecl-container">
                   <EclDefinition :definition="concept['http://endhealth.info/im#definition']" />
                 </div>
@@ -120,7 +120,7 @@
                   <Graph :conceptIri="conceptIri" :splitterRightSize="splitterRightSize" />
                 </div>
               </TabPanel>
-              <TabPanel header="Query" v-if="isQuery">
+              <TabPanel header="Query" v-if="isQuery(types)">
                 <div class="concept-panel-content" id="query-container">
                   <h4>Query Definition</h4>
                   <QueryDefinition :modelValue="dataSet" :edit="false"></QueryDefinition>
@@ -136,8 +136,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { defineComponent, computed, ref, Ref, watch, onMounted, reactive } from "vue";
 import EntityChart from "../components/concept/EntityChart.vue";
 import Graph from "../components/concept/graph/Graph.vue";
 import QueryText from "../components/concept/query/QueryText.vue";
@@ -147,12 +147,15 @@ import Members from "../components/concept/Members.vue";
 import PanelHeader from "../components/concept/PanelHeader.vue";
 import Mappings from "../components/concept/Mappings.vue";
 import EclDefinition from "@/components/concept/EclDefinition.vue";
-import { mapState } from "vuex";
+import { useStore } from "vuex";
 import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import Properties from "@/components/concept/Properties.vue";
-import { Helpers, Vocabulary, Models, Config } from "im-library";
+import { Helpers, Vocabulary, Models, Config, Services, QueryDefinition } from "im-library";
 import { DefinitionConfig, EntityReferenceNode, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
-import { QueryDefinition } from "im-library";
+import { useToast } from "primevue/usetoast";
+import axios from "axios";
+import { useRouter } from "vue-router";
+import { MenuItem } from "primevue/menuitem";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
@@ -161,406 +164,381 @@ const {
   Sorters: { byOrder },
   TypeGuards: { isTTBundle }
 } = Helpers;
+const { EntityService, DirectService, ConfigService, Env, LoggerService, QueryService } = Services;
 
-export default defineComponent({
-  name: "Concept",
-  components: {
-    PanelHeader,
-    EntityChart,
-    Graph,
-    UsedIn,
-    Members,
-    Definition,
-    DownloadDialog,
-    Mappings,
-    Properties,
-    EclDefinition,
-    QueryText,
-    QueryDefinition
+const toast = useToast();
+const router = useRouter();
+const store = useStore();
+const conceptIri = computed(() => store.state.conceptIri);
+const selectedEntityType = computed(() => store.state.selectedEntityType);
+const conceptActivePanel = computed(() => store.state.conceptActivePanel);
+const activeModule = computed(() => store.state.activeModule);
+const favourites = computed(() => store.state.favourites);
+
+const activeProfile = computed({
+  get() {
+    return store.state.activeProfile;
   },
-  computed: {
-    activeProfile: {
-      get(): any {
-        return this.$store.state.activeProfile;
-      },
-      set(value: any): void {
-        this.$store.commit("updateActiveProfile", value);
-      }
-    },
-
-    isSet(): boolean {
-      return isValueSet(this.types);
-    },
-
-    showGraph(): boolean {
-      return isOfTypes(this.types, IM.CONCEPT, SHACL.NODESHAPE);
-    },
-
-    showMappings(): boolean {
-      return (isConcept(this.types) || isOfTypes(this.types, RDFS.CLASS)) && !isRecordModel(this.types);
-    },
-
-    isConcept(): boolean {
-      return isConcept(this.types);
-    },
-
-    isQuery(): boolean {
-      return isQuery(this.types);
-    },
-
-    isRecordModel(): boolean {
-      return isRecordModel(this.types);
-    },
-
-    isFolder(): boolean {
-      return isFolder(this.types);
-    },
-
-    isProperty(): boolean {
-      return isProperty(this.types);
-    },
-
-    ...mapState(["conceptIri", "selectedEntityType", "conceptActivePanel", "activeModule", "favourites"])
-  },
-  watch: {
-    async conceptIri() {
-      await this.init();
-    },
-
-    selectedEntityType(newValue, oldValue) {
-      this.setActivePanel(newValue, oldValue);
-    },
-
-    async conceptActivePanel() {
-      this.active = this.conceptActivePanel;
-    },
-
-    active(newValue) {
-      this.$store.commit("updateConceptActivePanel", newValue);
-    },
-
-    types() {
-      if (this.isFolder) {
-        if ("activeElement" in document) {
-          (document.activeElement as HTMLElement).blur();
-        }
-        this.active = 0;
-      }
-    }
-  },
-  async mounted() {
-    await this.init();
-  },
-  data() {
-    return {
-      loading: true,
-      tabMap: {} as Map<string, number>,
-      editDialogView: true,
-      showDownloadDialog: false,
-      concept: {} as any,
-      definitionText: "",
-      display: false,
-      types: [] as TTIriRef[],
-      header: "",
-      dialogHeader: "",
-      active: 0,
-      profile: {} as Models.Query.Profile,
-      copyMenuItems: [] as any,
-      definitionConfig: [] as DefinitionConfig[],
-      summaryConfig: [] as DefinitionConfig[],
-      conceptAsString: "",
-      terms: [] as any[],
-      items: [
-        {
-          label: "JSON Format",
-          command: () => {
-            this.downloadOption("json");
-          }
-        },
-        {
-          label: "Turtle Format",
-          command: () => {
-            this.downloadOption("turtle");
-          }
-        }
-        // {label: "Custom Format",
-        // command: () => {
-        //     this.downloadOption("custom");
-        //   }
-        // }
-      ] as any,
-      selectedOption: {} as any,
-      splitterRightSize: 0,
-      dataSet: {} as any
-    };
-  },
-  methods: {
-    updateFavourites(data: any) {
-      if (isObjectHasKeys(data)) this.$store.commit("updateFavourites", data["@id"]);
-    },
-
-    isFavourite(iri: string) {
-      if (!this.favourites.length) return false;
-      return this.favourites.includes(iri);
-    },
-
-    directToEditRoute() {
-      this.$directService.directTo(this.$env.EDITOR_URL, this.conceptIri, "editor");
-    },
-
-    directToCreateRoute(): void {
-      this.$router.push({ name: "Create" });
-    },
-
-    async getTerms(iri: string) {
-      const entity = await this.$entityService.getPartialEntity(iri, [IM.HAS_TERM_CODE]);
-      this.terms = isObjectHasKeys(entity, [IM.HAS_TERM_CODE])
-        ? (entity[IM.HAS_TERM_CODE] as []).map(term => {
-            return { name: term[RDFS.LABEL], code: term[IM.CODE] };
-          })
-        : [];
-    },
-
-    async getConcept(iri: string): Promise<void> {
-      const configs = this.definitionConfig.concat(this.summaryConfig);
-
-      const predicates = configs
-        .filter((c: DefinitionConfig) => c.type !== "Divider")
-        .filter((c: DefinitionConfig) => c.predicate !== "subtypes")
-        .filter((c: DefinitionConfig) => c.predicate !== "termCodes")
-        .filter((c: DefinitionConfig) => c.predicate !== "@id")
-        .filter((c: DefinitionConfig) => c.predicate !== "None")
-        .filter((c: DefinitionConfig) => c.predicate !== undefined)
-        .map((c: DefinitionConfig) => c.predicate);
-
-      if (predicates.includes("inferred")) {
-        predicates.splice(predicates.indexOf("inferred"), 1, "http://endhealth.info/im#definition");
-      }
-      this.concept = await this.$entityService.getPartialEntity(iri, predicates);
-      this.concept["@id"] = iri;
-      const result = await this.$entityService.getPagedChildren(iri, 1, 10);
-      if (result && isObjectHasKeys(result, ["result", "totalCount"])) {
-        const resultChildren = result.result.map((child: EntityReferenceNode) => {
-          return { "@id": child["@id"], name: child.name };
-        });
-        this.concept["subtypes"] = { children: resultChildren, totalCount: result.totalCount, loadMore: this.loadMore };
-      }
-      this.concept["termCodes"] = await this.$entityService.getEntityTermCodes(iri);
-
-      this.profile = new Models.Query.Profile(this.concept);
-    },
-
-    async getDefinition(iri: string): Promise<void> {
-      const result = await this.$entityService.getDefinitionBundle(iri);
-      const hasMember = await this.$entityService.getPartialAndTotalCount(iri, IM.HAS_MEMBER, 1, 10);
-      if (hasMember.totalCount !== 0 && isTTBundle(result)) {
-        result.entity[IM.HAS_MEMBER] = hasMember.result;
-        result.predicates[IM.HAS_MEMBER] = "has member";
-      }
-      if (hasMember.totalCount >= 10 && isTTBundle(result)) {
-        result.entity[IM.HAS_MEMBER] = result.entity[IM.HAS_MEMBER].concat({ "@id": this.conceptIri, name: "see more..." });
-      }
-
-      if (isObjectHasKeys(result, ["entity"]) && isObjectHasKeys(result.entity, [RDFS.SUBCLASS_OF, IM.ROLE_GROUP])) {
-        const roleGroup = result.entity[IM.ROLE_GROUP];
-        delete result.entity[IM.ROLE_GROUP];
-        const newRoleGroup: any = {};
-        newRoleGroup[IM.ROLE_GROUP] = roleGroup;
-        result.entity[RDFS.SUBCLASS_OF].push(newRoleGroup);
-      }
-      this.concept[IM.DEFINITION] = result;
-    },
-
-    async getConfig(name: string): Promise<DefinitionConfig[]> {
-      const configs = await this.$configService.getComponentLayout(name);
-      if (configs.every(config => isObjectHasKeys(config, ["order"]))) {
-        configs.sort(byOrder);
-      } else {
-        this.$loggerService.error(undefined, "Failed to sort config for definition component layout. One or more config items are missing 'order' property.");
-      }
-      return configs;
-    },
-
-    async init(): Promise<void> {
-      this.loading = true;
-      this.definitionConfig = await this.getConfig("definition");
-      this.summaryConfig = await this.getConfig("summary");
-      await this.getConcept(this.conceptIri);
-      await this.getDefinition(this.conceptIri);
-      await this.getTerms(this.conceptIri);
-      this.types = isObjectHasKeys(this.concept, [RDF.TYPE]) ? this.concept[RDF.TYPE] : ([] as TTIriRef[]);
-      if (this.isQuery) await this.getQueryDefinition(this.conceptIri);
-      this.header = this.concept[RDFS.LABEL];
-      await this.setCopyMenuItems();
-      this.setStoreType();
-      const allConfigs = this.definitionConfig.concat(this.summaryConfig);
-      this.conceptAsString = copyConceptToClipboard(this.concept, allConfigs, undefined, Config.XmlSchemaDatatypes);
-      this.tabMap = new Map<string, number>();
-      this.setTabMap();
-      this.loading = false;
-      document.title = this.header || "";
-    },
-
-    setStoreType(): void {
-      let type;
-      if (this.isSet) {
-        type = "Sets";
-      } else if (this.isConcept && !this.isRecordModel) {
-        type = "Ontology";
-      } else if (this.isQuery) {
-        type = "Queries";
-      } else if (this.isRecordModel) {
-        type = "DataModel";
-      } else if (this.isProperty) {
-        type = "Property";
-      } else {
-        type = this.activeModule;
-        this.active = 0;
-      }
-      this.$store.commit("updateSelectedEntityType", type);
-    },
-
-    setActivePanel(newType: string, oldType: string): void {
-      if (newType === oldType) {
-        this.active = this.conceptActivePanel;
-      } else {
-        if (this.isSet) {
-          this.active = this.tabMap.get("Members") || 0;
-        } else if (this.isRecordModel) {
-          this.active = this.tabMap.get("Properties") || 0;
-        } else if (this.isQuery) {
-          this.active = this.tabMap.get("Query") || 0;
-        } else {
-          this.active = 0;
-        }
-      }
-    },
-
-    setTabMap() {
-      const tabList = document.getElementsByClassName("p-tabview-nav-content")?.[0]?.children?.[0]?.children as HTMLCollectionOf<HTMLElement>;
-      if (tabList && tabList.length)
-        for (let i = 0; i < tabList.length; i++) {
-          if (tabList[i].innerText) this.tabMap.set(tabList[i].innerText, i);
-        }
-    },
-
-    openDownloadDialog(): void {
-      this.showDownloadDialog = true;
-    },
-
-    closeDownloadDialog(): void {
-      this.showDownloadDialog = false;
-    },
-
-    async setCopyMenuItems(): Promise<void> {
-      this.copyMenuItems = [
-        {
-          label: "Copy",
-          disabled: true
-        },
-        {
-          separator: true
-        },
-        {
-          label: "All",
-          command: async () => {
-            await navigator.clipboard
-              .writeText(copyConceptToClipboard(this.concept, this.definitionConfig.concat(this.summaryConfig), undefined, Config.XmlSchemaDatatypes))
-              .then(() => {
-                this.$toast.add(this.$loggerService.success("Concept copied to clipboard"));
-              })
-              .catch(err => {
-                this.$toast.add(this.$loggerService.error("Failed to copy concept to clipboard", err));
-              });
-          }
-        }
-      ];
-
-      let key: string;
-      let value: any;
-      for ([key, value] of Object.entries(this.concept)) {
-        let result = conceptObjectToCopyString(key, value, 0, 1, this.definitionConfig.concat(this.summaryConfig));
-        if (!result || !result.value) continue;
-        const label = result.label;
-        const text = result.value;
-        this.copyMenuItems.push({
-          label: label,
-          command: async () => {
-            await navigator.clipboard
-              .writeText(text)
-              .then(() => {
-                this.$toast.add(this.$loggerService.success(label + " copied to clipboard"));
-              })
-              .catch(err => {
-                this.$toast.add(this.$loggerService.error("Failed to copy " + label + " to clipboard", err));
-              });
-          }
-        });
-      }
-    },
-
-    isObjectHasKeysWrapper(object: any, keys?: string[]) {
-      if (keys) return isObjectHasKeys(object, keys);
-      else return isObjectHasKeys(object);
-    },
-
-    async exportConcept(format: any) {
-      this.loading = true;
-      const result = await this.$entityService.downloadConcept(this.conceptIri, format);
-      this.loading = false;
-      const url = window.URL.createObjectURL(new Blob([result], { type: format === "turtle" ? "text/plain" : "application/javascript" }));
-      const link = document.createElement("a");
-      link.href = url;
-      const ending = format === "turtle" ? ".txt" : ".json";
-      link.download = "Concept" + ending;
-      link.click();
-    },
-    downloadOption(format: any) {
-      if (format === "custom") {
-        this.openDownloadDialog();
-      } else {
-        this.exportConcept(format);
-      }
-    },
-
-    toggle(event: any, refId: string) {
-      const x = this.$refs[refId] as any;
-      x.toggle(event);
-    },
-
-    async loadMore(children: any[], totalCount: number, nextPage: number, pageSize: number, loadButton: boolean, iri: string) {
-      if (loadButton) {
-        if (nextPage * pageSize < totalCount) {
-          const result = await this.$entityService.getPagedChildren(iri, nextPage, pageSize);
-          const resultChildren = result.result.map((child: EntityReferenceNode) => {
-            return { "@id": child["@id"], name: child.name };
-          });
-          children = children.concat(resultChildren);
-          nextPage = nextPage + 1;
-          loadButton = true;
-        } else if (nextPage * pageSize > totalCount) {
-          const result = await this.$entityService.getPagedChildren(iri, nextPage, pageSize);
-          const resultChildren = result.result.map((child: EntityReferenceNode) => {
-            return { "@id": child["@id"], name: child.name };
-          });
-          children = children.concat(resultChildren);
-          loadButton = false;
-        } else {
-          loadButton = false;
-        }
-      }
-      return { children: children, totalCount: totalCount, nextPage: nextPage, pageSize: pageSize, loadButton: loadButton, iri: iri };
-    },
-
-    updateSplitter(event: any) {
-      this.splitterRightSize = event.sizes[1];
-    },
-
-    async getQueryDefinition(iri: string) {
-      this.dataSet = await this.$queryService.querySummary(iri);
-    }
+  set(newValue: any) {
+    store.commit("updateActiveProfile", newValue);
   }
 });
+
+const showGraph = computed(() => isOfTypes(types.value, IM.CONCEPT, SHACL.NODESHAPE));
+const showMappings = computed(() => (isConcept(types.value) || isOfTypes(types.value, RDFS.CLASS)) && !isRecordModel(types.value));
+
+const entityService = new EntityService(axios);
+const configService = new ConfigService(axios);
+const directService = new DirectService(axios);
+const queryService = new QueryService(axios);
+
+let loading = ref(true);
+let tabMap = reactive(new Map<string, number>());
+let editDialogView = ref(true);
+let showDownloadDialog = ref(false);
+let concept: Ref<any> = ref({});
+let definitionText = ref("");
+let display = ref(false);
+let types: Ref<TTIriRef[]> = ref([]);
+let header = ref("");
+let dialogHeader = ref("");
+let active = ref(0);
+let profile = ref({} as Models.Query.Profile);
+let copyMenuItems: Ref<any[]> = ref([]);
+let definitionConfig: Ref<DefinitionConfig[]> = ref([]);
+let summaryConfig: Ref<DefinitionConfig[]> = ref([]);
+let conceptAsString = ref("");
+let terms: Ref<any[]> = ref([]);
+let selectedOption: Ref<any> = ref({});
+let splitterRightSize = ref(0);
+let dataSet: Ref<any> = ref({});
+let items: Ref<MenuItem[]> = ref([
+  {
+    label: "JSON Format",
+    command: () => {
+      downloadOption("json");
+    }
+  },
+  {
+    label: "Turtle Format",
+    command: () => {
+      downloadOption("turtle");
+    }
+  }
+  // {label: "Custom Format",
+  // command: () => {
+  //     this.downloadOption("custom");
+  //   }
+  // }
+]);
+
+const copyMenu = ref();
+const downloadMenu = ref();
+
+watch(
+  () => conceptIri.value,
+  () => {
+    init();
+  }
+);
+watch(
+  () => selectedEntityType.value,
+  (newValue, oldValue) => {
+    setActivePanel(newValue, oldValue);
+  }
+);
+watch(
+  () => conceptActivePanel.value,
+  newValue => {
+    active = newValue;
+  }
+);
+watch(active, newValue => {
+  store.commit("updateConceptActivePanel", newValue);
+});
+watch(types, newValue => {
+  if (isFolder(newValue)) {
+    if ("activeElement" in document) {
+      (document.activeElement as HTMLElement).blur();
+    }
+    active.value = 0;
+  }
+});
+
+onMounted(async () => {
+  await init();
+});
+
+function updateFavourites(data: any) {
+  if (isObjectHasKeys(data)) store.commit("updateFavourites", data["@id"]);
+}
+
+function isFavourite(iri: string) {
+  if (!favourites.value.length) return false;
+  return favourites.value.includes(iri);
+}
+
+function directToEditRoute() {
+  directService.directTo(Env.EDITOR_URL, conceptIri.value, "editor");
+}
+
+function directToCreateRoute(): void {
+  router.push({ name: "Create" });
+}
+
+async function getTerms(iri: string) {
+  const entity = await entityService.getPartialEntity(iri, [IM.HAS_TERM_CODE]);
+  terms.value = isObjectHasKeys(entity, [IM.HAS_TERM_CODE])
+    ? (entity[IM.HAS_TERM_CODE] as []).map(term => {
+        return { name: term[RDFS.LABEL], code: term[IM.CODE] };
+      })
+    : [];
+}
+
+async function getConcept(iri: string): Promise<void> {
+  const configs = definitionConfig.value.concat(summaryConfig.value);
+
+  const predicates = configs
+    .filter((c: DefinitionConfig) => c.type !== "Divider")
+    .filter((c: DefinitionConfig) => c.predicate !== "subtypes")
+    .filter((c: DefinitionConfig) => c.predicate !== "termCodes")
+    .filter((c: DefinitionConfig) => c.predicate !== "@id")
+    .filter((c: DefinitionConfig) => c.predicate !== "None")
+    .filter((c: DefinitionConfig) => c.predicate !== undefined)
+    .map((c: DefinitionConfig) => c.predicate);
+
+  if (predicates.includes("inferred")) {
+    predicates.splice(predicates.indexOf("inferred"), 1, "http://endhealth.info/im#definition");
+  }
+  concept.value = await entityService.getPartialEntity(iri, predicates);
+  concept.value["@id"] = iri;
+  const result = await entityService.getPagedChildren(iri, 1, 10);
+  if (result && isObjectHasKeys(result, ["result", "totalCount"])) {
+    const resultChildren = result.result.map((child: EntityReferenceNode) => {
+      return { "@id": child["@id"], name: child.name };
+    });
+    concept.value["subtypes"] = { children: resultChildren, totalCount: result.totalCount, loadMore: loadMore };
+  }
+  concept.value["termCodes"] = await entityService.getEntityTermCodes(iri);
+
+  profile.value = new Models.Query.Profile(concept.value);
+}
+
+async function getDefinition(iri: string): Promise<void> {
+  const result = await entityService.getDefinitionBundle(iri);
+  const hasMember = await entityService.getPartialAndTotalCount(iri, IM.HAS_MEMBER, 1, 10);
+  if (hasMember.totalCount !== 0 && isTTBundle(result)) {
+    result.entity[IM.HAS_MEMBER] = hasMember.result;
+    result.predicates[IM.HAS_MEMBER] = "has member";
+  }
+  if (hasMember.totalCount >= 10 && isTTBundle(result)) {
+    result.entity[IM.HAS_MEMBER] = result.entity[IM.HAS_MEMBER].concat({ "@id": conceptIri.value, name: "see more..." });
+  }
+
+  if (isObjectHasKeys(result, ["entity"]) && isObjectHasKeys(result.entity, [RDFS.SUBCLASS_OF, IM.ROLE_GROUP])) {
+    const roleGroup = result.entity[IM.ROLE_GROUP];
+    delete result.entity[IM.ROLE_GROUP];
+    const newRoleGroup: any = {};
+    newRoleGroup[IM.ROLE_GROUP] = roleGroup;
+    result.entity[RDFS.SUBCLASS_OF].push(newRoleGroup);
+  }
+  concept.value[IM.DEFINITION] = result;
+}
+
+async function getConfig(name: string): Promise<DefinitionConfig[]> {
+  const configs = await configService.getComponentLayout(name);
+  if (configs.every(config => isObjectHasKeys(config, ["order"]))) {
+    configs.sort(byOrder);
+  } else {
+    LoggerService.error(undefined, "Failed to sort config for definition component layout. One or more config items are missing 'order' property.");
+  }
+  return configs;
+}
+
+async function init(): Promise<void> {
+  loading.value = true;
+  definitionConfig.value = await getConfig("definition");
+  summaryConfig.value = await getConfig("summary");
+  await getConcept(conceptIri.value);
+  await getDefinition(conceptIri.value);
+  await getTerms(conceptIri.value);
+  types.value = isObjectHasKeys(concept.value, [RDF.TYPE]) ? concept.value[RDF.TYPE] : ([] as TTIriRef[]);
+  if (isQuery(types.value)) await getQueryDefinition(conceptIri.value);
+  header.value = concept.value[RDFS.LABEL];
+  await setCopyMenuItems();
+  setStoreType();
+  const allConfigs = definitionConfig.value.concat(summaryConfig.value);
+  conceptAsString.value = copyConceptToClipboard(concept.value, allConfigs, undefined, Config.XmlSchemaDatatypes);
+  tabMap.clear;
+  setTabMap();
+  loading.value = false;
+  document.title = header.value || "";
+}
+
+function setStoreType(): void {
+  let type;
+  if (isValueSet(types.value)) {
+    type = "Sets";
+  } else if (isConcept(types.value) && !isRecordModel(types.value)) {
+    type = "Ontology";
+  } else if (isQuery(types.value)) {
+    type = "Queries";
+  } else if (isRecordModel(types.value)) {
+    type = "DataModel";
+  } else if (isProperty(types.value)) {
+    type = "Property";
+  } else {
+    type = activeModule.value;
+    active.value = 0;
+  }
+  store.commit("updateSelectedEntityType", type);
+}
+
+function setActivePanel(newType: string, oldType: string): void {
+  if (newType === oldType) {
+    active.value = conceptActivePanel.value;
+  } else {
+    if (isValueSet(types.value)) {
+      active.value = tabMap.get("Members") || 0;
+    } else if (isRecordModel(types.value)) {
+      active.value = tabMap.get("Properties") || 0;
+    } else if (isQuery(types.value)) {
+      active.value = tabMap.get("Query") || 0;
+    } else {
+      active.value = 0;
+    }
+  }
+}
+
+function setTabMap() {
+  const tabList = document.getElementsByClassName("p-tabview-nav-content")?.[0]?.children?.[0]?.children as HTMLCollectionOf<HTMLElement>;
+  if (tabList && tabList.length)
+    for (let i = 0; i < tabList.length; i++) {
+      if (tabList[i].innerText) tabMap.set(tabList[i].innerText, i);
+    }
+}
+
+function openDownloadDialog(): void {
+  showDownloadDialog.value = true;
+}
+
+function closeDownloadDialog(): void {
+  showDownloadDialog.value = false;
+}
+
+async function setCopyMenuItems(): Promise<void> {
+  copyMenuItems.value = [
+    {
+      label: "Copy",
+      disabled: true
+    },
+    {
+      separator: true
+    },
+    {
+      label: "All",
+      command: async () => {
+        await navigator.clipboard
+          .writeText(copyConceptToClipboard(concept.value, definitionConfig.value.concat(summaryConfig.value), undefined, Config.XmlSchemaDatatypes))
+          .then(() => {
+            toast.add(LoggerService.success("Concept copied to clipboard"));
+          })
+          .catch(err => {
+            toast.add(LoggerService.error("Failed to copy concept to clipboard", err));
+          });
+      }
+    }
+  ];
+
+  let key: string;
+  let value: any;
+  for ([key, value] of Object.entries(concept.value)) {
+    let result = conceptObjectToCopyString(key, value, 0, 1, definitionConfig.value.concat(summaryConfig.value));
+    if (!result || !result.value) continue;
+    const label = result.label;
+    const text = result.value;
+    copyMenuItems.value.push({
+      label: label,
+      command: async () => {
+        await navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            toast.add(LoggerService.success(label + " copied to clipboard"));
+          })
+          .catch(err => {
+            toast.add(LoggerService.error("Failed to copy " + label + " to clipboard", err));
+          });
+      }
+    });
+  }
+}
+
+function isObjectHasKeysWrapper(object: any, keys?: string[]) {
+  if (keys) return isObjectHasKeys(object, keys);
+  else return isObjectHasKeys(object);
+}
+
+async function exportConcept(format: any) {
+  loading.value = true;
+  const result = await entityService.downloadConcept(conceptIri.value, format);
+  loading.value = false;
+  const url = window.URL.createObjectURL(new Blob([result], { type: format === "turtle" ? "text/plain" : "application/javascript" }));
+  const link = document.createElement("a");
+  link.href = url;
+  const ending = format === "turtle" ? ".txt" : ".json";
+  link.download = "Concept" + ending;
+  link.click();
+}
+
+function downloadOption(format: any) {
+  if (format === "custom") {
+    openDownloadDialog();
+  } else {
+    exportConcept(format);
+  }
+}
+
+function toggleDownloadMenu(event: any) {
+  const x = downloadMenu.value as any;
+  x.toggle(event);
+}
+
+function toggleCopyMenu(event: any) {
+  const x = copyMenu.value as any;
+  x.toggle(event);
+}
+
+async function loadMore(children: any[], totalCount: number, nextPage: number, pageSize: number, loadButton: boolean, iri: string) {
+  if (loadButton) {
+    if (nextPage * pageSize < totalCount) {
+      const result = await entityService.getPagedChildren(iri, nextPage, pageSize);
+      const resultChildren = result.result.map((child: EntityReferenceNode) => {
+        return { "@id": child["@id"], name: child.name };
+      });
+      children = children.concat(resultChildren);
+      nextPage = nextPage + 1;
+      loadButton = true;
+    } else if (nextPage * pageSize > totalCount) {
+      const result = await entityService.getPagedChildren(iri, nextPage, pageSize);
+      const resultChildren = result.result.map((child: EntityReferenceNode) => {
+        return { "@id": child["@id"], name: child.name };
+      });
+      children = children.concat(resultChildren);
+      loadButton = false;
+    } else {
+      loadButton = false;
+    }
+  }
+  return { children: children, totalCount: totalCount, nextPage: nextPage, pageSize: pageSize, loadButton: loadButton, iri: iri };
+}
+
+function updateSplitter(event: any) {
+  splitterRightSize.value = event.sizes[1];
+}
+
+async function getQueryDefinition(iri: string) {
+  dataSet.value = await queryService.querySummary(iri);
+}
 </script>
 <style>
 #concept-main-container {

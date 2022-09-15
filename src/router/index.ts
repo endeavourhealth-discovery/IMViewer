@@ -3,11 +3,14 @@ import Home from "../views/Home.vue";
 import Concept from "../views/Concept.vue";
 import store from "@/store/index";
 import { nextTick } from "vue";
-import { AccessDenied, PageNotFound, SnomedLicense, EntityNotFound, Helpers, Config } from "im-library";
+import { AccessDenied, PageNotFound, SnomedLicense, EntityNotFound, Helpers, Config, Services } from "im-library";
+import axios from "axios";
 const {
   DataTypeCheckers: { isObjectHasKeys }
 } = Helpers;
-import vm from "@/main";
+const { Env, EntityService } = Services;
+
+const entityService = new EntityService(axios);
 
 const APP_TITLE = "IM Viewer";
 
@@ -59,7 +62,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from) => {
   const iri = to.params.selectedIri as string;
-  const currentUrl = vm.$env.VIEWER_URL + to.path.slice(1);
+  const currentUrl = Env.VIEWER_URL + to.path.slice(1);
   if (to.path !== "/snomedLicense") {
     store.commit("updateSnomedReturnUrl", currentUrl);
     store.commit("updateAuthReturnUrl", currentUrl);
@@ -68,7 +71,7 @@ router.beforeEach(async (to, from) => {
     return false;
   }
   if (iri) {
-    store.commit("updateRecentLocalActivity", { iri: iri, dateTime: new Date(), app: vm.$env.VIEWER_URL });
+    store.commit("updateRecentLocalActivity", { iri: iri, dateTime: new Date(), app: Env.VIEWER_URL });
     store.commit("updateConceptIri", to.params.selectedIri as string);
   }
   if (to.matched.some((record: any) => record.meta.requiresAuth)) {
@@ -76,7 +79,7 @@ router.beforeEach(async (to, from) => {
     console.log("auth guard user authenticated: " + res.authenticated);
     if (!res.authenticated) {
       console.log("redirecting to login");
-      window.location.href = vm.$env.AUTH_URL + "login?returnUrl=" + currentUrl;
+      window.location.href = Env.AUTH_URL + "login?returnUrl=" + currentUrl;
     }
   }
   if (to.matched.some((record: any) => record.meta.requiresLicense)) {
@@ -90,7 +93,7 @@ router.beforeEach(async (to, from) => {
   if (to.name === "Concept" && isObjectHasKeys(to.params, ["selectedIri"])) {
     try {
       new URL(iri);
-      if (!(await vm.$entityService.iriExists(iri))) {
+      if (!(await entityService.iriExists(iri))) {
         router.push({ name: "EntityNotFound" });
       }
     } catch (_error) {

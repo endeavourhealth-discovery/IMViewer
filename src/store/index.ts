@@ -1,12 +1,11 @@
 import { createStore } from "vuex";
 import AuthService from "@/services/AuthService";
-import { Models, Vocabulary, Constants } from "im-library";
+import { Models, Vocabulary, Constants, Services } from "im-library";
 import { RecentActivityItem } from "im-library/dist/types/interfaces/Interfaces";
 const { User, CustomAlert } = Models;
 const { IM } = Vocabulary;
 const { Avatars } = Constants;
-
-import vm from "@/main";
+const { LoggerService } = Services;
 
 export default createStore({
   // update stateType.ts when adding new state!
@@ -134,9 +133,9 @@ export default createStore({
         } else {
           dispatch("logoutCurrentUser").then(resLogout => {
             if (resLogout.status === 200) {
-              vm.$loggerService.info(undefined, "Force logout successful");
+              LoggerService.info(undefined, "Force logout successful");
             } else {
-              vm.$loggerService.error(undefined, "Force logout failed");
+              LoggerService.error(undefined, "Force logout failed");
             }
           });
         }
