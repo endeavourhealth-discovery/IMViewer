@@ -132,7 +132,7 @@ export default defineComponent({
           command: () => {
             const index = parent.data.children.findIndex((c:any) => c.iri && node.iri ? c.iri === node.iri : c.name === node.name);
             parent.data.children.splice(index,1);
-            if(parent.data.name.startsWith("middle-node") && parent.data.children.length === 1 ){
+            if( !parent.data.relToParent.startsWith("Group Number") && parent.data.name.startsWith("middle-node") && parent.data.children.length === 1 ){
               const cnode = parent.data.children[0];
               cnode.relToParent = parent.data.relToParent;
               const gparent = parent.parent;
