@@ -6,6 +6,7 @@ import Checkbox from "primevue/checkbox";
 import Column from "primevue/column";
 import Button from "primevue/button";
 import Menu from "primevue/menu";
+import { setupServer } from "msw/node";
 
 describe("Members.vue", () => {
   let wrapper;
@@ -109,6 +110,21 @@ describe("Members.vue", () => {
       directParent: { name: "African", "@id": "http://endhealth.info/im#VSET_EthnicCategoryCEG16_N" }
     }
   ];
+
+  const restHandlers = [];
+  const server = setupServer(...restHandlers);
+
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+  });
 
   beforeEach(async () => {
     vi.resetAllMocks();

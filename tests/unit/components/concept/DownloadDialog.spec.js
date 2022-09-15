@@ -5,6 +5,7 @@ import SelectButton from "primevue/selectbutton";
 import Checkbox from "primevue/checkbox";
 import Button from "primevue/button";
 import ProgressSpinner from "primevue/progressspinner";
+import { setupServer } from "msw/node";
 import { Vocabulary, Services } from "im-library";
 const { IM, RDFS } = Vocabulary;
 const { Env } = Services;
@@ -93,6 +94,21 @@ describe("DownloadDialog.vue", () => {
   let mockToast;
   let mockEntityService;
   let mockLoggerService;
+
+  const restHandlers = [];
+  const server = setupServer(...restHandlers);
+
+  beforeAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+  });
 
   beforeEach(async () => {
     vi.resetAllMocks();
