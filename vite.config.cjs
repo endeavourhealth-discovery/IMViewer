@@ -12,20 +12,20 @@ export default defineConfig({
   server: {
     port: 8082,
     proxy: {
-        '/imapi': {
-            target: 'http://localhost:8080',
-            changeOrigin: true,
-            secure: false,
-            ws: true,
-            rewrite: (p) => p.replace(/^\/imapi/, '')
-        },
-        '/nodeapi': {
-            target: 'http://localhost:3000',
-            changeOrigin: true,
-            secure: false,
-            ws: true,
-            rewrite: (p) => p.replace(/^\/nodeapi/, '')
-        }
+      "/imapi": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+        rewrite: p => p.replace(/^\/imapi/, "")
+      },
+      "/nodeapi": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+        rewrite: p => p.replace(/^\/nodeapi/, "")
+      }
     }
   },
   optimizeDeps: {
@@ -41,6 +41,7 @@ export default defineConfig({
     },
     coverage: {
       reporter: ["text", "lcov"]
-    }
-  },
+    },
+    setupFiles: "./tests/setupTests.js"
+  }
 });
