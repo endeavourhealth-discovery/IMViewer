@@ -15,6 +15,7 @@
       <Button class="svg-pan-zoom-control p-button-secondary" icon="pi pi-minus" @click="zoomOut" />
     </div>
   </div>
+  <ContextMenu ref="menu" :model="contextMenu" />
 </template>
 
 <script lang="ts">
@@ -22,10 +23,12 @@ import { defineComponent, PropType } from "@vue/runtime-core";
 import * as d3 from "d3";
 import svgPanZoom from "svg-pan-zoom";
 import { RouteRecordName } from "vue-router";
-import { TTGraphData } from "im-library/dist/types/interfaces/Interfaces";
-import { Helpers } from "im-library";
+import {TTGraphData} from "im-library/dist/types/interfaces/Interfaces";
+import {Config, Helpers, Vocabulary} from "im-library";
+import ContextMenu from "primevue/contextmenu";
+const { IM } = Vocabulary;
 const {
-  GraphTranslator: { translateFromEntityBundle, toggleNodeByName, hasNodeChildrenByName },
+  GraphTranslator: { translateFromEntityBundle, toggleNodeByName, hasNodeChildrenByName, addNodes },
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }
 } = Helpers;
 
@@ -76,7 +79,11 @@ export default defineComponent({
         },
         font: {},
         path: { fill: "", stroke: "#AAAAAA" }
-      }
+      },
+
+      contextMenu: [] as {iri:string, label:string, command: (d:any) => void, disabled?:boolean} [],
+      graphExcludePredicates: Config.GraphExcludePredicates,
+
     };
   },
   mounted() {
@@ -91,6 +98,52 @@ export default defineComponent({
   methods: {
     onResize() {
       this.drawGraph();
+    },
+
+    async getContextMenu(d: any) {
+      let node = d.path[0]["__data__"]["data"] as TTGraphData;
+      this.contextMenu = [] as {iri:string, label:string, command: (d:any) => void, disabled?:boolean} [];
+      if(node.iri && !node.name.startsWith("middle-node")){
+        const bundle = await this.$entityService.getBundleByPredicateExclusions(node.iri, [IM.HAS_MEMBER]);
+        const hasMember = await this.$entityService.getPartialAndTotalCount(node.iri, IM.HAS_MEMBER, 1, 10);
+        if (hasMember.totalCount !== 0) {
+          bundle.entity[IM.HAS_MEMBER] = hasMember.result;
+          bundle.predicates[IM.HAS_MEMBER] = "has member";
+        }
+        if (hasMember.totalCount >= 10) {
+          bundle.entity[IM.HAS_MEMBER] = bundle.entity[IM.HAS_MEMBER].concat({ "@id": "seeMore", name: "see more..." });
+        }
+        Object.keys(bundle.entity).filter(value => value !== "@id").filter(value => !this.graphExcludePredicates.includes(value)).forEach((key: string) => {
+          this.contextMenu.push({
+            iri:key,
+            label:bundle.predicates[key],
+            command: () => {
+              addNodes(bundle.entity, [key], node, bundle.predicates);
+              this.redrawGraph();
+            }
+          });
+        });
+      }
+      const parent = d.path[0]["__data__"]["parent"];
+      if(parent){
+        this.contextMenu.push({
+          iri: "hide",
+          label: "hide",
+          command: () => {
+            const index = parent.data.children.findIndex((c:any) => c.iri && node.iri ? c.iri === node.iri : c.name === node.name);
+            parent.data.children.splice(index,1);
+            if( !parent.data.relToParent.startsWith("Group Number") && parent.data.name.startsWith("middle-node") && parent.data.children.length === 1 ){
+              const cnode = parent.data.children[0];
+              cnode.relToParent = parent.data.relToParent;
+              const gparent = parent.parent;
+              const index = gparent.data.children.findIndex((c:any) => c.name === parent.data.name);
+              gparent.data.children.splice(index,1);
+              gparent.data.children.push(cnode);
+            }
+            this.redrawGraph();
+          }
+        });
+      }
     },
 
     drawGraph() {
@@ -153,7 +206,12 @@ export default defineComponent({
           return hasNodeChildrenByName(this.data, d.data.name) ? this.colour.inactiveNode.fill : this.colour.activeNode.fill;
         })
         .attr("stroke", (d: any) => (hasNodeChildrenByName(this.data, d.data.name) ? this.colour.inactiveNode.stroke : this.colour.activeNode.stroke))
-        .attr("r", () => this.radius)
+        .attr("r", (d: any) => {
+          if(d.data.name !== undefined && typeof d.data.name === 'string' && d.data.name.startsWith("middle-node")){
+            return 3;
+          }
+          return this.radius;
+        })
         .call(this.drag(this.simulation) as any);
 
       const div = d3
@@ -178,23 +236,34 @@ export default defineComponent({
         .on("dblclick", (d: any) => this.dblclick(d))
         .on("click", (d: any) => this.click(d))
         .on("mouseover", (d: any) => {
-          div
-            .transition()
-            .duration(200)
-            .style("opacity", 0.9);
-          div
-            .html(d.path[0]["__data__"]["data"]["name"] + "<div/> Press ctr+click to navigate")
-            .style("left", d.layerX + "px")
-            .style("top", d.layerY + 10 + "px");
+          const name = d.path[0]["__data__"]["data"]["name"];
+          if(name !== undefined && typeof name === 'string' && !name.startsWith("middle-node")) {
+            div
+                .transition()
+                .duration(200)
+                .style("opacity", 0.9);
+            div
+                .html(name + "<div/> Press ctr+click to navigate")
+                .style("left", d.layerX + "px")
+                .style("top", d.layerY + 10 + "px");
+          }
         })
         .on("mouseout", (_d: any) => {
           div
             .transition()
             .duration(500)
             .style("opacity", 0);
+        })
+        .on('contextmenu', (e) => {
+          this.getContextMenu(e);
+          (this.$refs.menu as ContextMenu).show(e);
         });
 
       const nodeText = nodeTextWrapper.append("xhtml:p").text((d: any) => {
+        if(d.data.name !== undefined && typeof d.data.name === 'string' && d.data.name.startsWith("middle-node")) {
+          return "";
+        }
+
         if (!d.data.name) {
           return "undefined";
         }
