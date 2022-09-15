@@ -9,21 +9,6 @@ const { User, CustomAlert } = Models;
 const testUser = new User("devtest", "John", "Doe", "john.doe@ergosoft.co.uk", "12345678", "colour/002-man.png");
 
 describe("AuthService", () => {
-  const restHandlers = [];
-  const server = setupServer(...restHandlers);
-
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "error" });
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
-  afterEach(() => {
-    server.resetHandlers();
-  });
-
   describe("signOut", () => {
     beforeEach(() => {
       vi.clearAllMocks();

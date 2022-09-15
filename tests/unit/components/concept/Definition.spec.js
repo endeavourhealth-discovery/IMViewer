@@ -165,21 +165,6 @@ describe("Definition.vue ___ no headers", () => {
     { label: "Data model properties", predicate: "dataModelProperties", type: "DataModelProperties", size: "100%", order: 11 }
   ];
 
-  const restHandlers = [];
-  const server = setupServer(...restHandlers);
-
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "error" });
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
-  afterEach(() => {
-    server.resetHandlers();
-  });
-
   beforeEach(() => {
     vi.resetAllMocks();
 

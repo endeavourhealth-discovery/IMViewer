@@ -229,21 +229,6 @@ describe("Graph.vue", () => {
     leafNodes: []
   };
 
-  const restHandlers = [];
-  const server = setupServer(...restHandlers);
-
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "error" });
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
-  afterEach(() => {
-    server.resetHandlers();
-  });
-
   beforeEach(() => {
     vi.resetAllMocks();
     mockEntityService = { getEntityGraph: vi.fn().mockResolvedValue(GRAPH) };
