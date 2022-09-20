@@ -23,18 +23,14 @@
             </template>
             <Button type="button" label="Download..." @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" :loading="downloading" />
             <template id="overlay_menu">
-              <Menu ref="menu" v-if="checkAuthorization()" :model="downloadMenu1" :popup="true" appendTo="body"/>
-              <Menu ref="menu" v-else :model="downloadMenu" :popup="true" appendTo="body"/>
+              <Menu ref="menu" v-if="checkAuthorization()" :model="downloadMenu1" :popup="true" appendTo="body" />
+              <Menu ref="menu" v-else :model="downloadMenu" :popup="true" appendTo="body" />
             </template>
           </div>
         </div>
       </template>
-      <template #empty>
-        No members found.
-      </template>
-      <template #loading>
-        Loading data. Please wait...
-      </template>
+      <template #empty> No members found. </template>
+      <template #loading> Loading data. Please wait... </template>
       <Column field="entity.name" header="Name">
         <template #body="slotProps">
           <div v-html="slotProps.data.entity.name" class="name-container"></div>
@@ -49,230 +45,213 @@
             {{ subSet }}
           </span>
         </span>
-        <span v-if="slotProps.data.type === 'IS_SUBSET_OF'" class="group-header">
-          Is Subset Of
-        </span>
-        <span v-if="slotProps.data.type === 'INCLUDED_SELF'" class="group-header">
-          Included Members (self only)
-        </span>
-        <span v-if="slotProps.data.type === 'INCLUDED_DESC'" class="group-header">
-          Included Members (and their descendants)
-        </span>
-        <span v-if="slotProps.data.type === 'EXCLUDED'" class="group-header">
-          Excluded Members (and their descendants)
-        </span>
-        <span v-if="slotProps.data.type === 'EXPANDED'" class="group-header">
-          Expanded Members
-        </span>
-        <span v-if="slotProps.data.type === 'COMPLEX'" class="group-header">
-          Complex Members
-        </span>
+        <span v-if="slotProps.data.type === 'IS_SUBSET_OF'" class="group-header"> Is Subset Of </span>
+        <span v-if="slotProps.data.type === 'INCLUDED_SELF'" class="group-header"> Included Members (self only) </span>
+        <span v-if="slotProps.data.type === 'INCLUDED_DESC'" class="group-header"> Included Members (and their descendants) </span>
+        <span v-if="slotProps.data.type === 'EXCLUDED'" class="group-header"> Excluded Members (and their descendants) </span>
+        <span v-if="slotProps.data.type === 'EXPANDED'" class="group-header"> Expanded Members </span>
+        <span v-if="slotProps.data.type === 'COMPLEX'" class="group-header"> Complex Members </span>
       </template>
     </DataTable>
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Auth } from "aws-amplify";
-import { defineComponent } from "@vue/runtime-core";
+import { defineComponent, onMounted, ref, Ref, watch } from "vue";
 import { ValueSetMember, ExportValueSet } from "im-library/dist/types/interfaces/Interfaces";
-import { Helpers, Vocabulary } from "im-library";
+import { Helpers, Services, Vocabulary } from "im-library";
+import axios from "axios";
+import { useToast } from "primevue/usetoast";
 const {
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }
 } = Helpers;
 const { RDFS, IM } = Vocabulary;
+const { EntityService, LoggerService, SetService } = Services;
 
-export default defineComponent({
-  name: "Members",
-  props: {
-    conceptIri: { type: String, required: true }
-  },
-  watch: {
-    async conceptIri() {
-      await this.getMembers();
-    }
-  },
-  async mounted() {
-    await this.getMembers();
-    this.getUserRoles();
-    await this.getTotalCount();
-    if (this.totalCount >= 10) {
-      this.loadButton = true;
-    }
-  },
-  data() {
-    return {
-      userRoles: [] as string[],
-      loading: false,
-      downloading: false,
-      members: {} as ExportValueSet,
-      combinedMembers: [] as ValueSetMember[],
-      selected: {} as ValueSetMember,
-      subsets: [] as string[],
-      expandedRowGroups: ["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"],
-      downloadMenu: [
-        { label: "Definition Only", command: () => this.download(false, false) },
-        { label: "Core", command: () => this.download(true, false) },
-        { label: "Core & Legacy", command: () => this.download(true, true) },
-        { label: "Core & Legacy (Flat)", command: () => this.download(true, true, true) },
-      ],
-      downloadMenu1: [
-        { label: "Definition Only", command: () => this.download(false, false) },
-        { label: "Core", command: () => this.download(true, false) },
-        { label: "Core & Legacy", command: () => this.download(true, true) },
-        { label: "Core & Legacy (Flat)", command: () => this.download(true, true, true) },
-        { label: "IMv1", command: () => this.downloadIMV1() }
-      ],
-      isPublishing: false,
-      nextPage: 2,
-      pageSize: 20,
-      loadButton: false,
-      totalCount: 0,
-      hasMembers: {} as any,
-      isIncludedSelf: false
-    };
-  },
-  methods: {
-    toggle(event: any) {
-      const x = this.$refs.menu as any;
-      x.toggle(event);
-    },
+const props = defineProps({
+  conceptIri: { type: String, required: true }
+});
 
-    async getMembers(): Promise<void> {
-      this.loading = true;
-      this.expandedRowGroups = ["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"];
-      this.selected = {} as ValueSetMember;
-      this.subsets = [];
-      this.members = await this.$entityService.getEntityMembers(this.conceptIri, false, false, this.pageSize, true);
-      this.sortMembers();
-      this.combinedMembers = this.members.members;
-      if (isArrayHasLength(this.combinedMembers) && this.combinedMembers[0].type === "INCLUDED_SELF") {
-        this.isIncludedSelf = true;
-      }
-      this.setSubsets();
-      this.loading = false;
-    },
+const entityService = new EntityService(axios);
+const setService = new SetService(axios);
+const toast = useToast();
 
-    setSubsets(): void {
-      this.combinedMembers.forEach((member: ValueSetMember) => {
-        if (!this.subsets.some(e => e === member.label)) {
-          if (member.type === "SUBSET") {
-            this.subsets.push(member.label);
-          }
-        }
-      });
-    },
+let userRoles: Ref<string[]> = ref([]);
+let loading = ref(false);
+let downloading = ref(false);
+let members: Ref<ExportValueSet> = ref({} as ExportValueSet);
+let combinedMembers: Ref<ValueSetMember[]> = ref([]);
+let selected: Ref<ValueSetMember> = ref({} as ValueSetMember);
+let subsets: Ref<string[]> = ref([]);
+let isPublishing = ref(false);
+let nextPage = ref(2);
+let pageSize = ref(20);
+let loadButton = ref(false);
+let totalCount = ref(0);
+let hasMembers: Ref<any> = ref({});
+let isIncludedSelf = ref(false);
+let expandedRowGroups: Ref<string[]> = ref(["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"]);
+let downloadMenu = ref([
+  { label: "Definition Only", command: () => download(false, false) },
+  { label: "Core", command: () => download(true, false) },
+  { label: "Core & Legacy", command: () => download(true, true) },
+  { label: "Core & Legacy (Flat)", command: () => download(true, true, true) }
+]);
+let downloadMenu1 = ref([
+  { label: "Definition Only", command: () => download(false, false) },
+  { label: "Core", command: () => download(true, false) },
+  { label: "Core & Legacy", command: () => download(true, true) },
+  { label: "Core & Legacy (Flat)", command: () => download(true, true, true) },
+  { label: "IMv1", command: () => downloadIMV1() }
+]);
 
-    async downloadIMV1(): Promise<void> {
-      this.downloading = true;
-      try {
-        this.$toast.add(this.$loggerService.success("Download will begin shortly"));
-        const result = await this.$setService.IMV1(this.conceptIri);
-        const label: string = (await this.$entityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
-        this.downloadFile(result, label + ".txt");
-      } catch (error) {
-        this.$toast.add(this.$loggerService.error("Download failed from server"));
-      } finally {
-        this.downloading = false;
-      }
-    },
+const menu = ref();
 
-    async download(core: boolean, legacy: boolean, flat: boolean = false): Promise<void> {
-      this.downloading = true;
-      try {
-        this.$toast.add(this.$loggerService.success("Download will begin shortly"));
-        const result = (await this.$entityService.getFullExportSet(this.conceptIri, core, legacy, flat)).data;
-        const label: string = (await this.$entityService.getPartialEntity(this.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
-        this.downloadFile(result, this.getFileName(label));
-      } catch (error) {
-        this.$toast.add(this.$loggerService.error("Download failed from server"));
-      } finally {
-        this.downloading = false;
-      }
-    },
+watch(
+  () => props.conceptIri,
+  async () => await getMembers()
+);
 
-    getFileName(label: string) {
-      if (label.length > 100) {
-        label = label.substring(0, 100);
-      }
-      return (
-        label +
-        " - " +
-        new Date()
-          .toJSON()
-          .slice(0, 10)
-          .replace(/-/g, "/") +
-        ".xlsx"
-      );
-    },
-
-    downloadFile(data: any, fileName: string) {
-      const url = window.URL.createObjectURL(new Blob([data], { type: "application" }));
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = fileName;
-      link.click();
-    },
-
-    sortMembers(): void {
-      if (isObjectHasKeys(this.members, ["members"]) && isArrayHasLength(this.members.members)) {
-        this.members.members.sort((a: ValueSetMember, b: ValueSetMember) =>
-          a.label.localeCompare(b.label) == 0 ? a.entity.name.localeCompare(b.entity.name) : a.label.localeCompare(b.label)
-        );
-      }
-    },
-
-    publish() {
-      this.isPublishing = true;
-      this.$setService
-        .publish(this.conceptIri)
-        .then(() => {
-          this.isPublishing = false;
-          this.$toast.add(this.$loggerService.success("Value set published", "Published to IM1 :" + this.conceptIri));
-        })
-        .catch(() => {
-          this.isPublishing = false;
-          this.$toast.add(this.$loggerService.error("Failed to publish value set", "Publish to IM1 FAILED :" + this.conceptIri));
-        });
-    },
-
-    getUserRoles() {
-      Auth.currentSession()
-        .then(data => {
-          this.userRoles = data.getIdToken().payload["cognito:groups"];
-        })
-        .catch(() => {
-          this.userRoles = [];
-        });
-    },
-
-    checkAuthorization() {
-      if (this.userRoles) return this.userRoles.includes("IM1_PUBLISH");
-      else return false;
-    },
-
-    async loadMore() {
-      if (this.isIncludedSelf) {
-        if (this.nextPage * this.pageSize < this.totalCount) {
-          this.hasMembers = await this.$entityService.getHasMember(this.conceptIri, IM.HAS_MEMBER, this.nextPage, this.pageSize);
-          this.combinedMembers[0].entity.name = this.combinedMembers[0].entity.name.concat(this.hasMembers.members[0].entity.name);
-          this.nextPage = this.nextPage + 1;
-          this.loadButton = true;
-        } else if (this.nextPage * this.pageSize > this.totalCount) {
-          this.hasMembers = await this.$entityService.getHasMember(this.conceptIri, IM.HAS_MEMBER, this.nextPage, this.pageSize);
-          this.combinedMembers[0].entity.name = this.combinedMembers[0].entity.name.concat(this.hasMembers.members[0].entity.name);
-          this.loadButton = false;
-        } else {
-          this.loadButton = false;
-        }
-      }
-    },
-
-    async getTotalCount() {
-      this.totalCount = (await this.$entityService.getPartialAndTotalCount(this.conceptIri, IM.HAS_MEMBER, 1, 10)).totalCount;
-    }
+onMounted(async () => {
+  await getMembers();
+  await getUserRoles();
+  await getTotalCount();
+  if (totalCount.value >= 10) {
+    loadButton.value = true;
   }
 });
+
+function toggle(event: any) {
+  const x = menu.value as any;
+  x.toggle(event);
+}
+
+async function getMembers(): Promise<void> {
+  loading.value = true;
+  expandedRowGroups.value = ["a_MemberIncluded", "b_MemberExcluded", "z_ComplexMember"];
+  selected.value = {} as ValueSetMember;
+  subsets.value = [];
+  members.value = await entityService.getEntityMembers(props.conceptIri, false, false, pageSize.value, true);
+  sortMembers();
+  combinedMembers.value = members.value.members;
+  if (isArrayHasLength(combinedMembers.value) && combinedMembers.value[0].type === "INCLUDED_SELF") {
+    isIncludedSelf.value = true;
+  }
+  setSubsets();
+  loading.value = false;
+}
+
+function setSubsets(): void {
+  combinedMembers.value.forEach((member: ValueSetMember) => {
+    if (!subsets.value.some(e => e === member.label)) {
+      if (member.type === "SUBSET") {
+        subsets.value.push(member.label);
+      }
+    }
+  });
+}
+
+async function downloadIMV1(): Promise<void> {
+  downloading.value = true;
+  try {
+    toast.add(LoggerService.success("Download will begin shortly"));
+    const result = await setService.IMV1(props.conceptIri);
+    const label: string = (await entityService.getPartialEntity(props.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
+    downloadFile(result, label + ".txt");
+  } catch (error) {
+    toast.add(LoggerService.error("Download failed from server"));
+  } finally {
+    downloading.value = false;
+  }
+}
+
+async function download(core: boolean, legacy: boolean, flat: boolean = false): Promise<void> {
+  downloading.value = true;
+  try {
+    toast.add(LoggerService.success("Download will begin shortly"));
+    const result = (await entityService.getFullExportSet(props.conceptIri, core, legacy, flat)).data;
+    const label: string = (await entityService.getPartialEntity(props.conceptIri, [RDFS.LABEL]))[RDFS.LABEL];
+    downloadFile(result, getFileName(label));
+  } catch (error) {
+    toast.add(LoggerService.error("Download failed from server"));
+  } finally {
+    downloading.value = false;
+  }
+}
+
+function getFileName(label: string) {
+  if (label.length > 100) {
+    label = label.substring(0, 100);
+  }
+  return label + " - " + new Date().toJSON().slice(0, 10).replace(/-/g, "/") + ".xlsx";
+}
+
+function downloadFile(data: any, fileName: string) {
+  const url = window.URL.createObjectURL(new Blob([data], { type: "application" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  link.click();
+}
+
+function sortMembers(): void {
+  if (isObjectHasKeys(members.value, ["members"]) && isArrayHasLength(members.value.members)) {
+    members.value.members.sort((a: ValueSetMember, b: ValueSetMember) =>
+      a.label.localeCompare(b.label) == 0 ? a.entity.name.localeCompare(b.entity.name) : a.label.localeCompare(b.label)
+    );
+  }
+}
+
+function publish() {
+  isPublishing.value = true;
+  setService
+    .publish(props.conceptIri)
+    .then(() => {
+      isPublishing.value = false;
+      toast.add(LoggerService.success("Value set published", "Published to IM1 :" + props.conceptIri));
+    })
+    .catch(() => {
+      isPublishing.value = false;
+      toast.add(LoggerService.error("Failed to publish value set", "Publish to IM1 FAILED :" + props.conceptIri));
+    });
+}
+
+async function getUserRoles() {
+  await Auth.currentSession()
+    .then(data => {
+      userRoles.value = data.getIdToken().payload["cognito:groups"];
+    })
+    .catch(() => {
+      userRoles.value = [];
+    });
+}
+
+function checkAuthorization() {
+  if (userRoles.value) return userRoles.value.includes("IM1_PUBLISH");
+  else return false;
+}
+
+async function loadMore() {
+  if (isIncludedSelf.value) {
+    if (nextPage.value * pageSize.value < totalCount.value) {
+      hasMembers.value = await entityService.getHasMember(props.conceptIri, IM.HAS_MEMBER, nextPage.value, pageSize.value);
+      combinedMembers.value[0].entity.name = combinedMembers.value[0].entity.name.concat(hasMembers.value.members[0].entity.name);
+      nextPage.value = nextPage.value + 1;
+      loadButton.value = true;
+    } else if (nextPage.value * pageSize.value > totalCount.value) {
+      hasMembers.value = await entityService.getHasMember(props.conceptIri, IM.HAS_MEMBER, nextPage.value, pageSize.value);
+      combinedMembers.value[0].entity.name = combinedMembers.value[0].entity.name.concat(hasMembers.value.members[0].entity.name);
+      loadButton.value = false;
+    } else {
+      loadButton.value = false;
+    }
+  }
+}
+
+async function getTotalCount() {
+  totalCount.value = (await entityService.getPartialAndTotalCount(props.conceptIri, IM.HAS_MEMBER, 1, 10)).totalCount;
+}
 </script>
 
 <style scoped>

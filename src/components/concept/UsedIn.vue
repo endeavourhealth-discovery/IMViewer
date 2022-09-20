@@ -19,14 +19,10 @@
       @page="handlePage($event)"
       :loading="loading"
     >
-      <template #empty>
-        No records found.
-      </template>
-      <template #loading>
-        Loading data. Please wait.
-      </template>
+      <template #empty> No records found. </template>
+      <template #loading> Loading data. Please wait. </template>
       <Column field="name" filter-field="name" header="Name">
-        <template #body="{data}">
+        <template #body="{ data }">
           <span :style="'color:' + data.colour" class="p-mx-1 type-icon">
             <i :class="data.icon" aria-hidden="true" />
           </span>
@@ -36,106 +32,105 @@
     </DataTable>
   </div>
 </template>
-<script lang="ts">
-import { defineComponent } from "@vue/runtime-core";
-import { Helpers, Vocabulary } from "im-library";
+<script setup lang="ts">
+import { defineComponent, onMounted, onUnmounted, ref, Ref, watch } from "vue";
+import { Helpers, Services, Vocabulary } from "im-library";
+import axios from "axios";
+import { useRouter } from "vue-router";
 const {
   DataTypeCheckers: { isObjectHasKeys },
   ContainerDimensionGetters: { getContainerElementOptimalHeight },
   ConceptTypeMethods: { getColourFromType, getFAIconFromType }
 } = Helpers;
 const { RDF, RDFS } = Vocabulary;
+const { EntityService } = Services;
 
-export default defineComponent({
-  name: "UsedIn",
-  props: {
-    conceptIri: { type: String, required: true }
-  },
-  watch: {
-    async conceptIri() {
-      await this.init();
-    }
-  },
-  async mounted() {
-    window.addEventListener("resize", this.onResize);
-    await this.init();
-  },
-  beforeUnmount() {
-    window.removeEventListener("resize", this.onResize);
-  },
-  data() {
-    return {
-      usages: [] as any[],
-      loading: false,
-      selected: {} as any,
-      recordsTotal: 0,
-      currentPage: 0,
-      pageSize: 25,
-      scrollHeight: "500px",
-      templateString: "Displaying {first} to {last} of [Loading...] concepts"
-    };
-  },
-  methods: {
-    async init() {
-      this.loading = true;
-      await this.getUsages(this.conceptIri, this.currentPage, this.pageSize);
-      this.setScrollHeight();
-      this.loading = false;
-      await this.getRecordsSize(this.conceptIri);
-    },
-
-    async getUsages(iri: string, pageIndex: number, pageSize: number): Promise<void> {
-      const usages = await this.$entityService.getEntityUsages(iri, pageIndex, pageSize);
-      this.usages = usages.map((usage: any) => {
-        return {
-          "@id": usage["@id"],
-          name: usage[RDFS.LABEL],
-          icon: getFAIconFromType(usage[RDF.TYPE]),
-          colour: getColourFromType(usage[RDF.TYPE])
-        };
-      });
-    },
-
-    async getRecordsSize(iri: string): Promise<void> {
-      this.recordsTotal = await this.$entityService.getUsagesTotalRecords(iri);
-      this.templateString = "Displaying {first} to {last} of {totalRecords} concepts";
-    },
-
-    async handlePage(event: any): Promise<void> {
-      this.loading = true;
-      this.pageSize = event.rows;
-      this.currentPage = event.page;
-      await this.getUsages(this.conceptIri, this.currentPage, this.pageSize);
-      this.scrollToTop();
-      this.loading = false;
-    },
-
-    handleSelected(): void {
-      if (isObjectHasKeys(this.selected, ["@id"])) {
-        this.$router.push({
-          name: "Concept",
-          params: { selectedIri: this.selected["@id"] }
-        });
-      }
-    },
-
-    scrollToTop(): void {
-      const resultsContainer = document.getElementById("search-results-container") as HTMLElement;
-      const scrollBox = resultsContainer?.getElementsByClassName("p-datatable-wrapper")[0] as HTMLElement;
-      if (scrollBox) {
-        scrollBox.scrollTop = 0;
-      }
-    },
-
-    onResize(): void {
-      this.setScrollHeight();
-    },
-
-    setScrollHeight(): void {
-      this.scrollHeight = getContainerElementOptimalHeight("usedin-table-container", ["p-paginator"], false, undefined, 1);
-    }
-  }
+const props = defineProps({
+  conceptIri: { type: String, required: true }
 });
+
+const entityService = new EntityService(axios);
+const router = useRouter();
+
+let usages: Ref<any[]> = ref([]);
+let loading = ref(false);
+let selected: Ref<any> = ref({});
+let recordsTotal = ref(0);
+let currentPage = ref(0);
+let pageSize = ref(25);
+let scrollHeight = ref("500px");
+let templateString = ref("Displaying {first} to {last} of [Loading...] concepts");
+
+onMounted(async () => {
+  window.addEventListener("resize", onResize);
+  await init();
+});
+
+onUnmounted(() => window.removeEventListener("resize", onResize));
+
+watch(
+  () => props.conceptIri,
+  async () => await init()
+);
+
+async function init() {
+  loading.value = true;
+  await getUsages(props.conceptIri, currentPage.value, pageSize.value);
+  setScrollHeight();
+  loading.value = false;
+  await getRecordsSize(props.conceptIri);
+}
+
+async function getUsages(iri: string, pageIndex: number, pageSize: number): Promise<void> {
+  const result = await entityService.getEntityUsages(iri, pageIndex, pageSize);
+  usages.value = result.map((usage: any) => {
+    return {
+      "@id": usage["@id"],
+      name: usage[RDFS.LABEL],
+      icon: getFAIconFromType(usage[RDF.TYPE]),
+      colour: getColourFromType(usage[RDF.TYPE])
+    };
+  });
+}
+
+async function getRecordsSize(iri: string): Promise<void> {
+  recordsTotal.value = await entityService.getUsagesTotalRecords(iri);
+  templateString.value = "Displaying {first} to {last} of {totalRecords} concepts";
+}
+
+async function handlePage(event: any): Promise<void> {
+  loading.value = true;
+  pageSize.value = event.rows;
+  currentPage.value = event.page;
+  await getUsages(props.conceptIri, currentPage.value, pageSize.value);
+  scrollToTop();
+  loading.value = false;
+}
+
+function handleSelected(): void {
+  if (isObjectHasKeys(selected.value, ["@id"])) {
+    router.push({
+      name: "Concept",
+      params: { selectedIri: selected.value["@id"] }
+    });
+  }
+}
+
+function scrollToTop(): void {
+  const resultsContainer = document.getElementById("search-results-container") as HTMLElement;
+  const scrollBox = resultsContainer?.getElementsByClassName("p-datatable-wrapper")[0] as HTMLElement;
+  if (scrollBox) {
+    scrollBox.scrollTop = 0;
+  }
+}
+
+function onResize(): void {
+  setScrollHeight();
+}
+
+function setScrollHeight(): void {
+  scrollHeight.value = getContainerElementOptimalHeight("usedin-table-container", ["p-paginator"], false, undefined, 1);
+}
 </script>
 
 <style scoped>

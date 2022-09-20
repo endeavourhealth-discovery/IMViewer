@@ -1,12 +1,8 @@
 <template>
   <div id="properties-table-container">
     <DataTable :value="dataModelPropsData" :scrollable="true" ref="propertiesTable" :loading="loading">
-      <template #empty>
-        No records found
-      </template>
-      <template #loading>
-        Loading data. Please wait...
-      </template>
+      <template #empty> No records found </template>
+      <template #loading> Loading data. Please wait... </template>
       <template #header>
         <div class="table-header">
           Data model properties
@@ -42,84 +38,84 @@
     </DataTable>
   </div>
 </template>
-<script lang="ts">
-import { defineComponent } from "@vue/runtime-core";
-import { RouteRecordName } from "vue-router";
+<script setup lang="ts">
+import { defineComponent, onMounted, onUnmounted, Ref, ref, watch } from "vue";
+import { RouteRecordName, useRoute, useRouter } from "vue-router";
 import { DataModelProperty, ProcessedDataModelProperty } from "im-library/dist/types/interfaces/Interfaces";
-import { Helpers } from "im-library";
+import { Helpers, Services } from "im-library";
+import axios from "axios";
 const {
   ContainerDimensionGetters: { getContainerElementOptimalHeight }
 } = Helpers;
+const { EntityService } = Services;
 
-export default defineComponent({
-  name: "Properties",
-  components: {},
-  props: {
-    conceptIri: { type: String, required: true }
-  },
-  watch: {
-    async conceptIri(newValue) {
-      await this.getDataModelProps(newValue);
-    }
-  },
-  data() {
-    return {
-      loading: false,
-      dataModelPropsData: [] as ProcessedDataModelProperty[],
-      scrollHeight: "500px"
-    };
-  },
-  async mounted() {
-    window.addEventListener("resize", this.onResize);
-    this.onResize();
-    await this.getDataModelProps(this.conceptIri);
-  },
-  beforeUnmount() {
-    window.removeEventListener("resize", this.onResize);
-  },
-  methods: {
-    onResize() {
-      this.setScrollHeight();
-    },
-
-    async getDataModelProps(iri: string): Promise<void> {
-      this.loading = true;
-      const result = await this.$entityService.getDataModelProperties(iri);
-      this.dataModelPropsData = result.map((prop: DataModelProperty) => {
-        return {
-          propertyId: prop.property["@id"],
-          propertyName: prop.property.name,
-          propertyDisplay: prop.property.name,
-          typeId: prop.type ? prop.type["@id"] : "",
-          typeName: prop.type ? prop.type.name : "",
-          typeDisplay: prop.type ? prop.type.name || prop.type["@id"] : "",
-          inheritedId: prop.inheritedFrom["@id"],
-          inheritedName: prop.inheritedFrom.name,
-          inheritedDisplay: prop.inheritedFrom.name || "-",
-          cardinality: `${prop.minExclusive || prop.minInclusive || 0} : ${prop.maxExclusive || prop.maxInclusive || "*"}`
-        };
-      });
-      this.loading = false;
-    },
-
-    navigate(iri: any): void {
-      const currentRoute = this.$route.name as RouteRecordName | undefined;
-      if (iri)
-        this.$router.push({
-          name: currentRoute,
-          params: { selectedIri: iri }
-        });
-    },
-
-    setScrollHeight(): void {
-      this.scrollHeight = getContainerElementOptimalHeight("properties-table-container", ["p-paginator"], false, undefined, 1);
-    },
-
-    exportCSV(): void {
-      (this.$refs as any).propertiesTable.exportCSV();
-    }
-  }
+const props = defineProps({
+  conceptIri: { type: String, required: true }
 });
+
+const entityService = new EntityService(axios);
+const route = useRoute();
+const router = useRouter();
+
+let loading = ref(false);
+let dataModelPropsData: Ref<ProcessedDataModelProperty[]> = ref([]);
+let scrollHeight = ref("500px");
+
+const propertiesTable = ref();
+
+watch(
+  () => props.conceptIri,
+  async newValue => getDataModelProps(newValue)
+);
+
+onMounted(async () => {
+  window.addEventListener("resize", onResize);
+  onResize();
+  await getDataModelProps(props.conceptIri);
+});
+
+onUnmounted(() => window.removeEventListener("resize", onResize));
+
+function onResize() {
+  setScrollHeight();
+}
+
+async function getDataModelProps(iri: string): Promise<void> {
+  loading.value = true;
+  const result = await entityService.getDataModelProperties(iri);
+  dataModelPropsData.value = result.map((prop: DataModelProperty) => {
+    return {
+      propertyId: prop.property["@id"],
+      propertyName: prop.property.name,
+      propertyDisplay: prop.property.name,
+      typeId: prop.type ? prop.type["@id"] : "",
+      typeName: prop.type ? prop.type.name : "",
+      typeDisplay: prop.type ? prop.type.name || prop.type["@id"] : "",
+      inheritedId: prop.inheritedFrom["@id"],
+      inheritedName: prop.inheritedFrom.name,
+      inheritedDisplay: prop.inheritedFrom.name || "-",
+      cardinality: `${prop.minExclusive || prop.minInclusive || 0} : ${prop.maxExclusive || prop.maxInclusive || "*"}`
+    };
+  });
+  loading.value = false;
+}
+
+function navigate(iri: any): void {
+  const currentRoute = route.name as RouteRecordName | undefined;
+  if (iri)
+    router.push({
+      name: currentRoute,
+      params: { selectedIri: iri }
+    });
+}
+
+function setScrollHeight(): void {
+  scrollHeight.value = getContainerElementOptimalHeight("properties-table-container", ["p-paginator"], false, undefined, 1);
+}
+
+function exportCSV(): void {
+  propertiesTable.value.exportCSV();
+}
 </script>
 
 <style scoped>
