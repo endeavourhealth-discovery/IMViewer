@@ -14,33 +14,23 @@
       <div class="options-container flex flex-row p-flex-wrap justify-contents-around">
         <div class="checkbox-label">
           <Checkbox :disabled="!definition" id="definition" :binary="true" value="Include is a" v-model="includeDefinition" />
-          <label class="label" :class="includeDefinition ? null : 'inactive-text'" for="definition">
-            Include definition
-          </label>
+          <label class="label" :class="includeDefinition ? null : 'inactive-text'" for="definition"> Include definition </label>
         </div>
         <div class="checkbox-label">
           <Checkbox :disabled="!hasSubTypes" id="has-sub-types" :binary="true" value="Include has sub types" v-model="includeHasSubTypes" />
-          <label class="label" :class="includeHasSubTypes ? null : 'inactive-text'" for="has-sub-types">
-            Include has sub types
-          </label>
+          <label class="label" :class="includeHasSubTypes ? null : 'inactive-text'" for="has-sub-types"> Include has sub types </label>
         </div>
         <div class="checkbox-label">
           <Checkbox :disabled="!isChildOf" id="is-child-of" :binary="true" value="Include is child of" v-model="includeIsChildOf" />
-          <label class="label" :class="includeIsChildOf ? null : 'inactive-text'" for="is-child-of">
-            Include is child of
-          </label>
+          <label class="label" :class="includeIsChildOf ? null : 'inactive-text'" for="is-child-of"> Include is child of </label>
         </div>
         <div class="checkbox-label">
           <Checkbox :disabled="!hasChildren" id="has-children" :binary="true" value="Include has children" v-model="includeHasChildren" />
-          <label class="label" :class="includeHasChildren ? null : 'inactive-text'" for="has-children">
-            Include has children
-          </label>
+          <label class="label" :class="includeHasChildren ? null : 'inactive-text'" for="has-children"> Include has children </label>
         </div>
         <div class="checkbox-label">
           <Checkbox :disabled="!terms" id="terms" :binary="true" value="Include terms" v-model="includeTerms" />
-          <label class="label" :class="includeTerms ? null : 'inactive-text'" for="terms">
-            Include terms
-          </label>
+          <label class="label" :class="includeTerms ? null : 'inactive-text'" for="terms"> Include terms </label>
         </div>
         <div class="checkbox-label">
           <Checkbox
@@ -50,27 +40,19 @@
             value="Include data model properties"
             v-model="includeDataModelProperties"
           />
-          <label class="label" :class="includeDataModelProperties ? null : 'inactive-text'" for="data-model-properties">
-            Include data model properties
-          </label>
+          <label class="label" :class="includeDataModelProperties ? null : 'inactive-text'" for="data-model-properties"> Include data model properties </label>
         </div>
         <div class="checkbox-label">
           <Checkbox :disabled="!members" id="members" :binary="true" value="Include members" v-model="includeMembers" />
-          <label class="label" :class="includeMembers ? null : 'inactive-text'" for="members">
-            Include members
-          </label>
+          <label class="label" :class="includeMembers ? null : 'inactive-text'" for="members"> Include members </label>
         </div>
         <div class="checkbox-label">
           <Checkbox :disabled="!includeMembers" id="expandMembers" :binary="true" value="Expand members" v-model="expandMembers" />
-          <label class="label" :class="includeMembers ? null : 'inactive-text'" for="expandMembers">
-            Expand members
-          </label>
+          <label class="label" :class="includeMembers ? null : 'inactive-text'" for="expandMembers"> Expand members </label>
         </div>
         <div class="checkbox-label">
           <Checkbox id="inactive" :binary="true" value="Include inactive" v-model="includeInactive" />
-          <label class="label" for="inactive">
-            Include inactive children/parents
-          </label>
+          <label class="label" for="inactive"> Include inactive children/parents </label>
         </div>
       </div>
       <div class="download-button-container flex flex-row justify-contents-around">
@@ -83,146 +65,143 @@
   </Dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "@vue/runtime-core";
+<script setup lang="ts">
+import { defineComponent, onMounted, ref, Ref, watch } from "vue";
 import { TTIriRef, EntityReferenceNode, TermCode, ExportValueSet, DataModelProperty, TTBundle } from "im-library/dist/types/interfaces/Interfaces";
-import { Vocabulary, Helpers } from "im-library";
+import { Vocabulary, Services, Helpers } from "im-library";
+import { useToast } from "primevue/usetoast";
+import axios from "axios";
 const { IM, RDFS } = Vocabulary;
 const {
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys },
   Converters: { iriToUrl }
 } = Helpers;
+const { EntityService, Env, LoggerService } = Services;
 
-export default defineComponent({
-  name: "DownloadDialog",
-  props: {
-    conceptIri: { type: String, required: true },
-    showDialog: { type: Boolean, required: true }
-  },
-  emits: {
-    closeDownloadDialog: () => true
-  },
-  watch: {
-    async conceptIri(newValue) {
-      await this.init(newValue);
-    }
-  },
-  async mounted() {
-    await this.init(this.conceptIri);
-  },
-
-  data() {
-    return {
-      concept: {} as any,
-      definition: {} as TTBundle,
-      hasSubTypes: [] as EntityReferenceNode[],
-      isChildOf: [] as TTIriRef[],
-      hasChildren: [] as any[],
-      terms: [] as TermCode[],
-      dataModelProperties: [] as DataModelProperty[],
-      members: {} as ExportValueSet,
-      includeHasSubTypes: true,
-      includeDataModelProperties: true,
-      includeMembers: true,
-      expandMembers: false,
-      includeDefinition: true,
-      includeIsChildOf: false,
-      includeHasChildren: false,
-      includeInactive: false,
-      includeTerms: false,
-      loading: false,
-      RDFS_LABEL: RDFS.LABEL,
-      format: {
-        name: "Excel(.xlsx)",
-        value: "excel",
-        mime: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-      },
-      formatOptions: [
-        { name: "JSON", value: "json", mime: "application/json" },
-        {
-          name: "Excel(.xlsx)",
-          value: "excel",
-          mime: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        }
-      ]
-    };
-  },
-  methods: {
-    closeDownloadDialog(): void {
-      this.$emit("closeDownloadDialog");
-    },
-
-    downloadConcept(): void {
-      const modIri = iriToUrl(this.conceptIri);
-
-      const url =
-        this.$env.API +
-        "api/entity/download?iri=" +
-        modIri +
-        "&format=" +
-        this.format.value +
-        "&hasSubTypes=" +
-        this.includeHasSubTypes +
-        "&dataModelProperties=" +
-        this.includeDataModelProperties +
-        "&members=" +
-        this.includeMembers +
-        "&expandMembers=" +
-        this.expandMembers +
-        "&inferred=" +
-        this.includeDefinition +
-        "&terms=" +
-        this.includeTerms +
-        "&isChildOf=" +
-        this.includeIsChildOf +
-        "&hasChildren=" +
-        this.includeHasChildren +
-        "&inactive=" +
-        this.includeInactive;
-      const popup = window.open(url);
-      if (!popup) {
-        this.$toast.add(this.$loggerService.error("Download failed from server"));
-      } else {
-        this.$toast.add(this.$loggerService.success("Download will begin shortly"));
-      }
-      this.closeDownloadDialog();
-    },
-
-    async init(iri: string): Promise<void> {
-      this.loading = true;
-      this.concept = await this.$entityService.getPartialEntity(iri, [RDFS.LABEL, IM.IS_CHILD_OF, IM.HAS_CHILDREN]);
-      if (isObjectHasKeys(this.concept, [IM.IS_CHILD_OF]) && isArrayHasLength(this.concept[IM.IS_CHILD_OF])) {
-        this.isChildOf = this.concept[IM.IS_CHILD_OF];
-      }
-      if (isObjectHasKeys(this.concept, [IM.HAS_CHILDREN]) && this.concept[IM.HAS_CHILDREN]) {
-        this.hasChildren = this.concept[IM.HAS_CHILDREN];
-      }
-
-      this.definition = await this.$entityService.getDefinitionBundle(iri);
-
-      this.hasSubTypes = await this.$entityService.getEntityChildren(iri);
-
-      this.terms = await this.$entityService.getEntityTermCodes(iri);
-
-      this.dataModelProperties = await this.$entityService.getDataModelProperties(iri);
-
-      this.members = await this.$entityService.getEntityMembers(iri, this.expandMembers, false);
-
-      this.setIncludeBooleans();
-      this.loading = false;
-    },
-
-    setIncludeBooleans(): void {
-      this.includeDefinition = !!this.definition;
-      this.includeHasSubTypes = !!this.hasSubTypes.length;
-      this.includeIsChildOf = !!this.isChildOf.length;
-      this.includeHasChildren = !!this.hasChildren.length;
-      this.includeTerms = !!this.terms.length;
-      this.includeDataModelProperties = !!this.dataModelProperties.length;
-      this.includeMembers = !!(isObjectHasKeys(this.members, ["members"]) && isArrayHasLength(this.members.members));
-    }
-  }
+const props = defineProps({
+  conceptIri: { type: String, required: true },
+  showDialog: { type: Boolean, required: true }
 });
+
+const emit = defineEmits({
+  closeDownloadDialog: () => true
+});
+
+const toast = useToast();
+const entityService = new EntityService(axios);
+
+watch(
+  () => props.conceptIri,
+  async newValue => await init(newValue)
+);
+
+onMounted(async () => await init(props.conceptIri));
+
+let concept: Ref<any> = ref({} as any);
+let definition: Ref<TTBundle> = ref({} as TTBundle);
+let hasSubTypes: Ref<EntityReferenceNode[]> = ref([]);
+let isChildOf: Ref<TTIriRef[]> = ref([]);
+let hasChildren: Ref<any[]> = ref([]);
+let terms: Ref<TermCode[]> = ref([]);
+let dataModelProperties: Ref<DataModelProperty[]> = ref([]);
+let members: Ref<ExportValueSet> = ref({} as ExportValueSet);
+let includeHasSubTypes = ref(true);
+let includeDataModelProperties = ref(true);
+let includeMembers = ref(true);
+let expandMembers = ref(false);
+let includeDefinition = ref(true);
+let includeIsChildOf = ref(false);
+let includeHasChildren = ref(false);
+let includeInactive = ref(false);
+let includeTerms = ref(false);
+let loading = ref(false);
+let format = ref({
+  name: "Excel(.xlsx)",
+  value: "excel",
+  mime: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+});
+let formatOptions = ref([
+  { name: "JSON", value: "json", mime: "application/json" },
+  {
+    name: "Excel(.xlsx)",
+    value: "excel",
+    mime: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  }
+]);
+
+function closeDownloadDialog(): void {
+  emit("closeDownloadDialog");
+}
+
+function downloadConcept(): void {
+  const modIri = iriToUrl(props.conceptIri);
+
+  const url =
+    Env.API +
+    "api/entity/download?iri=" +
+    modIri +
+    "&format=" +
+    format.value.value +
+    "&hasSubTypes=" +
+    includeHasSubTypes.value +
+    "&dataModelProperties=" +
+    includeDataModelProperties.value +
+    "&members=" +
+    includeMembers.value +
+    "&expandMembers=" +
+    expandMembers.value +
+    "&inferred=" +
+    includeDefinition.value +
+    "&terms=" +
+    includeTerms.value +
+    "&isChildOf=" +
+    includeIsChildOf.value +
+    "&hasChildren=" +
+    includeHasChildren.value +
+    "&inactive=" +
+    includeInactive.value;
+  const popup = window.open(url);
+  if (!popup) {
+    toast.add(LoggerService.error("Download failed from server"));
+  } else {
+    toast.add(LoggerService.success("Download will begin shortly"));
+  }
+  closeDownloadDialog();
+}
+
+async function init(iri: string): Promise<void> {
+  loading.value = true;
+  concept.value = await entityService.getPartialEntity(iri, [RDFS.LABEL, IM.IS_CHILD_OF, IM.HAS_CHILDREN]);
+  if (isObjectHasKeys(concept.value, [IM.IS_CHILD_OF]) && isArrayHasLength(concept.value[IM.IS_CHILD_OF])) {
+    isChildOf.value = concept.value[IM.IS_CHILD_OF];
+  }
+  if (isObjectHasKeys(concept.value, [IM.HAS_CHILDREN]) && concept.value[IM.HAS_CHILDREN]) {
+    hasChildren.value = concept.value[IM.HAS_CHILDREN];
+  }
+
+  definition.value = await entityService.getDefinitionBundle(iri);
+
+  hasSubTypes.value = await entityService.getEntityChildren(iri);
+
+  terms.value = await entityService.getEntityTermCodes(iri);
+
+  dataModelProperties.value = await entityService.getDataModelProperties(iri);
+
+  members.value = await entityService.getEntityMembers(iri, expandMembers.value, false);
+
+  setIncludeBooleans();
+  loading.value = false;
+}
+
+function setIncludeBooleans(): void {
+  includeDefinition.value = !!definition.value;
+  includeHasSubTypes.value = !!hasSubTypes.value.length;
+  includeIsChildOf.value = !!isChildOf.value.length;
+  includeHasChildren.value = !!hasChildren.value.length;
+  includeTerms.value = !!terms.value.length;
+  includeDataModelProperties.value = !!dataModelProperties.value.length;
+  includeMembers.value = !!(isObjectHasKeys(members.value, ["members"]) && isArrayHasLength(members.value.members));
+}
 </script>
 
 <style scoped>

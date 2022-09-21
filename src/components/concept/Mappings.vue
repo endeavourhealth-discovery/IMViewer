@@ -86,223 +86,233 @@
   </OverlayPanel>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { defineComponent, onMounted, ref, Ref, watch } from "vue";
 import SimpleMaps from "@/components/concept/mapping/SimpleMaps.vue";
 import { Namespace, SimpleMap, SimpleMapIri, MapItem, ChartTableNode, ChartMapNode } from "im-library/dist/types/interfaces/Interfaces";
-import { Helpers, Vocabulary } from "im-library";
+import { Helpers, Services, Vocabulary } from "im-library";
+import axios from "axios";
 const {
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys },
   Sorters: { byPriority, byScheme }
 } = Helpers;
 const { IM } = Vocabulary;
+const { EntityService } = Services;
 
-export default defineComponent({
-  name: "Mappings",
-  components: { SimpleMaps },
-  props: { conceptIri: { type: String, required: true } },
-  watch: {
-    async conceptIri() {
-      await this.updateMappings();
-    }
-  },
-  data() {
-    return {
-      mappings: [] as any[],
-      data: {} as any,
-      hoveredResult: {} as any,
-      matchedFrom: [] as SimpleMap[],
-      matchedTo: [] as SimpleMap[],
-      namespaces: [] as Namespace[],
-      loading: false
-    };
-  },
-  async mounted() {
-    await this.updateMappings();
-  },
-  methods: {
-    async updateMappings() {
-      this.loading = true;
-      await this.getMappings();
-      this.getSimpleMapsNamespaces();
-      this.data = this.createChartStructure(this.mappings);
-      this.loading = false;
-    },
-    async getMappings(): Promise<void> {
-      this.mappings = (await this.$entityService.getPartialEntity(this.conceptIri, [IM.HAS_MAP]))[IM.HAS_MAP] || [];
-      this.data = {};
-
-      this.namespaces = await this.$entityService.getNamespaces();
-      this.matchedFrom = await this.$entityService.getMatchedFrom(this.conceptIri);
-      this.matchedTo = await this.$entityService.getMatchedTo(this.conceptIri);
-    },
-
-    createChartTableNode(
-      items:
-        | {
-            assuranceLevel: string;
-            iri: string;
-            name: string;
-            priority: number;
-          }[]
-        | SimpleMapIri[],
-      location: string,
-      position: number,
-      type: string
-    ): ChartTableNode {
-      return {
-        key: location + "_" + position,
-        type: type,
-        data: { mapItems: items }
-      };
-    },
-
-    createChartMapNode(item: string, location: string, positionInLevel: number): ChartMapNode | undefined {
-      switch (item) {
-        case IM.ONE_OF:
-          return {
-            key: location + "_" + positionInLevel,
-            type: "oneOf",
-            data: { label: "One of" },
-            children: [] as ChartMapNode[]
-          };
-        case IM.COMBINATION_OF:
-          return {
-            key: location + "_" + positionInLevel,
-            type: "comboOf",
-            data: { label: "Combination of" },
-            children: [] as ChartMapNode[]
-          };
-        case IM.SOME_OF:
-          return {
-            key: location + "_" + positionInLevel,
-            type: "someOf",
-            data: { label: "Some of" },
-            children: [] as ChartMapNode[]
-          };
-        default:
-          return undefined;
-      }
-    },
-
-    generateChildNodes(mapObject: any, location: string, positionInLevel: number): ChartMapNode[] | ChartTableNode[] {
-      if (isObjectHasKeys(mapObject[0], [IM.MAPPED_TO])) {
-        const mappedList = [] as MapItem[];
-        mapObject.forEach((item: any) => {
-          mappedList.push({
-            name: item[IM.MAPPED_TO][0].name,
-            iri: item[IM.MAPPED_TO][0]["@id"],
-            priority: item[IM.MAP_PRIORITY],
-            assuranceLevel: item[IM.ASSURANCE_LEVEL][0].name
-          });
-        });
-        mappedList.sort(byPriority);
-        return [this.createChartTableNode(mappedList, location, positionInLevel, "childList")];
-      } else {
-        // is array
-        const results = [] as ChartMapNode[];
-        let count = 0;
-        for (const item of mapObject) {
-          let mapNode = this.createChartMapNode(Object.keys(item)[0], location, count);
-          if (mapNode) {
-            mapNode.children = this.generateChildNodes(item[Object.keys(item)[0]], location + "_" + count, 0);
-            results.push(mapNode);
-          }
-          count++;
-        }
-        return results;
-      }
-    },
-
-    createChartStructure(mappingObject: any): ChartMapNode | [] {
-      const parentNode = {
-        key: "0",
-        type: "hasMap",
-        data: { label: "Has map" },
-        children: [] as ChartMapNode[] | ChartTableNode[]
-      };
-      if (!(isArrayHasLength(mappingObject) || isObjectHasKeys(mappingObject)) && !isArrayHasLength(this.matchedFrom) && !isArrayHasLength(this.matchedTo)) {
-        return [];
-      }
-      if (isArrayHasLength(mappingObject) || isObjectHasKeys(mappingObject)) {
-        parentNode.children = this.generateChildNodes(mappingObject, "0", 0);
-      }
-      if (isArrayHasLength(this.matchedFrom)) {
-        const matchedFromChildren = this.generateSimpleMapsNodes(this.matchedFrom, "0_" + parentNode.children.length, 0, "matchedFromList");
-        parentNode.children.push({
-          key: "0_" + parentNode.children.length,
-          type: "matchedFrom",
-          data: { label: "Matched From" },
-          children: matchedFromChildren
-        });
-      }
-      if (isArrayHasLength(this.matchedTo)) {
-        const matchedToChildren = this.generateSimpleMapsNodes(this.matchedTo, "0_" + parentNode.children.length, 0, "matchedToList");
-        parentNode.children.push({
-          key: "0_" + parentNode.children.length,
-          type: "matchedTo",
-          data: { label: "Matched To" },
-          children: matchedToChildren
-        });
-      }
-      return parentNode;
-    },
-
-    generateSimpleMapsNodes(simpleMaps: SimpleMap[], location: string, positionInLevel: number, type: string): ChartTableNode[] {
-      if (!isArrayHasLength(simpleMaps)) {
-        return [this.createChartTableNode([], location, positionInLevel, type)];
-      }
-      const simpleMapsList = [] as SimpleMapIri[];
-      simpleMaps.forEach((mapItem: SimpleMap) => {
-        simpleMapsList.push({
-          name: mapItem.name,
-          iri: mapItem["@id"],
-          scheme: mapItem.scheme,
-          code: mapItem.code
-        });
-      });
-      simpleMapsList.sort(byScheme);
-      return [this.createChartTableNode(simpleMapsList, location, positionInLevel, type)];
-    },
-
-    getSimpleMapsNamespaces(): void {
-      if (isArrayHasLength(this.matchedFrom) && isArrayHasLength(this.namespaces)) {
-        this.matchedFrom.forEach((mapItem: SimpleMap) => {
-          const found = this.namespaces.find((namespace: Namespace) => namespace.iri.toLowerCase() === (mapItem["@id"].split("#")[0] + "#").toLowerCase());
-          if (found && isObjectHasKeys(found, ["name"])) {
-            mapItem.scheme = found.name;
-          } else {
-            mapItem.scheme = "None";
-          }
-        });
-      }
-      if (isArrayHasLength(this.matchedTo) && isArrayHasLength(this.namespaces)) {
-        this.matchedTo.forEach((mapItem: SimpleMap) => {
-          const found = this.namespaces.find((namespace: Namespace) => namespace.iri.toLowerCase() === (mapItem["@id"].split("#")[0] + "#").toLowerCase());
-          if (found && isObjectHasKeys(found, ["name"])) {
-            mapItem.scheme = found.name;
-          } else {
-            mapItem.scheme = "None";
-          }
-        });
-      }
-    },
-
-    toggle(event: any, data: MapItem, refId: string): void {
-      this.hoveredResult = data;
-      const x = this.$refs[refId] as any;
-      x.toggle(event);
-    },
-
-    handleMatchedFromToggle(event: any, data: any) {
-      this.toggle(event, data, "opMatchedFrom");
-    },
-
-    handleMatchedToToggle(event: any, data: any) {
-      this.toggle(event, data, "opMatchedTo");
-    }
-  }
+const props = defineProps({
+  conceptIri: { type: String, required: true }
 });
+
+const entityService = new EntityService(axios);
+
+let mappings: Ref<any[]> = ref([]);
+let data: Ref<any> = ref({});
+let hoveredResult: Ref<any> = ref({});
+let matchedFrom: Ref<SimpleMap[]> = ref([]);
+let matchedTo: Ref<SimpleMap[]> = ref([]);
+let namespaces: Ref<Namespace[]> = ref([]);
+let loading = ref(false);
+
+const opMap = ref();
+const opMatchedTo = ref();
+const opMatchedFrom = ref();
+
+watch(
+  () => props.conceptIri,
+  async () => await updateMappings()
+);
+
+onMounted(async () => await updateMappings());
+
+async function updateMappings() {
+  loading.value = true;
+  await getMappings();
+  getSimpleMapsNamespaces();
+  data.value = createChartStructure(mappings.value);
+  loading.value = false;
+}
+
+async function getMappings(): Promise<void> {
+  mappings.value = (await entityService.getPartialEntity(props.conceptIri, [IM.HAS_MAP]))[IM.HAS_MAP] || [];
+  data.value = {};
+
+  namespaces.value = await entityService.getNamespaces();
+  matchedFrom.value = await entityService.getMatchedFrom(props.conceptIri);
+  matchedTo.value = await entityService.getMatchedTo(props.conceptIri);
+}
+
+function createChartTableNode(
+  items:
+    | {
+        assuranceLevel: string;
+        iri: string;
+        name: string;
+        priority: number;
+      }[]
+    | SimpleMapIri[],
+  location: string,
+  position: number,
+  type: string
+): ChartTableNode {
+  return {
+    key: location + "_" + position,
+    type: type,
+    data: { mapItems: items }
+  };
+}
+
+function createChartMapNode(item: string, location: string, positionInLevel: number): ChartMapNode | undefined {
+  switch (item) {
+    case IM.ONE_OF:
+      return {
+        key: location + "_" + positionInLevel,
+        type: "oneOf",
+        data: { label: "One of" },
+        children: [] as ChartMapNode[]
+      };
+    case IM.COMBINATION_OF:
+      return {
+        key: location + "_" + positionInLevel,
+        type: "comboOf",
+        data: { label: "Combination of" },
+        children: [] as ChartMapNode[]
+      };
+    case IM.SOME_OF:
+      return {
+        key: location + "_" + positionInLevel,
+        type: "someOf",
+        data: { label: "Some of" },
+        children: [] as ChartMapNode[]
+      };
+    default:
+      return undefined;
+  }
+}
+
+function generateChildNodes(mapObject: any, location: string, positionInLevel: number): ChartMapNode[] | ChartTableNode[] {
+  if (isObjectHasKeys(mapObject[0], [IM.MAPPED_TO])) {
+    const mappedList = [] as MapItem[];
+    mapObject.forEach((item: any) => {
+      mappedList.push({
+        name: item[IM.MAPPED_TO][0].name,
+        iri: item[IM.MAPPED_TO][0]["@id"],
+        priority: item[IM.MAP_PRIORITY],
+        assuranceLevel: item[IM.ASSURANCE_LEVEL][0].name
+      });
+    });
+    mappedList.sort(byPriority);
+    return [createChartTableNode(mappedList, location, positionInLevel, "childList")];
+  } else {
+    // is array
+    const results = [] as ChartMapNode[];
+    let count = 0;
+    for (const item of mapObject) {
+      let mapNode = createChartMapNode(Object.keys(item)[0], location, count);
+      if (mapNode) {
+        mapNode.children = generateChildNodes(item[Object.keys(item)[0]], location + "_" + count, 0);
+        results.push(mapNode);
+      }
+      count++;
+    }
+    return results;
+  }
+}
+
+function createChartStructure(mappingObject: any): ChartMapNode | [] {
+  const parentNode = {
+    key: "0",
+    type: "hasMap",
+    data: { label: "Has map" },
+    children: [] as ChartMapNode[] | ChartTableNode[]
+  };
+  if (!(isArrayHasLength(mappingObject) || isObjectHasKeys(mappingObject)) && !isArrayHasLength(matchedFrom.value) && !isArrayHasLength(matchedTo.value)) {
+    return [];
+  }
+  if (isArrayHasLength(mappingObject) || isObjectHasKeys(mappingObject)) {
+    parentNode.children = generateChildNodes(mappingObject, "0", 0);
+  }
+  if (isArrayHasLength(matchedFrom.value)) {
+    const matchedFromChildren = generateSimpleMapsNodes(matchedFrom.value, "0_" + parentNode.children.length, 0, "matchedFromList");
+    parentNode.children.push({
+      key: "0_" + parentNode.children.length,
+      type: "matchedFrom",
+      data: { label: "Matched From" },
+      children: matchedFromChildren
+    });
+  }
+  if (isArrayHasLength(matchedTo.value)) {
+    const matchedToChildren = generateSimpleMapsNodes(matchedTo.value, "0_" + parentNode.children.length, 0, "matchedToList");
+    parentNode.children.push({
+      key: "0_" + parentNode.children.length,
+      type: "matchedTo",
+      data: { label: "Matched To" },
+      children: matchedToChildren
+    });
+  }
+  return parentNode;
+}
+
+function generateSimpleMapsNodes(simpleMaps: SimpleMap[], location: string, positionInLevel: number, type: string): ChartTableNode[] {
+  if (!isArrayHasLength(simpleMaps)) {
+    return [createChartTableNode([], location, positionInLevel, type)];
+  }
+  const simpleMapsList = [] as SimpleMapIri[];
+  simpleMaps.forEach((mapItem: SimpleMap) => {
+    simpleMapsList.push({
+      name: mapItem.name,
+      iri: mapItem["@id"],
+      scheme: mapItem.scheme,
+      code: mapItem.code
+    });
+  });
+  simpleMapsList.sort(byScheme);
+  return [createChartTableNode(simpleMapsList, location, positionInLevel, type)];
+}
+
+function getSimpleMapsNamespaces(): void {
+  if (isArrayHasLength(matchedFrom.value) && isArrayHasLength(namespaces.value)) {
+    matchedFrom.value.forEach((mapItem: SimpleMap) => {
+      const found = namespaces.value.find((namespace: Namespace) => namespace.iri.toLowerCase() === (mapItem["@id"].split("#")[0] + "#").toLowerCase());
+      if (found && isObjectHasKeys(found, ["name"])) {
+        mapItem.scheme = found.name;
+      } else {
+        mapItem.scheme = "None";
+      }
+    });
+  }
+  if (isArrayHasLength(matchedTo.value) && isArrayHasLength(namespaces.value)) {
+    matchedTo.value.forEach((mapItem: SimpleMap) => {
+      const found = namespaces.value.find((namespace: Namespace) => namespace.iri.toLowerCase() === (mapItem["@id"].split("#")[0] + "#").toLowerCase());
+      if (found && isObjectHasKeys(found, ["name"])) {
+        mapItem.scheme = found.name;
+      } else {
+        mapItem.scheme = "None";
+      }
+    });
+  }
+}
+
+function toggle(event: any, data: MapItem, refId: string): void {
+  hoveredResult.value = data;
+  let x: any;
+  switch (refId) {
+    case "opMap":
+      x = opMap;
+    case "opMatchedTo":
+      x = opMatchedTo;
+    case "opMatchedFrom":
+      x = opMatchedFrom;
+  }
+  if (x) x.toggle(event);
+}
+
+function handleMatchedFromToggle(event: any, data: any) {
+  toggle(event, data, "opMatchedFrom");
+}
+
+function handleMatchedToToggle(event: any, data: any) {
+  toggle(event, data, "opMatchedTo");
+}
 </script>
 
 <style scoped>

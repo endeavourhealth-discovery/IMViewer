@@ -4,31 +4,28 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "@vue/runtime-core";
+<script setup lang="ts">
+import { defineComponent, onMounted, PropType, ref } from "vue";
 import { TTBundle } from "im-library/dist/types/interfaces/Interfaces";
+import { Services } from "im-library";
+import axios from "axios";
+const { EntityService } = Services;
 
-export default defineComponent({
-  name: "EclDefinition",
-  props: {
-    definition: { type: Object as PropType<TTBundle>, required: true }
-  },
-  async mounted() {
-    await this.init();
-  },
-  data() {
-    return {
-      eclString: ""
-    };
-  },
-  methods: {
-    async init() {
-      const result = await this.$entityService.getEcl(this.definition);
-      if (!result) this.eclString = "Error";
-      else this.eclString = result;
-    }
-  }
+const props = defineProps({
+  definition: { type: Object as PropType<TTBundle>, required: true }
 });
+
+const entityService = new EntityService(axios);
+
+let eclString = ref("");
+
+onMounted(async () => await init());
+
+async function init() {
+  const result = await entityService.getEcl(props.definition);
+  if (!result) eclString.value = "Error";
+  else eclString.value = result;
+}
 </script>
 
 <style scoped>

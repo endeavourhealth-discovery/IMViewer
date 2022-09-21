@@ -24,81 +24,73 @@
       <Column field="name" header="Name" style="flex: 0 0 65%">
         <template #body="slotProps">
           <span
-            style="width: 100%; height: 100%; display: flex; align-items: center;"
+            style="width: 100%; height: 100%; display: flex; align-items: center"
             @mouseenter="toggle($event, slotProps.data)"
             @mouseleave="toggle($event, slotProps.data)"
             >{{ slotProps.data.name }}</span
           >
         </template>
       </Column>
-      <Column field="code" header="Code" style="flex: 0 0 35%; word-break: break-all;" />
+      <Column field="code" header="Code" style="flex: 0 0 35%; word-break: break-all" />
       <template #groupheader="slotProps">
-        <span style="font-weight: 700; color:rgba(51,153,255,0.8)">
+        <span style="font-weight: 700; color: rgba(51, 153, 255, 0.8)">
           {{ slotProps.data.scheme }}
         </span>
       </template>
-      <template #empty>
-        No simple maps found.
-      </template>
-      <template #loading>
-        Loading data. Please wait...
-      </template>
+      <template #empty> No simple maps found. </template>
+      <template #loading> Loading data. Please wait... </template>
     </DataTable>
   </div>
 </template>
-<script lang="ts">
-import { defineComponent } from "@vue/runtime-core";
+<script setup lang="ts">
+import { defineComponent, onMounted, onUnmounted, ref } from "vue";
 import { SimpleMap } from "im-library/dist/types/interfaces/Interfaces";
 
-export default defineComponent({
-  name: "SimpleMaps",
-  props: {
-    data: {
-      type: Object as () => SimpleMap,
-      required: true
-    }
-  },
-  emits: ["toggleOverlay"],
-  async mounted() {
-    window.addEventListener("resize", this.onResize);
-    this.onResize();
-  },
-  beforeUnmount() {
-    window.removeEventListener("resize", this.onResize);
-  },
-  data() {
-    return {
-      loading: false,
-      scrollHeight: "500px",
-      rows: 25
-    };
-  },
-  methods: {
-    onResize(): void {
-      this.setTableWidth();
-    },
-
-    setTableWidth(): void {
-      const container = document.getElementById("simple-maps-table-container") as HTMLElement;
-      const table = container?.getElementsByClassName("p-datatable-table")[0] as HTMLElement;
-      if (table) {
-        table.style.width = "100%";
-      }
-    },
-
-    scrollToTop(): void {
-      const tableContainer = document.getElementById("simple-maps-table-container") as HTMLElement;
-      const scrollBox = tableContainer?.getElementsByClassName("p-datatable-wrapper")[0] as HTMLElement;
-      if (scrollBox) {
-        scrollBox.scrollTop = 0;
-      }
-    },
-
-    toggle(event: any, data: any) {
-      this.$emit("toggleOverlay", event, data);
-    }
+const props = defineProps({
+  data: {
+    type: Object as () => SimpleMap,
+    required: true
   }
 });
+
+const emit = defineEmits({
+  toggleOverlay: (event: any, data: SimpleMap) => true
+});
+
+let loading = ref(false);
+let scrollHeight = ref("500px");
+let rows = ref(25);
+
+onMounted(() => {
+  window.addEventListener("resize", onResize);
+  onResize();
+});
+
+onUnmounted(() => window.removeEventListener("resize", onResize));
+
+function onResize(): void {
+  setTableWidth();
+}
+
+function setTableWidth(): void {
+  const container = document.getElementById("simple-maps-table-container") as HTMLElement;
+  const table = container?.getElementsByClassName("p-datatable-table")[0] as HTMLElement;
+  if (table) {
+    table.style.width = "100%";
+  }
+}
+
+function scrollToTop(): void {
+  const tableContainer = document.getElementById("simple-maps-table-container") as HTMLElement;
+  const scrollBox = tableContainer?.getElementsByClassName("p-datatable-wrapper")[0] as HTMLElement;
+  if (scrollBox) {
+    scrollBox.scrollTop = 0;
+  }
+}
+
+function toggle(event: any, data: any) {
+  emit("toggleOverlay", event, data);
+}
 </script>
 
 <style scoped>

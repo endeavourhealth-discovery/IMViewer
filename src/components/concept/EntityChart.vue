@@ -58,56 +58,55 @@
   </OrganizationChart>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "@vue/runtime-core";
-import { RouteRecordName } from "vue-router";
+<script setup lang="ts">
+import { defineComponent, onMounted, Ref, ref, watch } from "vue";
+import { RouteRecordName, useRoute, useRouter } from "vue-router";
 import { GraphData } from "im-library/dist/types/interfaces/Interfaces";
+import { Services } from "im-library";
+import axios from "axios";
+const { EntityService } = Services;
 
-export default defineComponent({
-  name: "EntityChart",
-  props: {
-    conceptIri: { type: String, required: true }
-  },
-  watch: {
-    async conceptIri(newValue) {
-      await this.getGraph(newValue);
-    }
-  },
-  data() {
-    return {
-      loading: false,
-      graph: {} as GraphData
-    };
-  },
-  async mounted() {
-    await this.getGraph(this.conceptIri);
-  },
-  methods: {
-    getTypeFromIri(iri: string): string {
-      if (!iri.includes("#")) {
-        return iri;
-      }
-      let part = iri.split("#")[1];
-      part = part.includes(":") ? part.split(":")[1] : part;
-      return part.charAt(0).toUpperCase() + part.slice(1);
-    },
-
-    async getGraph(iri: string): Promise<void> {
-      this.loading = true;
-      this.graph = await this.$entityService.getEntityGraph(iri);
-      this.loading = false;
-    },
-
-    navigate(iri: string): void {
-      const currentRoute = this.$route.name as RouteRecordName | undefined;
-      if (iri)
-        this.$router.push({
-          name: currentRoute,
-          params: { selectedIri: iri }
-        });
-    }
-  }
+const props = defineProps({
+  conceptIri: { type: String, required: true }
 });
+
+const entityService = new EntityService(axios);
+const route = useRoute();
+const router = useRouter();
+
+let loading = ref(false);
+let graph: Ref<GraphData> = ref({});
+
+watch(
+  () => props.conceptIri,
+  async newValue => await getGraph(newValue)
+);
+
+onMounted(async () => await getGraph(props.conceptIri));
+
+function getTypeFromIri(iri: string): string {
+  if (!iri.includes("#")) {
+    return iri;
+  }
+  let part = iri.split("#")[1];
+  part = part.includes(":") ? part.split(":")[1] : part;
+  return part.charAt(0).toUpperCase() + part.slice(1);
+}
+
+async function getGraph(iri: string): Promise<void> {
+  loading.value = true;
+  graph.value = await entityService.getEntityGraph(iri);
+  loading.value = false;
+}
+
+function navigate(iri: string): void {
+  const currentRoute = route.name as RouteRecordName | undefined;
+  if (iri)
+    router.push({
+      name: currentRoute,
+      params: { selectedIri: iri }
+    });
+}
 </script>
 
 <style scoped>
