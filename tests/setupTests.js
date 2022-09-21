@@ -1,4 +1,5 @@
 import { setupServer } from "msw/node";
+import { handlers, handlersFaker } from "@/mocks/handlers";
 
 const restHandlers = [];
 const server = setupServer(...restHandlers);
