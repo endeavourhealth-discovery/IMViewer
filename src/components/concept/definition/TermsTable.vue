@@ -1,5 +1,5 @@
 <template>
-  <div v-if="hasData" id="term-codes-container" :style="{ width: size }">
+  <div v-if="hasData" id="term-codes-container" :style="{ width: size }" data-testid="container">
     <div class="head-container">
       <strong class="label">{{ label }}</strong>
       <span>&nbsp;({{ data.length }})</span>
@@ -16,18 +16,18 @@
         }"
       />
     </div>
-    <DataTable :value="data" :paginator="data.length > 5 ? true : false" :rows="5" id="term-codes-table" class="hidden">
+    <DataTable :value="data" :paginator="data.length > 5 ? true : false" :rows="5" id="term-codes-table" class="hidden" data-testid="data-table">
       <template #empty> No records found </template>
       <Column field="name" header="Name" :sortable="true">
         <template #body="slotProps">
-          <div>
+          <div data-testid="col-name">
             {{ slotProps.data.name }}
           </div>
         </template>
       </Column>
       <Column field="code" header="Code" :sortable="true">
         <template #body="slotProps">
-          <div>
+          <div data-testid="col-code">
             {{ slotProps.data.code || "None" }}
           </div>
         </template>

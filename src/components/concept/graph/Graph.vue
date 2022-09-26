@@ -1,6 +1,6 @@
 <template>
   <div class="graph-predicates-container">
-    <MultiSelect v-model="selectedPredicates" @change="updatePredicates" :options="options" option-label="name" placeholder="Select predicates" />
+    <MultiSelect v-model="selectedPredicates" @change="updatePredicates" :options="options" option-label="name" placeholder="Select predicates" data-testid="selectedPredicates"/>
     <div class="loading-container" v-if="loading">
       <ProgressSpinner />
     </div>

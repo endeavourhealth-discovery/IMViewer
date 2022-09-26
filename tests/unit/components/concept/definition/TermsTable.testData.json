@@ -1,0 +1,5 @@
+[
+  { "name": "Scoliosis deformity of spine", "code": "439061010", "scheme": "Snomed-CT namespace" },
+  { "name": "Scoliosis", "scheme": "Snomed-CT namespace" },
+  { "name": "Scoliosis deformity of spine (disorder)", "code": "2153143014", "scheme": "Snomed-CT namespace" }
+]

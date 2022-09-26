@@ -1,12 +1,12 @@
 <template>
-  <Dialog :visible="showDialog" :modal="true" :closable="false" :maximizable="true" :style="{ width: '50vw' }">
+  <Dialog :visible="showDialog" :modal="true" :closable="false" :maximizable="true" :style="{ width: '50vw' }" data-testid="dialog">
     <template #header>
       <h3>Download Concept:</h3>
     </template>
     <div v-if="loading" class="loading-container">
       <ProgressSpinner />
     </div>
-    <div v-else id="content" class="flex flex-column justify-contents-center align-items-center">
+    <div v-else id="content" class="flex flex-column justify-contents-center align-items-center" data-testid="content">
       <h4 v-if="concept[RDFS_LABEL]">
         {{ concept[RDFS_LABEL] }}
       </h4>

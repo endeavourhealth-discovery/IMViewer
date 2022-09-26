@@ -1,6 +1,6 @@
 <template>
   <div class="content-container">
-    <div class="summary-container">
+    <div class="summary-container" data-testid="container">
       <template v-for="(config, index) of configs" :key="index">
         <component
           :is="config.type"
@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent, PropType } from "vue";
+import { PropType } from "vue";
 import TermsTable from "@/components/concept/definition/TermsTable.vue";
 import { DefinitionConfig } from "im-library/dist/types/interfaces/Interfaces";
 import { Helpers } from "im-library";

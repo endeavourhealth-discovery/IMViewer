@@ -1,6 +1,6 @@
 <template>
   <div id="ecl-definition-container">
-    <span class="ecl-text">{{ eclString }}</span>
+    <span class="ecl-text" data-testid="eclString">{{ eclString }}</span>
   </div>
 </template>
 

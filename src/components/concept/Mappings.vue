@@ -2,9 +2,9 @@
   <div class="flex flex-row justify-contents-center align-items-center loading -container" v-if="loading">
     <ProgressSpinner />
   </div>
-  <OrganizationChart v-else :value="data">
+  <OrganizationChart v-else :value="data" data-testid="mappings">
     <template #hasMap="slotProps">
-      <span>{{ slotProps.node.data.label }}</span>
+      <span >{{ slotProps.node.data.label }}</span>
     </template>
     <template #oneOf="slotProps">
       <span>{{ slotProps.node.data.label }}</span>
@@ -22,7 +22,7 @@
       <span>{{ slotProps.node.data.label }}</span>
     </template>
     <template #childList="slotProps">
-      <table aria-label="Concept map children">
+      <table aria-label="Concept map children" data-testid="hasMap">
         <thead>
           <tr>
             <th scope="col">Name</th>
@@ -43,11 +43,11 @@
       </table>
     </template>
     <template #matchedFromList="slotProps">
-      <SimpleMaps v-if="slotProps.node.data.mapItems.length" :data="slotProps.node.data.mapItems" @toggleOverlay="handleMatchedFromToggle" />
+      <SimpleMaps v-if="slotProps.node.data.mapItems.length" :data="slotProps.node.data.mapItems" @toggleOverlay="handleMatchedFromToggle" data-testid="matchedFrom"/>
       <span v-else>None</span>
     </template>
     <template #matchedToList="slotProps">
-      <SimpleMaps v-if="slotProps.node.data.mapItems.length" :data="slotProps.node.data.mapItems" @toggleOverlay="handleMatchedToToggle" />
+      <SimpleMaps v-if="slotProps.node.data.mapItems.length" :data="slotProps.node.data.mapItems" @toggleOverlay="handleMatchedToToggle" data-testid="matchedTo"/>
       <span v-else>None</span>
     </template>
     <template #default>
@@ -68,7 +68,7 @@
   </OverlayPanel>
 
   <OverlayPanel ref="opMatchedFrom" id="overlay-panel-simple-maps">
-    <div class="flex flex-column justify-contents-start simple-maps-overlay">
+    <div class="flex flex-column justify-contents-start simple-maps-overlay" data-testid="matchedFromOverlay">
       <p><strong>Name: </strong>{{ hoveredResult.name }}</p>
       <p><strong>Iri: </strong>{{ hoveredResult.iri }}</p>
       <p><strong>Namespace: </strong>{{ hoveredResult.scheme }}</p>
@@ -77,7 +77,7 @@
   </OverlayPanel>
 
   <OverlayPanel ref="opMatchedTo" id="overlay-panel-simple-maps">
-    <div class="flex flex-column justify-contents-start simple-maps-overlay">
+    <div class="flex flex-column justify-contents-start simple-maps-overlay" data-testid="matchedToOverlay">
       <p><strong>Name: </strong>{{ hoveredResult.name }}</p>
       <p><strong>Iri: </strong>{{ hoveredResult.iri }}</p>
       <p><strong>Namespace: </strong>{{ hoveredResult.scheme }}</p>
@@ -113,9 +113,9 @@ let matchedTo: Ref<SimpleMap[]> = ref([]);
 let namespaces: Ref<Namespace[]> = ref([]);
 let loading = ref(false);
 
-const opMap = ref();
-const opMatchedTo = ref();
-const opMatchedFrom = ref();
+const opMap = ref(null);
+const opMatchedTo = ref(null);
+const opMatchedFrom = ref(null);
 
 watch(
   () => props.conceptIri,
@@ -298,12 +298,15 @@ function toggle(event: any, data: MapItem, refId: string): void {
   switch (refId) {
     case "opMap":
       x = opMap;
+      break;
     case "opMatchedTo":
       x = opMatchedTo;
+      break;
     case "opMatchedFrom":
       x = opMatchedFrom;
+      break;
   }
-  if (x) x.toggle(event);
+  if (x) x.value.toggle(event);
 }
 
 function handleMatchedFromToggle(event: any, data: any) {

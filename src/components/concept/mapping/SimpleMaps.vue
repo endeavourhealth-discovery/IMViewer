@@ -19,11 +19,12 @@
       id="simple-maps-table"
       @page="scrollToTop"
       :loading="loading"
+      data-testid="mapTable"
     >
-      <Column field="scheme" header="Scheme" />
+      <Column field="scheme" header="Scheme"/>
       <Column field="name" header="Name" style="flex: 0 0 65%">
         <template #body="slotProps">
-          <span
+          <span data-testid="col-name"
             style="width: 100%; height: 100%; display: flex; align-items: center"
             @mouseenter="toggle($event, slotProps.data)"
             @mouseleave="toggle($event, slotProps.data)"
@@ -31,9 +32,9 @@
           >
         </template>
       </Column>
-      <Column field="code" header="Code" style="flex: 0 0 35%; word-break: break-all" />
+      <Column field="code" header="Code" style="flex: 0 0 35%; word-break: break-all" data-testid="col-code"/>
       <template #groupheader="slotProps">
-        <span style="font-weight: 700; color: rgba(51, 153, 255, 0.8)">
+        <span style="font-weight: 700; color: rgba(51, 153, 255, 0.8)" data-testid="col-scheme">
           {{ slotProps.data.scheme }}
         </span>
       </template>

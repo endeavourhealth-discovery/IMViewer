@@ -2,7 +2,7 @@
   <div class="flex flex-row justify-contents-center align-items-center loading -container" v-if="loading">
     <ProgressSpinner />
   </div>
-  <OrganizationChart v-else :value="graph" :collapsible="true">
+  <OrganizationChart v-else :value="graph" :collapsible="true" data-testid="orgChart">
     <template #NONE>
       <p class="text-centered">None</p>
     </template>
@@ -10,7 +10,7 @@
       <span>{{ slotProps.node.name }}</span>
     </template>
     <template #PROPERTIES="slotProps">
-      <table aria-label="graph semantic properties table">
+      <table aria-label="graph semantic properties table" data-testid="properties">
         <thead>
           <tr>
             <th scope="col">Name</th>
@@ -28,7 +28,7 @@
       </table>
     </template>
     <template #ISA="slotProps">
-      <table aria-label="graph isa's table">
+      <table aria-label="graph isa's table" data-testid="isA">
         <thead>
           <tr>
             <th scope="col">Name</th>
@@ -42,7 +42,7 @@
       </table>
     </template>
     <template #SUBTYPE="slotProps">
-      <table aria-label="graph subtypes table">
+      <table aria-label="graph subtypes table" data-testid="subtype">
         <thead>
           <tr>
             <th scope="col">Name</th>

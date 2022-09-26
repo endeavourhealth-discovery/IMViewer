@@ -155,7 +155,7 @@ import { DefinitionConfig, EntityReferenceNode, TTIriRef } from "im-library/dist
 import { useToast } from "primevue/usetoast";
 import axios from "axios";
 import { useRouter } from "vue-router";
-import { MenuItem } from "primevue/menuitem";
+import { MenuItem } from "primevue/menuitem/MenuItem";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
@@ -212,6 +212,7 @@ let terms: Ref<any[]> = ref([]);
 let selectedOption: Ref<any> = ref({});
 let splitterRightSize = ref(0);
 let dataSet: Ref<any> = ref({});
+
 let items: Ref<MenuItem[]> = ref([
   {
     label: "JSON Format",
@@ -224,12 +225,13 @@ let items: Ref<MenuItem[]> = ref([
     command: () => {
       downloadOption("turtle");
     }
-  }
-  // {label: "Custom Format",
-  // command: () => {
-  //     this.downloadOption("custom");
-  //   }
-  // }
+  }/*,
+  {
+    label: "Custom Format",
+    command: () => {
+      downloadOption("custom");
+    }
+  }*/
 ]);
 
 const copyMenu = ref();

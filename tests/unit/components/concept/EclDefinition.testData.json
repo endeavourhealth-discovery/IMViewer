@@ -1,0 +1,15 @@
+{
+  "ECL": "<<108337002 | Islam AND/OR derivative |  OR \n<<1226001 | United Church of Canada |  OR \n<<160234004 | Salvation Army member (person) |",
+  "ENTITY": {
+    "http://endhealth.info/im#definition": [
+      {
+        "http://www.w3.org/ns/shacl#or": [
+          { "@id": "http://snomed.info/sct#108337002", "name": "Islam AND/OR derivative" },
+          { "@id": "http://snomed.info/sct#1226001", "name": "United Church of Canada" },
+          { "@id": "http://snomed.info/sct#160234004", "name": "Salvation Army member (person)" }
+        ]
+      }
+    ]
+  },
+  "PREDICATES": { "http://www.w3.org/ns/shacl#or": "or" }
+}
