@@ -188,8 +188,8 @@ const showMappings = computed(() => (isConcept(types.value) || isOfTypes(types.v
 
 const entityService = new EntityService(axios);
 const configService = new ConfigService(axios);
-const directService = new DirectService(axios);
 const queryService = new QueryService(axios);
+const directService = new DirectService(store);
 
 let loading = ref(true);
 let tabMap = reactive(new Map<string, number>());
