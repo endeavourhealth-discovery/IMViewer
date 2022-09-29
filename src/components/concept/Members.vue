@@ -14,17 +14,18 @@
       class="p-datatable-sm"
       scrollHeight="flex"
       :loading="loading"
+      data-testid="table"
     >
       <template #header>
         <div class="table-header-bar">
           <div class="checkboxes-container">
             <template v-if="checkAuthorization()">
-              <Button type="button" label="Publish" @click="publish" :loading="isPublishing"></Button>
+              <Button type="button" label="Publish" @click="publish" :loading="isPublishing" data-testid="publishButton"></Button>
             </template>
-            <Button type="button" label="Download..." @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" :loading="downloading" />
+            <Button type="button" label="Download..." @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" :loading="downloading" data-testid="downloadButton"/>
             <template id="overlay_menu">
-              <Menu ref="menu" v-if="checkAuthorization()" :model="downloadMenu1" :popup="true" appendTo="body" />
-              <Menu ref="menu" v-else :model="downloadMenu" :popup="true" appendTo="body" />
+              <Menu ref="menu" v-if="checkAuthorization()" :model="downloadMenu1" :popup="true" appendTo="body" data-testid="menuWithPublish"/>
+              <Menu ref="menu" v-else :model="downloadMenu" :popup="true" appendTo="body" data-testid="menuWithoutPublish"/>
             </template>
           </div>
         </div>
@@ -57,12 +58,12 @@
 </template>
 
 <script setup lang="ts">
-import { Auth } from "aws-amplify";
-import { defineComponent, onMounted, ref, Ref, watch } from "vue";
+import {computed, onMounted, ref, Ref, watch} from 'vue';
 import { ValueSetMember, ExportValueSet } from "im-library/dist/types/interfaces/Interfaces";
 import { Helpers, Services, Vocabulary } from "im-library";
 import axios from "axios";
 import { useToast } from "primevue/usetoast";
+import {useStore} from 'vuex';
 const {
   DataTypeCheckers: { isArrayHasLength, isObjectHasKeys }
 } = Helpers;
@@ -76,8 +77,10 @@ const props = defineProps({
 const entityService = new EntityService(axios);
 const setService = new SetService(axios);
 const toast = useToast();
+const store = useStore();
+const currentUser = computed(() => store.state.currentUser);
+const isLoggedIn = computed(() => store.state.isLoggedIn);
 
-let userRoles: Ref<string[]> = ref([]);
 let loading = ref(false);
 let downloading = ref(false);
 let members: Ref<ExportValueSet> = ref({} as ExportValueSet);
@@ -115,7 +118,6 @@ watch(
 
 onMounted(async () => {
   await getMembers();
-  await getUserRoles();
   await getTotalCount();
   if (totalCount.value >= 10) {
     loadButton.value = true;
@@ -217,18 +219,10 @@ function publish() {
     });
 }
 
-async function getUserRoles() {
-  await Auth.currentSession()
-    .then(data => {
-      userRoles.value = data.getIdToken().payload["cognito:groups"];
-    })
-    .catch(() => {
-      userRoles.value = [];
-    });
-}
-
 function checkAuthorization() {
-  if (userRoles.value) return userRoles.value.includes("IM1_PUBLISH");
+  if (isLoggedIn.value && currentUser.value) {
+    return currentUser.value.roles.includes("IM1_PUBLISH");
+  }
   else return false;
 }
 

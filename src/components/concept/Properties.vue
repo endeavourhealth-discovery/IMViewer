@@ -1,6 +1,6 @@
 <template>
   <div id="properties-table-container">
-    <DataTable :value="dataModelPropsData" :scrollable="true" ref="propertiesTable" :loading="loading">
+    <DataTable :value="dataModelPropsData" :scrollable="true" ref="propertiesTable" :loading="loading" data-testid="table">
       <template #empty> No records found </template>
       <template #loading> Loading data. Please wait... </template>
       <template #header>
@@ -11,7 +11,7 @@
       </template>
       <Column field="propertyDisplay" header="Name" :sortable="true">
         <template #body="slotProps">
-          <div class="link" @click="navigate(slotProps.data.propertyId)">
+          <div class="link" @click="navigate(slotProps.data.propertyId)" data-testid="name">
             {{ slotProps.data.propertyDisplay }}
           </div>
         </template>

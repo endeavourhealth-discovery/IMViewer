@@ -1,0 +1,151 @@
+{
+  "CONFIG": [
+    {"label": "Name", "predicate": "http://www.w3.org/2000/01/rdf-schema#label", "type": "TextWithLabel", "size": "50%", "order": 0},
+    {"label": "Iri", "predicate": "@id", "type": "TextWithLabel", "size": "50%", "order": 1},
+    {"label": "Status", "predicate": "http://endhealth.info/im#status", "type": "ObjectNameWithLabel", "size": "50%", "order": 2},
+    {"label": "Types", "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "type": "ArrayObjectNamesToStringWithLabel", "size": "50%", "order": 3},
+    {"label": "Description", "predicate": "http://www.w3.org/2000/01/rdf-schema#comment", "type": "TextHTMLWithLabel", "size": "100%", "order": 4},
+    {"label": "Divider", "predicate": "None", "type": "Divider", "size": "100%", "order": 5},
+    {"label": "Inferred", "predicate": "inferred", "type": "TextDefinition", "size": "50%", "order": 6},
+    {"label": "Has sub types", "predicate": "subtypes", "type": "ArrayObjectNameListboxWithLabel", "size": "50%", "order": 7},
+    {"label": "Divider", "predicate": "None", "type": "Divider", "size": "100%", "order": 8}
+  ],
+  "CONCEPT": {
+    "@id": "http://endhealth.info/im#concept",
+    "http://endhealth.info/im#status": {"@id": "http://endhealth.info/im#Active", "name": "Active"},
+    "http://www.w3.org/2000/01/rdf-schema#comment": "An entry recording information about a criticial care encounter.<p>common data model attributes for Critical care encounter",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+      {"@id": "http://endhealth.info/im#Concept", "name": "Concept"}
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": "Critical care encounter (record type)"
+  },
+  "DATAMODEL": {
+    "@id": "http://endhealth.info/im#dataModel",
+    "http://endhealth.info/im#status": {"@id": "http://endhealth.info/im#Active", "name": "Active"},
+    "http://www.w3.org/2000/01/rdf-schema#comment": "An entry recording information about a criticial care encounter.<p>common data model attributes for Critical care encounter",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+      {"@id": "http://endhealth.info/im#RecordType", "name": "Record type"},
+      {"@id": "http://www.w3.org/ns/shacl#NodeShape", "name": "Node shape"},
+      {"@id": "http://endhealth.info/im#Concept", "name": "Concept"}
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": "Critical care encounter (record type)"
+  },
+  "CHILDREN": {
+    "totalCount": 3,
+    "pageSize": 10,
+    "result": [
+      {
+        "name": "Adult critical care encounter",
+        "@id": "http://endhealth.info/im#1641000252107"
+      },
+      {
+        "name": "Neonatal critical care encounter",
+        "@id": "http://endhealth.info/im#831000252103"
+      },
+      {
+        "name": "Paediatric critical care encounter",
+        "@id": "http://endhealth.info/im#2811000252102"
+      }
+    ]
+  },
+  "MEMBERS": {
+    "totalCount": 3,
+    "pageSize": 10,
+    "result": [
+      {
+        "name": "Adult critical care encounter",
+        "@id": "http://endhealth.info/im#1641000252107"
+      },
+      {
+        "name": "Neonatal critical care encounter",
+        "@id": "http://endhealth.info/im#831000252103"
+      },
+      {
+        "name": "Paediatric critical care encounter",
+        "@id": "http://endhealth.info/im#2811000252102"
+      }
+    ]
+  },
+  "TERMS": [
+    {"name": "Critical care encounter (record type)"}
+  ],
+  "INFERRED": {
+    "entity": {
+      "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+        {"@id": "http://snomed.info/sct#928000", "name": "Disorder of musculoskeletal system"},
+        {"@id": "http://snomed.info/sct#699699005", "name": "Disorder of vertebral column"},
+        {"@id": "http://snomed.info/sct#64217002", "name": "Curvature of spine"}
+      ],
+      "http://endhealth.info/im#roleGroup": [
+        {
+          "http://snomed.info/sct#116676008": {"@id": "http://snomed.info/sct#31739005", "name": "Lateral abnormal curvature"},
+          "http://snomed.info/sct#363698007": {"@id": "http://snomed.info/sct#289959001", "name": "Musculoskeletal structure of spine"}
+        }
+      ]
+    },
+    "predicates": {
+      "http://endhealth.info/im#roleGroup": "Where",
+      "http://snomed.info/sct#116676008": "Associated morphology",
+      "http://snomed.info/sct#363698007": "Finding site",
+      "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Subclass of",
+      "http://www.w3.org/2002/07/owl#onProperty": "On property",
+      "http://www.w3.org/2002/07/owl#intersectionOf": "Combination of",
+      "http://www.w3.org/2002/07/owl#someValuesFrom": "With a value",
+      "http://www.w3.org/2002/07/owl#equivalentClass": "Is equivalent to"
+    }
+  },
+  "INFERRED_NESTED_ROLEGROUP": {
+    "entity": {
+      "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+        {"@id": "http://snomed.info/sct#928000", "name": "Disorder of musculoskeletal system"},
+        {"@id": "http://snomed.info/sct#699699005", "name": "Disorder of vertebral column"},
+        {"@id": "http://snomed.info/sct#64217002", "name": "Curvature of spine"},
+        {
+          "http://endhealth.info/im#roleGroup": [
+            {
+              "http://snomed.info/sct#116676008": {"@id": "http://snomed.info/sct#31739005", "name": "Lateral abnormal curvature"},
+              "http://snomed.info/sct#363698007": {"@id": "http://snomed.info/sct#289959001", "name": "Musculoskeletal structure of spine"}
+            }
+          ]
+        }
+      ],
+      "http://endhealth.info/im#hasMember": [
+        {
+          "name": "Adult critical care encounter",
+          "@id": "http://endhealth.info/im#1641000252107"
+        },
+        {
+          "name": "Neonatal critical care encounter",
+          "@id": "http://endhealth.info/im#831000252103"
+        },
+        {
+          "name": "Paediatric critical care encounter",
+          "@id": "http://endhealth.info/im#2811000252102"
+        }
+      ]
+    },
+    "predicates": {
+      "http://endhealth.info/im#hasMember": "has member",
+      "http://endhealth.info/im#roleGroup": "Where",
+      "http://snomed.info/sct#116676008": "Associated morphology",
+      "http://snomed.info/sct#363698007": "Finding site",
+      "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Subclass of",
+      "http://www.w3.org/2002/07/owl#onProperty": "On property",
+      "http://www.w3.org/2002/07/owl#intersectionOf": "Combination of",
+      "http://www.w3.org/2002/07/owl#someValuesFrom": "With a value",
+      "http://www.w3.org/2002/07/owl#equivalentClass": "Is equivalent to"
+    }
+  },
+  "DEFAULT_PREDICATE_NAMES": {
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": "Is subclass of",
+    "http://endhealth.info/im#roleGroup": "Where",
+    "http://www.w3.org/2002/07/owl#equivalentClass": "Is equivalent to",
+    "http://www.w3.org/2002/07/owl#intersectionOf": "Combination of",
+    "http://www.w3.org/2002/07/owl#someValuesFrom": "With a value",
+    "http://www.w3.org/2002/07/owl#onProperty": "On property",
+    "http://www.w3.org/ns/shacl#property": "Properties",
+    "http://www.w3.org/ns/shacl#class": "Type",
+    "http://www.w3.org/ns/shacl#path": "Property",
+    "http://www.w3.org/ns/shacl#datatype": "Type"
+  }
+}

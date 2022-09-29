@@ -71,7 +71,7 @@
       <SplitterPanel :size="80" :minSize="20" class="right-splitter-panel">
         <div id="concept-content-dialogs-container">
           <div id="concept-panel-container">
-            <TabView v-model:activeIndex="active" :lazy="true" class="tab-view">
+            <TabView v-model:activeIndex="active" :lazy="true" class="tab-view" data-testid="tabPanel">
               <TabPanel header="Details">
                 <div v-if="loading" class="loading-container">
                   <ProgressSpinner />
@@ -137,14 +137,13 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent, computed, ref, Ref, watch, onMounted, reactive } from "vue";
+import { computed, ref, Ref, watch, onMounted, reactive } from "vue";
 import EntityChart from "../components/concept/EntityChart.vue";
 import Graph from "../components/concept/graph/Graph.vue";
 import QueryText from "../components/concept/query/QueryText.vue";
 import Definition from "../components/concept/Definition.vue";
 import UsedIn from "../components/concept/UsedIn.vue";
 import Members from "../components/concept/Members.vue";
-import PanelHeader from "../components/concept/PanelHeader.vue";
 import Mappings from "../components/concept/Mappings.vue";
 import EclDefinition from "@/components/concept/EclDefinition.vue";
 import { useStore } from "vuex";
@@ -365,6 +364,7 @@ async function init(): Promise<void> {
   await getDefinition(conceptIri.value);
   await getTerms(conceptIri.value);
   types.value = isObjectHasKeys(concept.value, [RDF.TYPE]) ? concept.value[RDF.TYPE] : ([] as TTIriRef[]);
+
   if (isQuery(types.value)) await getQueryDefinition(conceptIri.value);
   header.value = concept.value[RDFS.LABEL];
   await setCopyMenuItems();
@@ -414,10 +414,13 @@ function setActivePanel(newType: string, oldType: string): void {
 
 function setTabMap() {
   const tabList = document.getElementsByClassName("p-tabview-nav-content")?.[0]?.children?.[0]?.children as HTMLCollectionOf<HTMLElement>;
-  if (tabList && tabList.length)
+  if (tabList && tabList.length) {
     for (let i = 0; i < tabList.length; i++) {
-      if (tabList[i].innerText) tabMap.set(tabList[i].innerText, i);
+      if (tabList[i].textContent) {
+        tabMap.set(tabList[i].textContent as string, i);
+      }
     }
+  }
 }
 
 function openDownloadDialog(): void {

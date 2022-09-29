@@ -21,7 +21,8 @@ export default {
         cognitoUser.attributes["custom:surname"],
         cognitoUser.attributes.email,
         "",
-        cognitoUser.attributes["custom:avatar"]
+        cognitoUser.attributes["custom:avatar"],
+        cognitoUser?.signInUserSession?.accessToken?.payload["cognito:groups"] || []
       );
       authenticatedUser.setId(cognitoUser.attributes.sub);
       return new CustomAlert(200, "User authenticated successfully", undefined, authenticatedUser);

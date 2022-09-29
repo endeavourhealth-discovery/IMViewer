@@ -30,7 +30,7 @@ describe("Graph.vue", () => {
           GraphComponent: true
         }
       },
-      props: {conceptIri: "http://snomed.info/sct#298382003"}
+      props: {conceptIri: "http://snomed.info/sct#298382003", splitterRightSize: 200}
     });
   });
 

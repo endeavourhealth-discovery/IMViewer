@@ -1,0 +1,12 @@
+{
+
+    "valueSet": {"name": "Value set - Family history", "@id": "http://endhealth.info/im#VSET_FamilyHistory"}, "members": [
+      {
+        "entity": {
+          "name": "or : \n  <a href=\"/viewer/#/concept/http:%2F%2Fsnomed.info%2Fsct%23416471007\">Family history of clinical finding</a>\n  <a href=\"/viewer/#/concept/http:%2F%2Fsnomed.info%2Fsct%23430722000\">Family history of operative procedure</a>\n  <a href=\"/viewer/#/concept/http:%2F%2Fsnomed.info%2Fsct%23430802005\">Family history of procedure on ovary</a>\n",
+          "@id": ""
+        }, "label": "a_MemberIncluded", "type": "INCLUDED_SELF", "directParent": {"name": "Value set - Family history", "@id": "http://endhealth.info/im#VSET_FamilyHistory"}
+      }
+    ], "limited": false
+
+}

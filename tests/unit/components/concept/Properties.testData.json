@@ -1,0 +1,90 @@
+[
+  {
+    "property": {
+      "name": "manufacturer",
+      "@id": "http://endhealth.info/im#manufacturer"
+    },
+    "type": {
+      "name": "Concept",
+      "@id": "http://endhealth.info/im#Concept"
+    },
+    "inheritedFrom": {}
+  },
+  {
+    "property": {
+      "name": "reaction",
+      "@id": "http://endhealth.info/im#reaction"
+    },
+    "type": {
+      "name": "Concept",
+      "@id": "http://endhealth.info/im#Concept"
+    },
+    "inheritedFrom": { "name": "InheritedParent" },
+    "minExclusive": 1
+  },
+  {
+    "property": {
+      "name": "vaccination procedure",
+      "@id": "http://endhealth.info/im#vaccinationProcedure"
+    },
+    "type": {
+      "name": "Value set Immunisations - Care connect",
+      "@id": "http://endhealth.info/im#VSET_Immunisations_CareConnect"
+    },
+    "inheritedFrom": {},
+    "minInclusive": 2
+  },
+  {
+    "property": {
+      "name": "vaccine product",
+      "@id": "http://endhealth.info/im#vaccineProduct"
+    },
+    "type": {
+      "name": "Concept",
+      "@id": "http://endhealth.info/im#Concept"
+    },
+    "inheritedFrom": {},
+    "maxInclusive": 3
+  },
+  {
+    "property": {
+      "name": "batch number",
+      "@id": "http://endhealth.info/im#batchNumber"
+    },
+    "type": {
+      "@id": "http://www.w3.org/2001/XMLSchema#string"
+    },
+    "inheritedFrom": {},
+    "maxExclusive": 4
+  },
+  {
+    "property": {
+      "name": "dose sequence",
+      "@id": "http://endhealth.info/im#doseSequence"
+    },
+    "type": {
+      "@id": "http://www.w3.org/2001/XMLSchema#string"
+    },
+    "inheritedFrom": {}
+  },
+  {
+    "property": {
+      "name": "doses required",
+      "@id": "http://endhealth.info/im#dosesRequired"
+    },
+    "type": {
+      "@id": "http://www.w3.org/2001/XMLSchema#string"
+    },
+    "inheritedFrom": {}
+  },
+  {
+    "property": {
+      "name": "expiry date",
+      "@id": "http://endhealth.info/im#expiryDate"
+    },
+    "type": {
+      "@id": "http://www.w3.org/2001/XMLSchema#string"
+    },
+    "inheritedFrom": {}
+  }
+]
