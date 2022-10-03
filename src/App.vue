@@ -30,9 +30,9 @@ const route = useRoute();
 const toast = useToast();
 const store = useStore();
 
-const appVersion = __APP_VERSION__;
-
 provide("axios", axios);
+
+const appVersion = __APP_VERSION__;
 
 let loading = ref(true);
 
