@@ -9,18 +9,21 @@ export default defineConfig({
     dedupe: ["vue"],
     alias: { "./runtimeConfig": "./runtimeConfig.browser", "@": path.resolve(__dirname, "./src") }
   },
+  define: {
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version)
+  },
   server: {
     port: 8082,
     proxy: {
       "/imapi": {
-        target: "http://localhost:8080",
+        target: "http://127.0.0.1:8080",
         changeOrigin: true,
         secure: false,
         ws: true,
         rewrite: p => p.replace(/^\/imapi/, "")
       },
       "/nodeapi": {
-        target: "http://localhost:3000",
+        target: "http://127.0.0.1:3000",
         changeOrigin: true,
         secure: false,
         ws: true,
