@@ -35,7 +35,7 @@ import { QueryDisplay } from "im-library/dist/types/interfaces/Interfaces";
 import { Services, Vocabulary } from "im-library";
 import axios from "axios";
 const { IM } = Vocabulary;
-const { QueryService, EntityService } = Services;
+const { QueryService } = Services;
 
 export default defineComponent({
   name: "QuerySetDefinition",
@@ -43,7 +43,6 @@ export default defineComponent({
     conceptIri: { type: String, required: true }
   },
   setup(props, _ctx) {
-    const entityService = new EntityService(axios);
     const queryService = new QueryService(axios);
     const queryDisplay = ref<QueryDisplay[]>();
     let expandedKeys = ref<any>({});
@@ -60,8 +59,7 @@ export default defineComponent({
     );
 
     async function getQueryDisplay() {
-      const query = (await entityService.getPartialEntity(props.conceptIri, [IM.DEFINITION]))[IM.DEFINITION];
-      queryDisplay.value = (await queryService.getSetQueryDisplay(JSON.parse(query))).children;
+      queryDisplay.value = (await queryService.getQueryDefinitionDisplay(props.conceptIri)).children;
     }
 
     function expandAll() {
