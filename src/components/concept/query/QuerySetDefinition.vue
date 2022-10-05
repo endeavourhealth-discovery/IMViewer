@@ -1,6 +1,6 @@
 <template>
   <div class="query-display-container">
-    <Tree :value="queryDisplay" class="tree-container">
+    <Tree :value="queryDisplay" :expandedKeys="expandedKeys" class="tree-container">
       <template #default="{ node }">{{ node.label }}</template>
       <template #propertyIs="{ node }">
         <IMViewerLink
@@ -46,15 +46,16 @@ export default defineComponent({
     const entityService = new EntityService(axios);
     const queryService = new QueryService(axios);
     const queryDisplay = ref<QueryDisplay[]>();
+    let expandedKeys = ref<any>({});
 
     onMounted(async () => {
-      await getQueryDisplay();
+      await init();
     });
 
     watch(
       () => props.conceptIri,
       async () => {
-        await getQueryDisplay();
+        await init();
       }
     );
 
@@ -63,7 +64,30 @@ export default defineComponent({
       queryDisplay.value = (await queryService.getSetQueryDisplay(JSON.parse(query))).children;
     }
 
-    return { queryDisplay };
+    function expandAll() {
+      if (queryDisplay.value) {
+        for (const node of queryDisplay.value) {
+          expandNode(node);
+        }
+      }
+      expandedKeys.value = { ...expandedKeys.value };
+    }
+
+    function expandNode(node: QueryDisplay) {
+      expandedKeys.value[node.key] = true;
+      if (node.children && node.children.length) {
+        for (let child of node.children) {
+          expandNode(child);
+        }
+      }
+    }
+
+    async function init() {
+      await getQueryDisplay();
+      expandAll();
+    }
+
+    return { queryDisplay, expandedKeys };
   }
 });
 </script>
