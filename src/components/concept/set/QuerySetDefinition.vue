@@ -1,5 +1,7 @@
 <template>
-  <div class="query-display-container">
+  <div v-if="!queryDisplay">No query definition found.</div>
+
+  <div v-else class="query-display-container">
     <Tree :value="queryDisplay" :expandedKeys="expandedKeys" class="tree-container">
       <template #default="{ node }">{{ node.label }}</template>
       <template #propertyIs="{ node }">
@@ -28,72 +30,66 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, onMounted, PropType } from "vue";
-import { Ref, ref, watch } from "vue";
+<script setup lang="ts">
+import { onMounted } from "vue";
+import { ref, watch } from "vue";
 import { QueryDisplay } from "im-library/dist/types/interfaces/Interfaces";
 import { Services, Vocabulary } from "im-library";
 import axios from "axios";
-const { IM } = Vocabulary;
 const { QueryService } = Services;
 
-export default defineComponent({
-  name: "QuerySetDefinition",
-  props: {
-    conceptIri: { type: String, required: true }
-  },
-  setup(props, _ctx) {
-    const queryService = new QueryService(axios);
-    const queryDisplay = ref<QueryDisplay[]>();
-    let expandedKeys = ref<any>({});
+const props = defineProps({ conceptIri: { type: String, required: true } });
 
-    onMounted(async () => {
-      await init();
-    });
+const queryService = new QueryService(axios);
+const queryDisplay = ref<QueryDisplay[]>();
+let expandedKeys = ref<any>({});
 
-    watch(
-      () => props.conceptIri,
-      async () => {
-        await init();
-      }
-    );
-
-    async function getQueryDisplay() {
-      queryDisplay.value = (await queryService.getQueryDefinitionDisplay(props.conceptIri)).children;
-    }
-
-    function expandAll() {
-      if (queryDisplay.value) {
-        for (const node of queryDisplay.value) {
-          expandNode(node);
-        }
-      }
-      expandedKeys.value = { ...expandedKeys.value };
-    }
-
-    function expandNode(node: QueryDisplay) {
-      expandedKeys.value[node.key] = true;
-      if (node.children && node.children.length) {
-        for (let child of node.children) {
-          expandNode(child);
-        }
-      }
-    }
-
-    async function init() {
-      await getQueryDisplay();
-      expandAll();
-    }
-
-    return { queryDisplay, expandedKeys };
-  }
+onMounted(async () => {
+  await init();
 });
+
+watch(
+  () => props.conceptIri,
+  async () => {
+    await init();
+  }
+);
+
+async function getQueryDisplay() {
+  queryDisplay.value = (await queryService.getQueryDefinitionDisplay(props.conceptIri)).children;
+}
+
+function expandAll() {
+  if (queryDisplay.value) {
+    for (const node of queryDisplay.value) {
+      expandNode(node);
+    }
+  }
+  expandedKeys.value = { ...expandedKeys.value };
+}
+
+function expandNode(node: QueryDisplay) {
+  expandedKeys.value[node.key] = true;
+  if (node.children && node.children.length) {
+    for (let child of node.children) {
+      expandNode(child);
+    }
+  }
+}
+
+async function init() {
+  await getQueryDisplay();
+  expandAll();
+}
 </script>
 
 <style scoped>
+.p-tree {
+  border: none;
+}
 .tree-container,
 .json {
-  height: calc(100vh - 9rem);
+  height: 100%;
   overflow: auto;
   width: 100%;
 }

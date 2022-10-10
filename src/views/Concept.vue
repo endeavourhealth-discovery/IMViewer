@@ -100,14 +100,9 @@
                   <Properties :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
-              <TabPanel header="Members" v-if="isValueSet(types)">
+              <TabPanel header="Set definition" v-if="isValueSet(types)">
                 <div class="concept-panel-content" id="members-container">
-                  <Members :conceptIri="conceptIri" />
-                </div>
-              </TabPanel>
-              <TabPanel header="Definition" v-if="isValueSet(types)">
-                <div class="concept-panel-content" id="members-container">
-                  <QuerySetDefinition :conceptIri="conceptIri" />
+                  <SetDefinition :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
               <TabPanel header="Terms" v-if="terms">
@@ -151,7 +146,7 @@ import UsedIn from "../components/concept/UsedIn.vue";
 import Members from "../components/concept/Members.vue";
 import Mappings from "../components/concept/Mappings.vue";
 import EclDefinition from "@/components/concept/EclDefinition.vue";
-import QuerySetDefinition from "../components/concept/query/QuerySetDefinition.vue"
+import QuerySetDefinition from "../components/concept/query/QuerySetDefinition.vue";
 import { useStore } from "vuex";
 import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import Properties from "@/components/concept/Properties.vue";
@@ -161,6 +156,7 @@ import { useToast } from "primevue/usetoast";
 import axios from "axios";
 import { useRouter } from "vue-router";
 import { MenuItem } from "primevue/menuitem/MenuItem";
+import SetDefinition from "@/components/concept/set/SetDefinition.vue";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
