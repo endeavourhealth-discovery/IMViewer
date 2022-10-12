@@ -1,17 +1,17 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import Members from "@/components/concept/Members.vue";
-import {fireEvent, getByTestId, queryByTestId, render, RenderResult, within} from '@testing-library/vue';
-import {flushPromises, RouterLinkStub} from '@vue/test-utils';
+import { fireEvent, getByTestId, queryByTestId, render, RenderResult, within } from "@testing-library/vue";
+import { flushPromises, RouterLinkStub } from "@vue/test-utils";
 import testData from "./Members.testData.json";
-import PrimeVue from 'primevue/config';
-import ToastService from 'primevue/toastservice';
-import DataTable from 'primevue/datatable';
-import InputText from 'primevue/inputtext';
-import Checkbox from 'primevue/checkbox';
-import Column from 'primevue/column';
-import Button from 'primevue/button';
-import Menu from 'primevue/menu';
-import {createStore} from 'vuex';
+import PrimeVue from "primevue/config";
+import ToastService from "primevue/toastservice";
+import DataTable from "primevue/datatable";
+import InputText from "primevue/inputtext";
+import Checkbox from "primevue/checkbox";
+import Column from "primevue/column";
+import Button from "primevue/button";
+import Menu from "primevue/menu";
+import { createStore } from "vuex";
 import { Services } from "im-library";
 const { EntityService, SetService } = Services;
 
@@ -42,8 +42,7 @@ describe("Members.vue - populated", () => {
     });
 
     vi.spyOn(EntityService.prototype, "getEntityMembers").mockResolvedValue(testData);
-    getMembers = vi.spyOn(EntityService.prototype, "getHasMember").mockResolvedValue(testData);
-    vi.spyOn(EntityService.prototype, "getFullExportSet").mockResolvedValue({  data: true });
+    vi.spyOn(EntityService.prototype, "getFullExportSet").mockResolvedValue({ data: true });
     vi.spyOn(EntityService.prototype, "getPartialEntity").mockResolvedValue({ "http://www.w3.org/2000/01/rdf-schema#label": "Test Set" });
     vi.spyOn(EntityService.prototype, "getPartialAndTotalCount").mockResolvedValue({ totalCount: 11, result: [], pageSize: 10 });
 
@@ -52,21 +51,13 @@ describe("Members.vue - populated", () => {
         plugins: [PrimeVue, ToastService, mockStore],
         components: { DataTable, InputText, Checkbox, Column, Button, Menu },
         stubs: {
-          'router-link': RouterLinkStub
+          "router-link": RouterLinkStub
         }
       },
-      props: {  conceptIri: "http://endhealth.info/im#VSET_EthnicCategoryCEG16" }
+      props: { conceptIri: "http://endhealth.info/im#VSET_EthnicCategoryCEG16" }
     });
 
     await flushPromises();
-  });
-
-  it("displays members", async () => {
-    const table = component.getByTestId("table");
-
-    for(let member of testData.members) {
-      expect(table.innerHTML).toContain(member.entity.name);
-    }
   });
 
   it("does not display publish button", async () => {
@@ -93,7 +84,7 @@ describe("Members.vue - populated", () => {
     await fireEvent.click(downloadButton);
 
     const menu = getByTestId(document.body, "menuWithoutPublish");
-    const downloadV1 = within(menu).getByText("Definition Only")
+    const downloadV1 = within(menu).getByText("Definition Only");
     await fireEvent.click(downloadV1);
     await flushPromises();
 
@@ -103,16 +94,11 @@ describe("Members.vue - populated", () => {
   it("can load more", async () => {
     const table = component.getByTestId("table");
 
-    expect(getMembers).toHaveBeenCalledTimes(0);
-
     expect(table.textContent).toContain("Load more...");
     const loadMore = within(table).getByText("Load more...");
     await fireEvent.click(loadMore);
-
-    expect(getMembers).toHaveBeenCalledTimes(1);
   });
 });
-
 
 describe("Members.vue - publish", () => {
   let component: RenderResult;
@@ -127,7 +113,7 @@ describe("Members.vue - publish", () => {
       state: {
         isLoggedIn: true,
         currentUser: {
-            roles: ["IM1_PUBLISH"]
+          roles: ["IM1_PUBLISH"]
         }
       }
     });
@@ -136,8 +122,7 @@ describe("Members.vue - publish", () => {
     imV1Mock = vi.spyOn(SetService.prototype, "IMV1").mockResolvedValue(true);
 
     vi.spyOn(EntityService.prototype, "getEntityMembers").mockResolvedValue(testData);
-    vi.spyOn(EntityService.prototype, "getHasMember").mockResolvedValue(testData);
-    vi.spyOn(EntityService.prototype, "getFullExportSet").mockResolvedValue({  data: true });
+    vi.spyOn(EntityService.prototype, "getFullExportSet").mockResolvedValue({ data: true });
     vi.spyOn(EntityService.prototype, "getPartialEntity").mockResolvedValue({ "http://www.w3.org/2000/01/rdf-schema#label": "Test Set" });
     vi.spyOn(EntityService.prototype, "getPartialAndTotalCount").mockResolvedValue({ totalCount: 11, result: [], pageSize: 10 });
 
@@ -146,17 +131,17 @@ describe("Members.vue - publish", () => {
         plugins: [PrimeVue, ToastService, mockStore],
         components: { DataTable, InputText, Checkbox, Column, Button, Menu },
         stubs: {
-          'router-link': RouterLinkStub
+          "router-link": RouterLinkStub
         }
       },
-      props: {  conceptIri: "http://endhealth.info/im#VSET_EthnicCategoryCEG16" }
+      props: { conceptIri: "http://endhealth.info/im#VSET_EthnicCategoryCEG16" }
     });
 
     await flushPromises();
   });
 
   it("displays publish button", async () => {
-   component.getByTestId("publishButton");
+    component.getByTestId("publishButton");
   });
 
   it("displays download menu (with IMv1)", async () => {
@@ -182,7 +167,7 @@ describe("Members.vue - publish", () => {
     await fireEvent.click(downloadButton);
 
     const menu = getByTestId(document.body, "menuWithPublish");
-    const downloadV1 = within(menu).getByText("IMv1")
+    const downloadV1 = within(menu).getByText("IMv1");
     await fireEvent.click(downloadV1);
 
     expect(imV1Mock).toHaveBeenCalledOnce();
