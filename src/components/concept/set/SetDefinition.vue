@@ -11,7 +11,7 @@
         <SubsetDisplay :conceptIri="props.conceptIri" />
       </div>
     </AccordionTab>
-    <AccordionTab header="Members">
+    <AccordionTab header="Direct Members">
       <div class="set-accordion-content" id="members-container">
         <Members :conceptIri="props.conceptIri" />
       </div>
