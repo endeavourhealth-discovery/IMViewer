@@ -16,7 +16,7 @@
         <Members :conceptIri="props.conceptIri" />
       </div>
     </AccordionTab>
-    <AccordionTab header="Query">
+    <AccordionTab header="Definition">
       <div class="set-accordion-content" id="set-definition-container">
         <QuerySetDefinition :conceptIri="props.conceptIri" />
       </div>
