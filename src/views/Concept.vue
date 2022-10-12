@@ -127,6 +127,11 @@
                   <QueryText :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
+              <TabPanel header="JSON">
+                <div class="concept-panel-content" id="query-container">
+                  <JSONViewer :conceptIri="conceptIri" />
+                </div>
+              </TabPanel>
             </TabView>
           </div>
           <DownloadDialog v-if="showDownloadDialog" @closeDownloadDialog="closeDownloadDialog" :showDialog="showDownloadDialog" :conceptIri="conceptIri" />
@@ -157,6 +162,7 @@ import axios from "axios";
 import { useRouter } from "vue-router";
 import { MenuItem } from "primevue/menuitem/MenuItem";
 import SetDefinition from "@/components/concept/set/SetDefinition.vue";
+import JSONViewer from "../components/concept/JSONViewer.vue";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
