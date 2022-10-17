@@ -120,6 +120,11 @@
                   <Graph :conceptIri="conceptIri" :splitterRightSize="splitterRightSize" />
                 </div>
               </TabPanel>
+              <TabPanel header="Data Model" v-if="isRecordModel">
+                <div id="data-model-container" class="concept-panel-content">
+                  <DataModel :conceptIri="conceptIri" :splitterRightSize="splitterRightSize" />
+                </div>
+              </TabPanel>
               <TabPanel header="Query" v-if="isQuery(types)">
                 <div class="concept-panel-content" id="query-container">
                   <h4>Query Definition</h4>
@@ -145,6 +150,7 @@
 import { computed, ref, Ref, watch, onMounted, reactive } from "vue";
 import EntityChart from "../components/concept/EntityChart.vue";
 import Graph from "../components/concept/graph/Graph.vue";
+import DataModel from "../components/concept/dataModel/DataModel.vue";
 import QueryText from "../components/concept/query/QueryText.vue";
 import Definition from "../components/concept/Definition.vue";
 import UsedIn from "../components/concept/UsedIn.vue";
@@ -160,7 +166,6 @@ import { DefinitionConfig, EntityReferenceNode, TTIriRef } from "im-library/dist
 import { useToast } from "primevue/usetoast";
 import axios from "axios";
 import { useRouter } from "vue-router";
-import { MenuItem } from "primevue/menuitem/MenuItem";
 import SetDefinition from "@/components/concept/set/SetDefinition.vue";
 import JSONViewer from "../components/concept/JSONViewer.vue";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
@@ -220,7 +225,7 @@ let selectedOption: Ref<any> = ref({});
 let splitterRightSize = ref(0);
 let dataSet: Ref<any> = ref({});
 
-let items: Ref<MenuItem[]> = ref([
+let items: Ref<any[]> = ref([
   {
     label: "JSON Format",
     command: () => {
@@ -578,6 +583,7 @@ async function getQueryDefinition(iri: string) {
   overflow: auto;
   background-color: #ffffff;
   height: 100%;
+  width: 100%;
 }
 
 .loading-container {
