@@ -120,7 +120,7 @@
                   <Graph :conceptIri="conceptIri" :splitterRightSize="splitterRightSize" />
                 </div>
               </TabPanel>
-              <TabPanel header="Data Model" v-if="isRecordModel">
+              <TabPanel header="Data Model" v-if="isRecordModel(types)">
                 <div id="data-model-container" class="concept-panel-content">
                   <DataModel :conceptIri="conceptIri" :splitterRightSize="splitterRightSize" />
                 </div>
@@ -398,8 +398,6 @@ function setStoreType(): void {
     type = "Ontology";
   } else if (isQuery(types.value)) {
     type = "Queries";
-  } else if (isRecordModel(types.value)) {
-    type = "DataModel";
   } else if (isProperty(types.value)) {
     type = "Property";
   } else {
@@ -416,7 +414,7 @@ function setActivePanel(newType: string, oldType: string): void {
     if (isValueSet(types.value)) {
       active.value = tabMap.get("Members") || 0;
     } else if (isRecordModel(types.value)) {
-      active.value = tabMap.get("Properties") || 0;
+      active.value = tabMap.get("Data Model") || 0;
     } else if (isQuery(types.value)) {
       active.value = tabMap.get("Query") || 0;
     } else {

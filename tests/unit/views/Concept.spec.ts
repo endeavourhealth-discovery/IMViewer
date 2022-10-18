@@ -95,7 +95,7 @@ describe("Concept.vue", () => {
           QueryDefinition: true,
           QueryText: true,
           Definition: true,
-          Properties: true
+          DataModel: true
         }
       },
     });
@@ -107,7 +107,7 @@ describe("Concept.vue", () => {
     expect(document.body.getElementsByTagName("top-bar-stub").length).toBe(1);
     expect(document.body.getElementsByTagName("definition-stub").length).toBe(2);
     expect(document.body.getElementsByTagName("secondary-tree-stub").length).toBe(1);
-    expect(document.body.getElementsByTagName("properties-stub").length).toBe(0);
+    expect(document.body.getElementsByTagName("data-model-stub").length).toBe(0);
   });
 
   it("switches tab on type change", async () => {
@@ -116,8 +116,8 @@ describe("Concept.vue", () => {
 
     expect(tabPanel.textContent).toContain("Details")
     expect(tabs[0].getAttribute("aria-selected")).toBe("true")
-    expect(tabPanel.textContent).not.toContain("Properties")
-    expect(document.body.getElementsByTagName("properties-stub").length).toBe(0);
+    expect(tabPanel.textContent).not.toContain("Data Model")
+    expect(document.body.getElementsByTagName("data-model-stub").length).toBe(0);
 
     getPartial.mockResolvedValue(testData.DATAMODEL);
     await store.commit('updateConceptIri', 'http://endhealth.info/im#dataModel');
@@ -126,8 +126,8 @@ describe("Concept.vue", () => {
     tabs = within(tabPanel).getAllByRole("tab");
     expect(tabs[0].textContent).toContain("Details")
     expect(tabs[0].getAttribute("aria-selected")).toBe("false")
-    expect(tabs[3].textContent).toContain("Properties")
-    expect(tabs[3].getAttribute("aria-selected")).toBe("true");
-    expect(document.body.getElementsByTagName("properties-stub").length).toBe(1);
+    expect(tabs[6].textContent).toContain("Data Model")
+    expect(tabs[6].getAttribute("aria-selected")).toBe("true");
+    expect(document.body.getElementsByTagName("data-model-stub").length).toBe(1);
   });
 });
