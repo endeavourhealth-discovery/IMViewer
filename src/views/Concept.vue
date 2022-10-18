@@ -127,9 +127,7 @@
               </TabPanel>
               <TabPanel header="Query" v-if="isQuery(types)">
                 <div class="concept-panel-content" id="query-container">
-                  <h4>Query Definition</h4>
-                  <QueryDefinition :modelValue="dataSet" :edit="false"></QueryDefinition>
-                  <QueryText :conceptIri="conceptIri" />
+                  <QueryDefinition :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
               <TabPanel header="JSON">
@@ -161,13 +159,14 @@ import QuerySetDefinition from "../components/concept/query/QuerySetDefinition.v
 import { useStore } from "vuex";
 import DownloadDialog from "@/components/concept/DownloadDialog.vue";
 import Properties from "@/components/concept/Properties.vue";
-import { Helpers, Vocabulary, Models, Config, Services, QueryDefinition } from "im-library";
+import { Helpers, Vocabulary, Models, Config, Services } from "im-library";
 import { DefinitionConfig, EntityReferenceNode, TTIriRef } from "im-library/dist/types/interfaces/Interfaces";
 import { useToast } from "primevue/usetoast";
 import axios from "axios";
 import { useRouter } from "vue-router";
 import SetDefinition from "@/components/concept/set/SetDefinition.vue";
 import JSONViewer from "../components/concept/JSONViewer.vue";
+import QueryDefinition from "../components/concept/query/QueryDefinition.vue";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
@@ -378,7 +377,6 @@ async function init(): Promise<void> {
   await getTerms(conceptIri.value);
   types.value = isObjectHasKeys(concept.value, [RDF.TYPE]) ? concept.value[RDF.TYPE] : ([] as TTIriRef[]);
 
-  if (isQuery(types.value)) await getQueryDefinition(conceptIri.value);
   header.value = concept.value[RDFS.LABEL];
   await setCopyMenuItems();
   setStoreType();
