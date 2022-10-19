@@ -25,7 +25,6 @@
 </template>
 
 <script setup lang="ts">
-import QuerySetDefinition from "../set/QuerySetDefinition.vue";
 import Members from "../Members.vue";
 import SubsetDisplay from "../set/SubsetDisplay.vue";
 import { onMounted, ref } from "@vue/runtime-core";
