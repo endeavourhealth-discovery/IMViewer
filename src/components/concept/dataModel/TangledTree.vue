@@ -1,20 +1,27 @@
 <template>
   <div id="data-model-svg-container" >
     <svg id="data-model-svg"></svg>
-    <ContextMenu ref="menu" :model="contextMenu" style="max-height: 200px; overflow: auto"/>
+    <OverlayPanel ref="menu" v-if="displayMenu" :style="{width: '300px', top: overlayTop + 'px'}" >
+      <div class="p-field">
+        <div class="p-inputgroup">
+            <span class="p-float-label">
+              <MultiSelect id="properties" v-model="selected" :options="multiselectMenu" optionLabel="label" display="chip" @change="change($event)"/>
+              <label for="properties">Select Properties</label>
+            </span>
+        </div>
+      </div>
+    </OverlayPanel>
   </div>
 </template>
 
 <script setup lang="ts">
 import * as d3 from "d3";
 import { Helpers } from "im-library";
-import {onMounted, PropType, ref, Ref, watch} from "vue";
+import {onMounted, PropType, ref, Ref, watch, reactive} from "vue";
 import {TangledTreeData} from "im-library/dist/types/interfaces/Interfaces";
 import _ from "lodash";
-import ContextMenu from "primevue/contextmenu";
 import { Services } from "im-library";
 import axios from "axios";
-import {context} from "msw";
 
 const { EntityService } = Services;
 
@@ -23,7 +30,8 @@ const {
 } = Helpers;
 
 const props = defineProps({
-  data: { type: Array as PropType<Array<TangledTreeData[]>>, required: true }
+  data: { type: Array as PropType<Array<TangledTreeData[]>>, required: true },
+  conceptIri: { type: String, required: true}
 });
 
 const entityService = new EntityService(axios);
@@ -39,79 +47,36 @@ watch(
 let options: Ref = ref({});
 let color = ref(d3.scaleOrdinal(d3.schemeSet2));
 let chartData:  Ref<TangledTreeData[][]> = ref([]);
-let contextMenu: Ref< {iri:string, label:string, command: (d:any) => void, disabled?:boolean}[]> = ref([]);
+let multiselectMenu: Ref< {iri:string, label:string,result: {}, disabled?:boolean}[]> = ref([]);
 let twinNode = ref("twin-node-");
-
+let selected: Ref< {iri:string, label:string,result: {}}[]> = ref([]);
+let selectedNode: Ref<TangledTreeData> = ref({} as TangledTreeData);
+let nodeMap = reactive(new Map<string, any[]>());
+let overlayTop = ref(0);
+let displayMenu = ref(true);
 
 const menu = ref();
 
 onMounted(() => {
   chartData.value = props.data;
   renderChart();
+  setSelected(props.conceptIri);
 })
 
-async function getContextMenu(d: any) {
+async function getMultiselectMenu(d: any) {
   let node = d.path[0]["__data__"] as any;
-  contextMenu.value = [] as { iri: string, label: string, command: (d: any) => void, disabled?: boolean } [];
+  multiselectMenu.value = [] as { iri: string, label: string,result: {}, disabled?: boolean } [];
   const result = !node.id.startsWith(twinNode) ? await entityService.getDataModelProperties(node.id) : [];
   if (result.length > 0) {
-    contextMenu.value.push({
-      iri: "all",
-      label: "add all",
-      command: () => {
-        addAll(node, result);
-      }
-    });
     result.forEach((r: any) => {
-      contextMenu.value.push({
+      multiselectMenu.value.push({
         iri: r.property["@id"],
         label: r.property.name,
-        command: () => {
-          let isExist = false;
-          chartData.value.forEach((d:any) => {
-            const result = d.some((n:any) => n.id == r.type["@id"])
-            if(result) isExist = true;
-          })
-          if(isExist) {
-            addNode(node, r, twinNode + r.type["@id"]);
-          } else {
-            addNode(node, r, r.type["@id"]);
-          }
-        }
+        result: r
       });
     });
-    contextMenu.value.push({
-      iri: "hide-all",
-      label: "hide all",
-      command: () => {
-        hideAll(node);
-      }
-    });
   }
-  if (node.type === "property") {
-    contextMenu.value.push({
-      iri: "hide",
-      label: "hide node",
-      command: () => {
-        hideNode(node, node.id);
-      }
-    });
-  }
-}
-
-function addAll(node:any, result:any[]) {
-  result.forEach((r:any) => {
-    let isExist = false;
-    chartData.value.forEach((d:any) => {
-      const result = d.some((n:any) => n.id == r.type["@id"])
-      if(result) isExist = true;
-    })
-    if(isExist) {
-      addNode(node, r, twinNode + r.type["@id"]);
-    } else {
-      addNode(node, r, r.type["@id"]);
-    }
-  })
+  displayMenu.value = multiselectMenu.value.length !== 0;
 }
 
 function addNode(node:any, r:any, typeId:any) {
@@ -195,6 +160,44 @@ function hideNode(node:any, parentId:any) {
   renderChart();
 }
 
+async function setSelected(iri:any) {
+  const result = await entityService.getDataModelProperties(iri) || [];
+  if (result.length > 0) {
+    result.forEach((r: any) => {
+      selected.value.push({
+                            iri: r.property["@id"],
+                            label: r.property.name,
+                            result: r
+                          })
+    })
+  }
+  nodeMap.set(iri,selected.value);
+}
+
+function change(event:any){
+  hideAll(selectedNode.value);
+  if(event.value.length > 0) {
+    event.value.forEach((p:any) => {
+      let isExist = false;
+      chartData.value.forEach((d:any) => {
+        const result = d.some((n:any) => n.id == p.result.type["@id"])
+        if(result) isExist = true;
+      })
+      if(isExist) {
+        addNode(selectedNode.value, p.result, twinNode + p.result.type["@id"]);
+      } else {
+        addNode(selectedNode.value, p.result, p.result.type["@id"]);
+      }
+    })
+  }
+
+  selected.value.forEach((s:any) => {
+    if(nodeMap.has(s.result.type["@id"]))
+      nodeMap.set(s.result.type["@id"], []);
+  })
+  nodeMap.set(selectedNode.value.id,selected.value);
+}
+
 function renderChart(){
   const svgDoc = document.getElementById("data-model-svg");
   if (svgDoc != null) {
@@ -204,7 +207,7 @@ function renderChart(){
   const tangleLayout = constructTangleLayout(chartData.value,options);
 
   const w = tangleLayout.layout.width ? tangleLayout.layout.width + 300 : 1000;
-  const h = tangleLayout.layout.height ? tangleLayout.layout.height : 1000;
+  const h = tangleLayout.layout.height ? tangleLayout.layout.height + 300 : 1000;
 
   const svg = d3.select("#data-model-svg").attr("width", w)
       .attr("height", h);
@@ -242,11 +245,7 @@ function renderChart(){
       .attr("stroke-linejoin", "round")
       .selectAll("g")
       .data(tangleLayout.nodes)
-      .join("g")
-      .on('contextmenu', (e) => {
-        getContextMenu(e);
-        menu.value.show(e);
-      });
+      .join("g");
 
   node.append("path")
       .attr("stroke", "black")
@@ -258,10 +257,24 @@ function renderChart(){
       .attr("stroke-width", 7)
       .attr("d", (n:any) => `M${n.x} ${n.y} L${n.x} ${n.y}`);
 
-  const selected = nodeCircle.filter((n:any) => n.cardinality !== undefined)
+  nodeCircle.on('contextmenu', (e) => {
+        const node = e.path[0]["__data__"]
+        e.preventDefault();
+        getMultiselectMenu(e);
+        if(displayMenu.value){
+          menu.value.show(e);
+        }
+        overlayTop.value= e.layerY;
+        if(selectedNode.value !== node) {
+          selectedNode.value = node;
+          selected.value = nodeMap.get(node.id) as any || [];
+        }
+      });
+
+  const selectedCircle = nodeCircle.filter((n:any) => n.cardinality !== undefined)
   let cardRect:any;
   let cardinality:any;
-  selected
+  selectedCircle
       .on("mouseover", (d:any) =>{
       const n = d.path[0]["__data__"];
       cardRect = svg.append("rect")
@@ -331,5 +344,9 @@ function renderChart(){
   overflow: auto;
 }
 
-
+.p-field {
+  margin-top: 2rem;
+  margin-left: 10px;
+  margin-right: 10px;
+}
 </style>

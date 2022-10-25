@@ -1,6 +1,6 @@
 <template>
   <div id="tree-container" >
-    <TangledTree :data="data" />
+    <TangledTree :conceptIri="conceptIri" :data="data" />
   </div>
 </template>
 
