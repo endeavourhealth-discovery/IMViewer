@@ -262,7 +262,7 @@ watch(
 watch(
   () => conceptActivePanel.value,
   newValue => {
-    active = newValue;
+    active.value = newValue;
   }
 );
 watch(active, newValue => {
@@ -409,7 +409,7 @@ function setActivePanel(newType: string, oldType: string): void {
     active.value = conceptActivePanel.value;
   } else {
     if (isValueSet(types.value)) {
-      active.value = tabMap.get("Members") || 0;
+      active.value = tabMap.get("Set definition") || 0;
     } else if (isRecordModel(types.value)) {
       active.value = tabMap.get("Data Model") || 0;
     } else if (isQuery(types.value)) {
