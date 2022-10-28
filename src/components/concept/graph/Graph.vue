@@ -32,14 +32,14 @@ watch(
   async newValue => await getEntityBundle(newValue)
 );
 
-let loading = ref(false);
-let data: Ref<TTGraphData> = ref({});
-let selectedPredicates: Ref<{ iri: string; name: string }[]> = ref([]);
-let selectedIris: Ref<string[]> = ref([]);
-let predicatesIris: Ref<string[]> = ref([]);
-let bundle: Ref<TTBundle> = ref({});
-let options: Ref<{ iri: string; name: string }[]> = ref([]);
-let predicates: Ref<any[]> = ref([]);
+const loading = ref(false);
+const data: Ref<TTGraphData> = ref({} as TTGraphData);
+const selectedPredicates: Ref<{ iri: string; name: string }[]> = ref([]);
+const selectedIris: Ref<string[]> = ref([]);
+const predicatesIris: Ref<string[]> = ref([]);
+const bundle: Ref<TTBundle> = ref({} as TTBundle);
+const options: Ref<{ iri: string; name: string }[]> = ref([]);
+const predicates: Ref<any[]> = ref([]);
 
 const graphExcludePredicates = Config.GraphExcludePredicates;
 

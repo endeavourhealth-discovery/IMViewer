@@ -51,7 +51,7 @@ const props = defineProps({
   id: { type: String }
 });
 
-let buttonExpanded = ref(false);
+const buttonExpanded = ref(false);
 
 const hasData = computed(() => isArrayHasLength(props.data));
 

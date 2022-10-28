@@ -53,14 +53,14 @@ const props = defineProps({
 const entityService = new EntityService(axios);
 const router = useRouter();
 
-let usages: Ref<any[]> = ref([]);
-let loading = ref(false);
-let selected: Ref<any> = ref({});
-let recordsTotal = ref(0);
-let currentPage = ref(0);
-let pageSize = ref(25);
-let scrollHeight = ref("500px");
-let templateString = ref("Displaying {first} to {last} of [Loading...] concepts");
+const usages: Ref<any[]> = ref([]);
+const loading = ref(false);
+const selected: Ref = ref({});
+const recordsTotal = ref(0);
+const currentPage = ref(0);
+const pageSize = ref(25);
+const scrollHeight = ref("500px");
+const templateString = ref("Displaying {first} to {last} of [Loading...] concepts");
 
 onMounted(async () => {
   window.addEventListener("resize", onResize);

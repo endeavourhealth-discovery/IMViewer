@@ -62,14 +62,14 @@ watch(
   () => drawGraph()
 );
 
-let root: Ref<any> = ref({});
-let simulation: Ref<any> = ref({});
-let svgPan: Ref<any> = ref({});
-let height = ref(400);
-let width = ref(400);
-let force = ref(-5000);
-let radius = ref(16);
-let colour = ref({
+const root: Ref = ref({});
+const simulation: Ref = ref({});
+const svgPan: Ref = ref({});
+const height = ref(400);
+const width = ref(400);
+const force = ref(-5000);
+const radius = ref(16);
+const colour = ref({
   activeNode: { fill: "#e3f2fd", stroke: "#AAAAAA" },
   inactiveNode: { fill: "#781c81", stroke: "#AAAAAA" },
   centerNode: {
@@ -79,7 +79,7 @@ let colour = ref({
   font: {},
   path: { fill: "", stroke: "#AAAAAA" }
 });
-let contextMenu: Ref<{ iri: string; label: string; command: (d: any) => void; disabled?: boolean }[]> = ref([]);
+const contextMenu: Ref<{ iri: string; label: string; command: (d: any) => void; disabled?: boolean }[]> = ref([]);
 
 const graphExcludePredicates = Config.GraphExcludePredicates;
 
