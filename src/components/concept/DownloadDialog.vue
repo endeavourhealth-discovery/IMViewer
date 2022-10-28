@@ -97,30 +97,30 @@ watch(
 
 onMounted(async () => await init(props.conceptIri));
 
-let concept: Ref<any> = ref({} as any);
-let definition: Ref<TTBundle> = ref({} as TTBundle);
-let hasSubTypes: Ref<EntityReferenceNode[]> = ref([]);
-let isChildOf: Ref<TTIriRef[]> = ref([]);
-let hasChildren: Ref<any[]> = ref([]);
-let terms: Ref<TermCode[]> = ref([]);
-let dataModelProperties: Ref<DataModelProperty[]> = ref([]);
-let members: Ref<ExportValueSet> = ref({} as ExportValueSet);
-let includeHasSubTypes = ref(true);
-let includeDataModelProperties = ref(true);
-let includeMembers = ref(true);
-let expandMembers = ref(false);
-let includeDefinition = ref(true);
-let includeIsChildOf = ref(false);
-let includeHasChildren = ref(false);
-let includeInactive = ref(false);
-let includeTerms = ref(false);
-let loading = ref(false);
-let format = ref({
+const concept: Ref = ref({} as any);
+const definition: Ref<TTBundle> = ref({} as TTBundle);
+const hasSubTypes: Ref<EntityReferenceNode[]> = ref([]);
+const isChildOf: Ref<TTIriRef[]> = ref([]);
+const hasChildren: Ref<any[]> = ref([]);
+const terms: Ref<TermCode[]> = ref([]);
+const dataModelProperties: Ref<DataModelProperty[]> = ref([]);
+const members: Ref<ExportValueSet> = ref({} as ExportValueSet);
+const includeHasSubTypes = ref(true);
+const includeDataModelProperties = ref(true);
+const includeMembers = ref(true);
+const expandMembers = ref(false);
+const includeDefinition = ref(true);
+const includeIsChildOf = ref(false);
+const includeHasChildren = ref(false);
+const includeInactive = ref(false);
+const includeTerms = ref(false);
+const loading = ref(false);
+const format = ref({
   name: "Excel(.xlsx)",
   value: "excel",
   mime: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 });
-let formatOptions = ref([
+const formatOptions = ref([
   { name: "JSON", value: "json", mime: "application/json" },
   {
     name: "Excel(.xlsx)",

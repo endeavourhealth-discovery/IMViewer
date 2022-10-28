@@ -34,7 +34,7 @@ provide("axios", axios);
 
 const appVersion = __APP_VERSION__;
 
-let loading = ref(true);
+const loading = ref(true);
 
 onMounted(() => {
   loading.value = true;

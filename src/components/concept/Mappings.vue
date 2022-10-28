@@ -105,13 +105,13 @@ const props = defineProps({
 
 const entityService = new EntityService(axios);
 
-let mappings: Ref<any[]> = ref([]);
-let data: Ref<any> = ref({});
-let hoveredResult: Ref<any> = ref({});
-let matchedFrom: Ref<SimpleMap[]> = ref([]);
-let matchedTo: Ref<SimpleMap[]> = ref([]);
-let namespaces: Ref<Namespace[]> = ref([]);
-let loading = ref(false);
+const mappings: Ref<any[]> = ref([]);
+const data: Ref = ref({});
+const hoveredResult: Ref = ref({});
+const matchedFrom: Ref<SimpleMap[]> = ref([]);
+const matchedTo: Ref<SimpleMap[]> = ref([]);
+const namespaces: Ref<Namespace[]> = ref([]);
+const loading = ref(false);
 
 const opMap = ref(null);
 const opMatchedTo = ref(null);

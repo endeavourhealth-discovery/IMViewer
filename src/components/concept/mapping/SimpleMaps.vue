@@ -58,9 +58,9 @@ const emit = defineEmits({
   toggleOverlay: (event: any, data: SimpleMap) => true
 });
 
-let loading = ref(false);
-let scrollHeight = ref("500px");
-let rows = ref(25);
+const loading = ref(false);
+const scrollHeight = ref("500px");
+const rows = ref(25);
 
 onMounted(() => {
   window.addEventListener("resize", onResize);

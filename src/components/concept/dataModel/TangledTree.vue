@@ -44,16 +44,16 @@ watch(
     }
 );
 
-let options: Ref = ref({});
-let color = ref(d3.scaleOrdinal(d3.schemeSet2));
-let chartData:  Ref<TangledTreeData[][]> = ref([]);
-let multiselectMenu: Ref< {iri:string, label:string,result: {}, disabled?:boolean}[]> = ref([]);
-let twinNode = ref("twin-node-");
-let selected: Ref< {iri:string, label:string,result: {}}[]> = ref([]);
-let selectedNode: Ref<TangledTreeData> = ref({} as TangledTreeData);
-let nodeMap = reactive(new Map<string, any[]>());
-let overlayTop = ref(0);
-let displayMenu = ref(true);
+const options: Ref = ref({});
+const color = ref(d3.scaleOrdinal(d3.schemeSet2));
+const chartData:  Ref<TangledTreeData[][]> = ref([]);
+const multiselectMenu: Ref< {iri:string, label:string,result: {}, disabled?:boolean}[]> = ref([]);
+const twinNode = ref("twin-node-");
+const selected: Ref< {iri:string, label:string,result: {}}[]> = ref([]);
+const selectedNode: Ref<TangledTreeData> = ref({} as TangledTreeData);
+const nodeMap = reactive(new Map<string, any[]>());
+const overlayTop = ref(0);
+const displayMenu = ref(true);
 
 const menu = ref();
 

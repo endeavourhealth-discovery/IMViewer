@@ -74,8 +74,8 @@ const entityService = new EntityService(axios);
 const route = useRoute();
 const router = useRouter();
 
-let loading = ref(false);
-let graph: Ref<GraphData> = ref({});
+const loading = ref(false);
+const graph: Ref<GraphData> = ref({} as GraphData);
 
 watch(
   () => props.conceptIri,

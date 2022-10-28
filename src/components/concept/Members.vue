@@ -78,21 +78,21 @@ const currentUser = computed(() => store.state.currentUser);
 const isLoggedIn = computed(() => store.state.isLoggedIn);
 const hasDefintion: Ref<boolean> = ref(false);
 
-let loading = ref(false);
-let downloading = ref(false);
-let members: Ref<TTIriRef[]> = ref([]);
-let isPublishing = ref(false);
-let nextPage = ref(2);
-let pageSize = ref(20);
-let loadButton = ref(false);
-let totalCount = ref(0);
-let downloadMenu = ref([
+const loading = ref(false);
+const downloading = ref(false);
+const members: Ref<TTIriRef[]> = ref([]);
+const isPublishing = ref(false);
+const nextPage = ref(2);
+const pageSize = ref(20);
+const loadButton = ref(false);
+const totalCount = ref(0);
+const downloadMenu = ref([
   { label: "Definition Only", command: () => download(false, false) },
   { label: "Core", command: () => download(true, false) },
   { label: "Core & Legacy", command: () => download(true, true) },
   { label: "Core & Legacy (Flat)", command: () => download(true, true, true) }
 ]);
-let downloadMenu1 = ref([
+const downloadMenu1 = ref([
   { label: "Definition Only", command: () => download(false, false) },
   { label: "Core", command: () => download(true, false) },
   { label: "Core & Legacy", command: () => download(true, true) },

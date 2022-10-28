@@ -17,7 +17,7 @@ const props = defineProps({
 
 const entityService = new EntityService(axios);
 
-let eclString = ref("");
+const eclString = ref("");
 
 onMounted(async () => await init());
 

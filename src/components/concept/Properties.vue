@@ -57,9 +57,9 @@ const entityService = new EntityService(axios);
 const route = useRoute();
 const router = useRouter();
 
-let loading = ref(false);
-let dataModelPropsData: Ref<ProcessedDataModelProperty[]> = ref([]);
-let scrollHeight = ref("500px");
+const loading = ref(false);
+const dataModelPropsData: Ref<ProcessedDataModelProperty[]> = ref([]);
+const scrollHeight = ref("500px");
 
 const propertiesTable = ref();
 

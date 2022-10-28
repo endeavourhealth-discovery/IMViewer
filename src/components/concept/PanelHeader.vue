@@ -21,8 +21,8 @@ const props = defineProps({
   header: { type: String, required: true }
 });
 
-let icon: Ref<any[]> = ref([]);
-let color = ref("");
+const icon: Ref<any[]> = ref([]);
+const color = ref("");
 
 watch(
   () => _.cloneDeep(props.types),
