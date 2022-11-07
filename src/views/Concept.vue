@@ -131,8 +131,13 @@
                 </div>
               </TabPanel>
               <TabPanel header="JSON">
-                <div class="concept-panel-content" id="query-container">
+                <div class="concept-panel-content" id="json-container">
                   <JSONViewer :conceptIri="conceptIri" />
+                </div>
+              </TabPanel>
+              <TabPanel header="Provenance">
+                <div class="concept-panel-content" id="provenance-container">
+                  <Provenance :conceptIri="conceptIri" />
                 </div>
               </TabPanel>
             </TabView>
@@ -166,6 +171,7 @@ import { useRouter } from "vue-router";
 import SetDefinition from "@/components/concept/set/SetDefinition.vue";
 import JSONViewer from "../components/concept/JSONViewer.vue";
 import QueryDefinition from "../components/concept/query/QueryDefinition.vue";
+import Provenance from "@/components/concept/Provenance.vue";
 const { IM, RDF, RDFS, SHACL } = Vocabulary;
 const {
   ConceptTypeMethods: { isOfTypes, isProperty, isValueSet, isConcept, isQuery, isFolder, isRecordModel },
