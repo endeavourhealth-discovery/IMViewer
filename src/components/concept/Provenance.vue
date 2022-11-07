@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import {Services, Vocabulary} from "../../../../IMLibrary";
+import {Services, Vocabulary} from "im-library";
 import axios from "axios";
 import {onMounted, ref, Ref} from "vue";
 const { IM } = Vocabulary;
