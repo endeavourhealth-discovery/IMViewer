@@ -41,10 +41,10 @@ async function getProvHistory(iri:string) {
   const result = await provService.getProvHistory(iri);
   result.forEach((p:any) => provenances.value.push({
     prov: p["@id"],
-    usedEntity: p[IM.PROV_USED][0].name || p[IM.PROV_USED][0]["@id"],
+    usedEntity: p[IM.PROV_USED]?.[0].name || p[IM.PROV_USED]?.[0]["@id"] || "---",
     effectiveDate: p[IM.EFFECTIVE_DATE],
     activityType: p[IM.PROV_ACTIVITY_TYPE][0].name || p[IM.PROV_ACTIVITY_TYPE][0]["@id"],
-    agent: p[IM.PROV_AGENT][0].name || p[IM.PROV_AGENT][0]["@id"]
+    agent: p[IM.PROV_AGENT]?.[0].name || p[IM.PROV_AGENT]?.[0]["@id"] || "---"
   }));
 
 }
